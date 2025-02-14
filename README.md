@@ -25,21 +25,18 @@ Biên dịch mã nguồn c/c++ cho thiết bị vi mạch
 [Bắt đầu lập trình Arduino, ESP32 với PlatformIO trên VSCode](https://www.youtube.com/watch?v=20eakkralUs)
 
 ---
-[Đăng ký tài khoản Github, nhóm thực hành](https://docs.google.com/spreadsheets/d/15r2aXF335uYO4l4v4CKt2mxZRjA3gJA9/edit?gid=1543650245#gid=1543650245)
-
+#### [Đăng ký tài khoản Github, nhóm thực hành](https://docs.google.com/spreadsheets/d/15r2aXF335uYO4l4v4CKt2mxZRjA3gJA9/edit?gid=1543650245#gid=1543650245)
+---
 #### [Tổng quan về sơ đồ chân ESP32 và Ngoại vi](https://khuenguyencreator.com/tong-quan-ve-so-do-chan-esp32-va-ngoai-vi/)
-
+#### [Lập trình ESP32 từ A tới Z](https://khuenguyencreator.com/lap-trinh-esp32-tu-a-toi-z/)
+#### [Lập trình ESP32 GPIO Digital Input và Digital Output](https://khuenguyencreator.com/lap-trinh-esp32-gpio-digital-input-va-digital-output/)
+---
 ### - [Blink an LED on ESP32](https://wokwi.com/projects/305566932847821378)
 #### Tham khảo
 
+  + [Tạo một dự án lập trình ESP32 với PlatformIO](https://khuenguyencreator.com/huong-dan-cai-dat-platform-io-lap-trinh-esp32/#Huong_dan_su_dung_Platform_IO_lap_trinh_ESP32)
+
   + [Wokwi for VS Code](https://docs.wokwi.com/vscode/getting-started)
-
-  + [1. Lập trình ESP32 từ A tới Z](https://khuenguyencreator.com/lap-trinh-esp32-tu-a-toi-z/)
-
-  + [2. Lập trình ESP32 GPIO Digital Input và Digital Output](https://khuenguyencreator.com/lap-trinh-esp32-gpio-digital-input-va-digital-output/)
-
-  + [3. Tạo một dự án lập trình ESP32 với PlatformIO](https://khuenguyencreator.com/huong-dan-cai-dat-platform-io-lap-trinh-esp32/#Huong_dan_su_dung_Platform_IO_lap_trinh_ESP32)
-
 
 -------------------------------
 ![](https://raw.githubusercontent.com/vvdung-husc/2024-2025.2.TIN4024.006/refs/heads/main/_Documents/diagram_one.png)
