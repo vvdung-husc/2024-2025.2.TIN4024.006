@@ -2,23 +2,21 @@
 
 // put function declarations here:
 
-
+int ledPin = 5;
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
- 
-
-  Serial.println("IoT wel co me");
+  pinMode(ledPin, OUTPUT);
 
 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  static uint32_t i = 0; ++i;
+
+  digitalWrite(ledPin, HIGH);
+  Serial.println("LED is on");
   delay(1000);
-  ulong t = millis();
-  Serial.print("loop i = ");Serial.print(i);
-  Serial.print("  Timer = ");Serial.println(t);
+  digitalWrite(ledPin, LOW);
+  Serial.println("LED is off");
+  delay(1000);
 }
 
