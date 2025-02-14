@@ -24,6 +24,9 @@ Biên dịch mã nguồn c/c++ cho thiết bị vi mạch
 
 [Bắt đầu lập trình Arduino, ESP32 với PlatformIO trên VSCode](https://www.youtube.com/watch?v=20eakkralUs)
 
+---
+[Đăng ký nhóm](https://docs.google.com/spreadsheets/d/15r2aXF335uYO4l4v4CKt2mxZRjA3gJA9/edit?gid=1543650245#gid=1543650245)
+
 ### - [Blink an LED on ESP32](https://wokwi.com/projects/305566932847821378)
 #### Tham khảo
 
@@ -44,3 +47,4 @@ Biên dịch mã nguồn c/c++ cho thiết bị vi mạch
 Ngôn ngữ đánh dấu : [Markdown](https://github.com/vvdung-husc/2024-2025.2.TIN4024.006/blob/main/_Documents/Markdown_Syntax.md)
 
 Biểu tượng cảm xúc : [Github Emojis](https://github.com/vvdung-husc/2024-2025.2.TIN4024.006/blob/main/_Documents/Github_Emojis.md)
+
