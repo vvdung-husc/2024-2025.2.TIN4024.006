@@ -1,21 +1,26 @@
 #include <Arduino.h>
 
-int Ledpin = 5;
+int LedDo = 5;
+int LedVang = 17;
+int LedXanh = 16;
 bool isLED_ON = false;
 ulong ledStart = 0;
+int LedState = 0;
 
 void setup() {
   Serial.begin(115200);
-  pinMode(Ledpin,OUTPUT);
+  pinMode(LedDo,OUTPUT);
+  pinMode(LedVang,OUTPUT);
+  pinMode(LedXanh,OUTPUT);
   
 }
 
 void Use_Blocking(){
-  digitalWrite(Ledpin, HIGH);
-  Serial.println("NON_Blocking LED -> ON");
+  digitalWrite(LedDo, HIGH);
+  Serial.println("LED -> ON");
   delay(1000);
-  digitalWrite(Ledpin, LOW);
-  Serial.println("NON_Blockin LED -> OFF");
+  digitalWrite(LedDo, LOW);
+  Serial.println("LED -> OFF");
   delay(1000);
 }
 
@@ -27,16 +32,39 @@ bool IsReady(ulong& ulTimer, uint32_t millisecond){
 }
 
 void Use_Non_Blocking() {
-  if(!IsReady(ledStart,1000)) return;
-  if(!isLED_ON){
-    digitalWrite(Ledpin, HIGH);
-    Serial.println("LED -> ON");
+  unsigned long currentMillis = millis();
+  switch (LedState)
+  {
+  case 0:
+    digitalWrite(LedDo, HIGH);
+    digitalWrite(LedVang, LOW);
+    digitalWrite(LedXanh, LOW);
+    if (currentMillis-ledStart >= 5000) { 
+      LedState = 1;
+      ledStart = currentMillis;
+    }
+    break;
+  
+  case 1:
+    digitalWrite(LedDo, LOW);
+    digitalWrite(LedVang, HIGH);
+    digitalWrite(LedXanh, LOW);
+    if (currentMillis-ledStart >= 2000) { 
+      LedState = 2;
+      ledStart = currentMillis;
+    }
+    break;
+  case 2:
+    digitalWrite(LedDo, LOW);
+    digitalWrite(LedVang, LOW);
+    digitalWrite(LedXanh, HIGH);
+    if (currentMillis-ledStart >= 3000) { 
+      LedState = 0;
+      ledStart = currentMillis;
+    }
+    break;
   }
-  else{
-    digitalWrite(Ledpin, LOW);
-    Serial.println("LED -> OFF");
-  }
-  isLED_ON = !isLED_ON;
+  
 }
 
 void loop() {
