@@ -1,6 +1,8 @@
 #include <Arduino.h>
 
 int ledPin = 5;
+int ledPinYel = 16;
+int ledpinGre = 4;
 
 bool isLED_ON = false;
 ulong lesStart = 0;
@@ -8,6 +10,8 @@ ulong lesStart = 0;
 void setup() {
   Serial.begin(115200);
   pinMode(ledPin, OUTPUT);
+  pinMode(ledPinYel, OUTPUT);
+  pinMode(ledpinGre, OUTPUT);
 
 }
 
@@ -27,6 +31,20 @@ bool IsReady(ulong& ulTimer, uint32_t milisecond){
 }
 
 
+// void Use_Non_Blocking()
+// {
+//   if(!IsReady(lesStart,100)) return;
+//   if(!isLED_ON){
+//     digitalWrite(ledPin, HIGH);
+//     Serial.print("NonBlockingLED -> ON");
+    
+//   } else {
+//     digitalWrite(ledPin,LOW);
+//     Serial.print("NonBlockingLED -> OFF");
+  
+//   }
+//   isLED_ON = !isLED_ON;
+// }
 void Use_Non_Blocking()
 {
   if(!IsReady(lesStart,100)) return;
