@@ -25,7 +25,7 @@ Biên dịch mã nguồn c/c++ cho thiết bị vi mạch
 [Bắt đầu lập trình Arduino, ESP32 với PlatformIO trên VSCode](https://www.youtube.com/watch?v=20eakkralUs)
 
 ---
-[Đăng ký nhóm](https://docs.google.com/spreadsheets/d/15r2aXF335uYO4l4v4CKt2mxZRjA3gJA9/edit?gid=1543650245#gid=1543650245)
+[Đăng ký tài khoản Github, nhóm thực hành](https://docs.google.com/spreadsheets/d/15r2aXF335uYO4l4v4CKt2mxZRjA3gJA9/edit?gid=1543650245#gid=1543650245)
 
 ### - [Blink an LED on ESP32](https://wokwi.com/projects/305566932847821378)
 #### Tham khảo
