@@ -79,12 +79,12 @@ void loop() {
   bool bCamON = true;
   if (t < 0.0){    
     strTemp += "Too COOL";
-    ledNumber = LED_YELLOW;
+    ledNumber = LED_BLUE;
     bCamON = false;
   }
   else if (t < 40.0){
     strTemp += "Normal";
-    ledNumber = LED_BLUE;
+    ledNumber = LED_YELLOW;
   }
   else {    
     strTemp += "Too HOT";
