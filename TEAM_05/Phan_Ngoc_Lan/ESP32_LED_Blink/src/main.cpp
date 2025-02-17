@@ -1,18 +1,24 @@
 #include <Arduino.h>
 
-int ledPinRed = 5;
-int ledPinBlue = 2;
-int ledPinYellow = 4;
-ulong ledstart = 0;
-ulong ledStart = 0;
-int ledState = 0;
+int ledPin = 5; // Chân GPIO 2 (thường nối sẵn LED trên board)
+
 bool isLED_ON = false;
+ulong ledStart = 0;
+
 void setup()
 {
   Serial.begin(115200);
-  pinMode(ledPinRed, OUTPUT);
-  pinMode(ledPinBlue, OUTPUT);
-  pinMode(ledPinYellow, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+}
+
+void Use_Blocking()
+{
+  digitalWrite(ledPin, HIGH); // Bật LED
+  Serial.println("LED -> ON");
+  delay(1000);               // Đợi 1 giây
+  digitalWrite(ledPin, LOW); // Tắt LED
+  Serial.println("LED -> OFF");
+  delay(1000); // Đợi 1 giây
 }
 
 bool IsReady(ulong &ulTimer, uint32_t milisecond)
@@ -24,80 +30,39 @@ bool IsReady(ulong &ulTimer, uint32_t milisecond)
   return true;
 }
 
-void UpdateLEDs()
+void Use_Non_Blocking()
 {
-  if (ledState == 0)
-  {
-    if (!IsReady(ledstart, 1000))
-      return;
+  if (!IsReady(ledStart, 1000))
+    return;
 
-    if (!isLED_ON)
-    {
-      digitalWrite(ledPinRed, HIGH);
-      digitalWrite(ledPinBlue, LOW);
-      digitalWrite(ledPinYellow, LOW); // Bật LED
-      Serial.println("NonBlocking LEDRED -> ON");
-    }
-    else
-    {
-      digitalWrite(ledPinRed, LOW);
-      digitalWrite(ledPinBlue, LOW);
-      digitalWrite(ledPinYellow, LOW); // Tắt LED
-      Serial.println("NonBlocking LEDRED -> OFF");
-    }
-    isLED_ON = !isLED_ON;
-    if (IsReady(ledStart, 60000))
-      ledState = 1;
-  }
-  else if (ledState == 1)
+  if (!isLED_ON)
   {
-    if (!IsReady(ledstart, 1000))
-      return;
-
-    if (!isLED_ON)
-    {
-      digitalWrite(ledPinRed, LOW);
-      digitalWrite(ledPinBlue, HIGH);
-      digitalWrite(ledPinYellow, LOW); // Bật LED
-      Serial.println("NonBlocking LEDBLUE -> ON");
-    }
-    else
-    {
-      digitalWrite(ledPinRed, LOW);
-      digitalWrite(ledPinBlue, LOW);
-      digitalWrite(ledPinYellow, LOW); // Tắt LED
-      Serial.println("NonBlocking LEDBLUE -> OFF");
-    }
-    isLED_ON = !isLED_ON;
-    if (IsReady(ledStart, 30000))
-      ledState = 2;
+    digitalWrite(ledPin, HIGH); // Bật LED
+    Serial.println("NonBlocking LED -> ON");
   }
-  else if (ledState == 2)
+  else
   {
-    if (!IsReady(ledstart, 1000))
-      return;
-
-    if (!isLED_ON)
-    {
-      digitalWrite(ledPinRed, LOW);
-      digitalWrite(ledPinBlue, LOW);
-      digitalWrite(ledPinYellow, HIGH); // Bật LED
-      Serial.println("NonBlocking LEDYELLOW -> ON");
-    }
-    else
-    {
-      digitalWrite(ledPinRed, LOW);
-      digitalWrite(ledPinBlue, LOW);
-      digitalWrite(ledPinYellow, LOW); // Tắt LED
-      Serial.println("NonBlocking LEDYELLOW -> OFF");
-    }
-    isLED_ON = !isLED_ON;
-    if (IsReady(ledStart, 7000))
-      ledState = 0;
+    digitalWrite(ledPin, LOW); // Tắt LED
+    Serial.println("NonBlocking LED -> OFF");
   }
+  isLED_ON = !isLED_ON;
 }
 
 void loop()
 {
-  UpdateLEDs();
+  // Use_Blocking();
+  Use_Non_Blocking();
+
+  ulong t = millis();
+  Serial.print("Timer :");
+  Serial.println(t);
 }
+
+// void loop() {
+//   digitalWrite(ledPin, HIGH); // Bật LED
+//   Serial.println("LED -> ON");
+//   delay(1000);                // Đợi 1 giây
+//   digitalWrite(ledPin, LOW);  // Tắt LED
+//   Serial.println("LED -> OFF");
+//   delay(1000);                // Đợi 1 giây
+// }
