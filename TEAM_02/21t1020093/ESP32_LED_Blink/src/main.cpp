@@ -23,12 +23,7 @@ void Use_Blocking(){
   Serial.print("LED -> OFF");
   delay(1000);
 }
-bool IsReady(ulong& ulTimer, uint32_t milisecond){
-  ulong t = millis();
-  if(t - ulTimer < milisecond) return false;
-  ulTimer = t;
-  return true;
-}
+
 
 
 // void Use_Non_Blocking()
@@ -45,6 +40,15 @@ bool IsReady(ulong& ulTimer, uint32_t milisecond){
 //   }
 //   isLED_ON = !isLED_ON;
 // }
+
+bool IsReady(ulong& ulTimer, uint32_t milisecond){
+  ulong t = millis();
+  if(t - ulTimer < milisecond) return false;
+  ulTimer = t;
+  return true;
+}
+
+
 void Use_Non_Blocking()
 {
   if(!IsReady(lesStart,100)) return;
