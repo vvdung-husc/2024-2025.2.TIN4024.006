@@ -3,7 +3,6 @@
 int LedDo = 5;
 int LedVang = 17;
 int LedXanh = 16;
-bool isLED_ON = false;
 ulong ledStart = 0;
 int LedState = 0;
 
@@ -36,34 +35,37 @@ void Use_Non_Blocking() {
   unsigned long currentMillis = millis();
   switch (LedState)
   {
-  case 0:
-    digitalWrite(LedDo, HIGH);
-    digitalWrite(LedVang, LOW);
-    digitalWrite(LedXanh, LOW);
-    if (IsReady(ledStart,5000)) { 
-      LedState = 1;
-      ledStart = currentMillis;
-    }
-    break;
-  
-  case 1:
-    digitalWrite(LedDo, LOW);
-    digitalWrite(LedVang, HIGH);
-    digitalWrite(LedXanh, LOW);
-    if (IsReady(ledStart,2000)) { 
-      LedState = 2;
-      ledStart = currentMillis;
-    }
-    break;
-  case 2:
-    digitalWrite(LedDo, LOW);
-    digitalWrite(LedVang, LOW);
-    digitalWrite(LedXanh, HIGH);
-    if (IsReady(ledStart,3000)) { 
-      LedState = 0;
-      ledStart = currentMillis;
-    }
-    break;
+    case 0:
+      digitalWrite(LedDo, HIGH);
+      digitalWrite(LedVang, LOW);
+      digitalWrite(LedXanh, LOW);
+      if (IsReady(ledStart,5000)) { 
+        LedState = 1;
+        ledStart = currentMillis;
+        Serial.println("ĐÈN ĐỎ -> ĐÈN VÀNG");
+      }
+      break;
+    
+    case 1:
+      digitalWrite(LedDo, LOW);
+      digitalWrite(LedVang, HIGH);
+      digitalWrite(LedXanh, LOW);
+      if (IsReady(ledStart,2000)) { 
+        LedState = 2;
+        ledStart = currentMillis;
+        Serial.println("ĐÈN VÀNG -> ĐÈN ĐỎ");
+      }
+      break;
+    case 2:
+      digitalWrite(LedDo, LOW);
+      digitalWrite(LedVang, LOW);
+      digitalWrite(LedXanh, HIGH);
+      if (IsReady(ledStart,3000)) { 
+        LedState = 0;
+        ledStart = currentMillis;
+        Serial.println("ĐÈN XANH -> ĐÈN ĐỎ");
+      }
+      break;
   }
   
 }
