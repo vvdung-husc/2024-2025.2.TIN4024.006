@@ -1,9 +1,13 @@
 #include <Arduino.h>
+#include <TM1637Display.h>
 
 //Pin
 #define rLED  5
 #define yLED  17
 #define gLED  16
+
+#define CLK   23
+#define DIO   22
 
 //1000 ms = 1 seconds
 #define rTIME  5000   //5 seconds
@@ -15,6 +19,8 @@ ulong ledTimeStart = 0;
 ulong nextTimeTotal = 0;
 int currentLED = rLED;
 
+TM1637Display display(CLK, DIO);
+
 bool IsReady(ulong &ulTimer, uint32_t milisecond);
 void NonBlocking_Traffic_Light();
 
@@ -25,7 +31,8 @@ void setup() {
   pinMode(yLED, OUTPUT);
   pinMode(gLED, OUTPUT);
 
-  
+  display.setBrightness(7);
+
   digitalWrite(yLED, LOW);
   digitalWrite(gLED, LOW);
   digitalWrite(rLED, HIGH);
@@ -35,10 +42,25 @@ void setup() {
   Serial.print("1. RED \t\t => Next "); Serial.println(nextTimeTotal);
 }
 
+int counter = 9;
+void Testing_Display(){
+  display.showNumberDec(counter, true, 2, 2);
+
+  counter--;
+  if (counter == 0) {
+    counter = 9;
+  }
+
+  delay(1000); 
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
-  currentMiliseconds = millis();
-  NonBlocking_Traffic_Light();
+  //currentMiliseconds = millis();
+  //NonBlocking_Traffic_Light();
+
+  Testing_Display();
+ 
 }
 
 bool IsReady(ulong &ulTimer, uint32_t milisecond)
