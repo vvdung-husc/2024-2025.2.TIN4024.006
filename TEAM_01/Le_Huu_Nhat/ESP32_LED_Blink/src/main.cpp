@@ -41,57 +41,57 @@ void Use_Non_Blocking() {
   unsigned long currentMillis = millis();
   switch (LedState)
   {
-    case 0:
-      digitalWrite(LedDo, HIGH);
+    case 0: // Đèn Xanh
+      digitalWrite(LedDo, LOW);
       digitalWrite(LedVang, LOW);
-      digitalWrite(LedXanh, LOW);
-      UpdateDisplay(countRed);
-      if (IsReady(ledStart,1000)) { 
-        countRed--;
-        if (countRed < 0) {
+      digitalWrite(LedXanh, HIGH);
+      UpdateDisplay(countGreen);
+      if (IsReady(ledStart, 1000)) { 
+        countGreen--;
+        if (countGreen < 0) {
           LedState = 1;
           ledStart = currentMillis;
-          countRed = 5; // Reset lại đếm cho lần sau
+          countGreen = 7; // Reset lại đếm cho lần sau
           if (lastState != LedState) {
-            Serial.println("ĐÈN ĐỎ -> ĐÈN VÀNG ");
+            Serial.println("ĐÈN XANH -> ĐÈN VÀNG");
             lastState = LedState;
           }
         }
       }
       break;
     
-    case 1:
+    case 1: // Đèn Vàng
       digitalWrite(LedDo, LOW);
       digitalWrite(LedVang, HIGH);
       digitalWrite(LedXanh, LOW);
       UpdateDisplay(countYellow);
-      if (IsReady(ledStart,1000)) { 
+      if (IsReady(ledStart, 1000)) { 
         countYellow--;
         if (countYellow < 0) {
           LedState = 2;
           ledStart = currentMillis;
           countYellow = 2; // Reset lại đếm cho lần sau
           if (lastState != LedState) {
-            Serial.println("ĐÈN VÀNG -> ĐÈN XANH ");
+            Serial.println("ĐÈN VÀNG -> ĐÈN ĐỎ");
             lastState = LedState;
           }
         }
       }
       break;
 
-    case 2:
-      digitalWrite(LedDo, LOW);
+    case 2: // Đèn Đỏ
+      digitalWrite(LedDo, HIGH);
       digitalWrite(LedVang, LOW);
-      digitalWrite(LedXanh, HIGH);
-      UpdateDisplay(countGreen);
-      if (IsReady(ledStart,1000)) { 
-        countGreen--;
-        if (countGreen < 0) {
+      digitalWrite(LedXanh, LOW);
+      UpdateDisplay(countRed);
+      if (IsReady(ledStart, 1000)) { 
+        countRed--;
+        if (countRed < 0) {
           LedState = 0;
           ledStart = currentMillis;
-          countGreen = 7; // Reset lại đếm cho lần sau
+          countRed = 5; // Reset lại đếm cho lần sau
           if (lastState != LedState) {
-            Serial.println("ĐÈN XANH -> ĐÈN ĐỎ ");
+            Serial.println("ĐÈN ĐỎ -> ĐÈN XANH");
             lastState = LedState;
           }
         }
@@ -100,14 +100,25 @@ void Use_Non_Blocking() {
   }
 }
 
+
 void setup() {
   Serial.begin(115200);
   pinMode(LedDo, OUTPUT);
   pinMode(LedVang, OUTPUT);
   pinMode(LedXanh, OUTPUT);
 
+  // Tắt tất cả các đèn khi bắt đầu
+  digitalWrite(LedDo, LOW);
+  digitalWrite(LedVang, LOW);
+  digitalWrite(LedXanh, LOW);
+
   display.setBrightness(0x0f); // Độ sáng cao nhất
+
+  // Bắt đầu từ LedState = 0 để hiện đèn Xanh trước
+  LedState = 2;
+  lastState = -1;
 }
+
 
 void loop() {
   Use_Non_Blocking();
