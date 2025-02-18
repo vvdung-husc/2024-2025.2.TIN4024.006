@@ -1,104 +1,86 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
 
-//Pin
+// Pin đèn giao thông
 #define rLED  5
 #define yLED  16
 #define gLED  15
 
+// Pin điều khiển TM1637
 #define CLK   23
 #define DIO   22
 
-//1000 ms = 1 seconds
-#define rTIME  5000   //5 seconds
-#define yTIME  2000
-#define gTIME  7000
+// Định nghĩa thời gian cho mỗi đèn
+#define rTIME  5   // 5 giây cho đèn đỏ
+#define yTIME  2   // 2 giây cho đèn vàng
+#define gTIME  7   // 7 giây cho đèn xanh
 
-ulong currentMiliseconds = 0;
-ulong ledTimeStart = 0;
-ulong nextTimeTotal = 0;
-int currentLED = rLED;
+ulong ledTimeStart = 0; // Lưu thời gian bắt đầu của LED hiện tại
+int currentLED = rLED;  // Đèn hiện tại (bắt đầu với đèn đỏ)
+int countdown = rTIME;  // Biến đếm ngược
 
-TM1637Display display(CLK, DIO);
-
-bool IsReady(ulong &ulTimer, uint32_t milisecond);
-void NonBlocking_Traffic_Light();
+TM1637Display display(CLK, DIO); // Khởi tạo màn hình LED
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
+  
   pinMode(rLED, OUTPUT);
   pinMode(yLED, OUTPUT);
   pinMode(gLED, OUTPUT);
+  
+  display.setBrightness(7); // Đặt độ sáng tối đa
 
-  display.setBrightness(7);
-
+  // Bật đèn đỏ đầu tiên
+  digitalWrite(rLED, HIGH);
   digitalWrite(yLED, LOW);
   digitalWrite(gLED, LOW);
-  digitalWrite(rLED, HIGH);
-  currentLED = rLED;
-  nextTimeTotal += rTIME;
-  Serial.println("== START ==>");
-  Serial.print("1. RED \t\t => Next "); Serial.println(nextTimeTotal);
+  ledTimeStart = millis();
+  
+  Serial.println("== START ==> RED");
+  display.showNumberDec(countdown, true, 2, 2); // Hiển thị thời gian ban đầu
 }
+void changeLight() {
+  // Tắt đèn hiện tại
+  digitalWrite(currentLED, LOW);
 
-int counter = 9;
-void Testing_Display(){
-  display.showNumberDec(counter, true, 2, 2);
-
-  counter--;
-  if (counter == 0) {
-    counter = 9;
+  // Chuyển sang đèn tiếp theo
+  if (currentLED == rLED) {
+    currentLED = gLED;
+    countdown = gTIME;
+    Serial.println("GREEN ON");
+  } 
+  else if (currentLED == gLED) {
+    currentLED = yLED;
+    countdown = yTIME;
+    Serial.println("YELLOW ON");
+  } 
+  else if (currentLED == yLED) {
+    currentLED = rLED;
+    countdown = rTIME;
+    Serial.println("RED ON");
   }
 
-  delay(1000); 
-}
+  // Bật đèn mới
+  digitalWrite(currentLED, HIGH);
+  display.showNumberDec(countdown, true, 2, 2); // Hiển thị thời gian mới
 
+  ledTimeStart = millis(); // Cập nhật lại thời gian bắt đầu
+}
 void loop() {
-  // put your main code here, to run repeatedly:
-  //currentMiliseconds = millis();
-  //NonBlocking_Traffic_Light();
+  ulong currentMillis = millis(); // Lấy thời gian hiện tại
 
-  Testing_Display();
- 
-}
+  // Kiểm tra nếu đã qua 1 giây -> Cập nhật đếm ngược
+  if (currentMillis - ledTimeStart >= 1000) {
+    ledTimeStart = currentMillis; // Cập nhật thời gian mới
+    countdown--; // Giảm thời gian đếm ngược
 
-bool IsReady(ulong &ulTimer, uint32_t milisecond)
-{
-  if (currentMiliseconds - ulTimer < milisecond) return false;
-  ulTimer = currentMiliseconds;
-  return true;
-}
-void NonBlocking_Traffic_Light(){
-  switch (currentLED) {
-    case rLED: // Đèn đỏ: 5 giây
-      if (IsReady(ledTimeStart, rTIME)) {
-        digitalWrite(rLED, LOW);
-        digitalWrite(gLED, HIGH);
-        currentLED = gLED;
-        nextTimeTotal += gTIME;
-        Serial.print("2. GREEN\t => Next "); Serial.println(nextTimeTotal);        
-      } 
-      break;
+    // Hiển thị số đếm trên màn hình TM1637
+    display.showNumberDec(countdown, true, 2, 2);
+    Serial.print("Countdown: "); Serial.println(countdown);
 
-    case gLED: // Đèn xanh: 7 giây
-      if (IsReady(ledTimeStart,gTIME)) {        
-        digitalWrite(gLED, LOW);
-        digitalWrite(yLED, HIGH);
-        currentLED = yLED;
-        nextTimeTotal += yTIME;
-        Serial.print("3. YELLOW\t => Next "); Serial.println(nextTimeTotal);        
-      }
-      break;
-
-    case yLED: // Đèn vàng: 2 giây
-      if (IsReady(ledTimeStart,yTIME)) {        
-        digitalWrite(yLED, LOW);
-        digitalWrite(rLED, HIGH);
-        currentLED = rLED;
-        nextTimeTotal += rTIME;
-        Serial.print("1. RED \t\t => Next "); Serial.println(nextTimeTotal);        
-      }
-      break;
+    // Nếu đếm ngược về 0, chuyển sang đèn tiếp theo
+    if (countdown == 0) {
+      changeLight();
+    }
   }
 }
