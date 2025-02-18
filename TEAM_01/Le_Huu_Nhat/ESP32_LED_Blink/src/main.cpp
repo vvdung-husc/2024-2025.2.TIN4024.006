@@ -15,14 +15,15 @@ void setup() {
   
 }
 
-void Use_Blocking(){
-  digitalWrite(LedDo, HIGH);
-  Serial.println("LED -> ON");
-  delay(1000);
-  digitalWrite(LedDo, LOW);
-  Serial.println("LED -> OFF");
-  delay(1000);
-}
+// void Use_Blocking(){
+//   digitalWrite(LedDo, HIGH);
+//   Serial.println("LED -> ON");
+//   delay(1000);
+//   digitalWrite(LedDo, LOW);
+//   Serial.println("LED -> OFF");
+//   delay(1000);
+// }
+
 
 bool IsReady(ulong& ulTimer, uint32_t millisecond){
   ulong t = millis();
@@ -39,7 +40,7 @@ void Use_Non_Blocking() {
     digitalWrite(LedDo, HIGH);
     digitalWrite(LedVang, LOW);
     digitalWrite(LedXanh, LOW);
-    if (currentMillis-ledStart >= 5000) { 
+    if (IsReady(ledStart,5000)) { 
       LedState = 1;
       ledStart = currentMillis;
     }
@@ -49,7 +50,7 @@ void Use_Non_Blocking() {
     digitalWrite(LedDo, LOW);
     digitalWrite(LedVang, HIGH);
     digitalWrite(LedXanh, LOW);
-    if (currentMillis-ledStart >= 2000) { 
+    if (IsReady(ledStart,2000)) { 
       LedState = 2;
       ledStart = currentMillis;
     }
@@ -58,7 +59,7 @@ void Use_Non_Blocking() {
     digitalWrite(LedDo, LOW);
     digitalWrite(LedVang, LOW);
     digitalWrite(LedXanh, HIGH);
-    if (currentMillis-ledStart >= 3000) { 
+    if (IsReady(ledStart,3000)) { 
       LedState = 0;
       ledStart = currentMillis;
     }
