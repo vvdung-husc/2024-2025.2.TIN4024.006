@@ -1,23 +1,28 @@
 #include <Arduino.h>
 
-int Ledpin = 5;
-bool isLED_ON = false;
+int LedDo = 5;
+int LedVang = 17;
+int LedXanh = 16;
 ulong ledStart = 0;
+int LedState = 0;
 
 void setup() {
   Serial.begin(115200);
-  pinMode(Ledpin,OUTPUT);
+  pinMode(LedDo,OUTPUT);
+  pinMode(LedVang,OUTPUT);
+  pinMode(LedXanh,OUTPUT);
   
 }
 
-void Use_Blocking(){
-  digitalWrite(Ledpin, HIGH);
-  Serial.println("NON_Blocking LED -> ON");
-  delay(1000);
-  digitalWrite(Ledpin, LOW);
-  Serial.println("NON_Blockin LED -> OFF");
-  delay(1000);
-}
+// void Use_Blocking(){
+//   digitalWrite(LedDo, HIGH);
+//   Serial.println("LED -> ON");
+//   delay(1000);
+//   digitalWrite(LedDo, LOW);
+//   Serial.println("LED -> OFF");
+//   delay(1000);
+// }
+
 
 bool IsReady(ulong& ulTimer, uint32_t millisecond){
   ulong t = millis();
@@ -27,16 +32,42 @@ bool IsReady(ulong& ulTimer, uint32_t millisecond){
 }
 
 void Use_Non_Blocking() {
-  if(!IsReady(ledStart,1000)) return;
-  if(!isLED_ON){
-    digitalWrite(Ledpin, HIGH);
-    Serial.println("LED -> ON");
+  unsigned long currentMillis = millis();
+  switch (LedState)
+  {
+    case 0:
+      digitalWrite(LedDo, HIGH);
+      digitalWrite(LedVang, LOW);
+      digitalWrite(LedXanh, LOW);
+      if (IsReady(ledStart,5000)) { 
+        LedState = 1;
+        ledStart = currentMillis;
+        Serial.println("ĐÈN ĐỎ -> ĐÈN VÀNG");
+      }
+      break;
+    
+    case 1:
+      digitalWrite(LedDo, LOW);
+      digitalWrite(LedVang, HIGH);
+      digitalWrite(LedXanh, LOW);
+      if (IsReady(ledStart,2000)) { 
+        LedState = 2;
+        ledStart = currentMillis;
+        Serial.println("ĐÈN VÀNG -> ĐÈN ĐỎ");
+      }
+      break;
+    case 2:
+      digitalWrite(LedDo, LOW);
+      digitalWrite(LedVang, LOW);
+      digitalWrite(LedXanh, HIGH);
+      if (IsReady(ledStart,3000)) { 
+        LedState = 0;
+        ledStart = currentMillis;
+        Serial.println("ĐÈN XANH -> ĐÈN ĐỎ");
+      }
+      break;
   }
-  else{
-    digitalWrite(Ledpin, LOW);
-    Serial.println("LED -> OFF");
-  }
-  isLED_ON = !isLED_ON;
+  
 }
 
 void loop() {
