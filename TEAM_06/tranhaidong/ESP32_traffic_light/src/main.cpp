@@ -1,74 +1,128 @@
 #include <Arduino.h>
-#include <TimeLib.h> 
+#include <TM1637Display.h>
 
-#define GREEN_LED 16  // Chân kết nối đèn xanh
-#define YELLOW_LED 17 // Chân kết nối đèn vàng
-#define RED_LED 5     // Chân kết nối đèn đỏ
+// Pin
+#define rLED  5
+#define yLED  17
+#define gLED  16
+
+#define CLK   23
+#define DIO   22
+
+// 1000 ms = 1 seconds
+#define rTIME  5000   // 5 seconds
+#define yTIME  2000
+#define gTIME  7000
+
+ulong currentMiliseconds = 0;
+ulong ledTimeStart = 0;
+ulong nextTimeTotal = 0;
+int currentLED = rLED;
+int counter = 0;
+ulong lastDisplayUpdate = 0; // Biến để lưu thời gian cập nhật màn hình cuối cùng
+
+TM1637Display display(CLK, DIO);
+
+bool IsReady(ulong &ulTimer, uint32_t milisecond);
+void NonBlocking_Traffic_Light();
 
 void setup() {
-  pinMode(GREEN_LED, OUTPUT);
-  pinMode(YELLOW_LED, OUTPUT);
-  pinMode(RED_LED, OUTPUT);
-  Serial.begin(115200); 
+  Serial.begin(115200);
+  pinMode(rLED, OUTPUT);
+  pinMode(yLED, OUTPUT);
+  pinMode(gLED, OUTPUT);
+
+  display.setBrightness(7);
+  digitalWrite(yLED, LOW);
+  digitalWrite(gLED, LOW);
+  digitalWrite(rLED, HIGH);
   
-  // Cấu hình thời gian mặc định nếu chưa có nguồn thời gian thực
-  setTime(6, 30, 0, 1, 1, 2025); 
+  currentLED = rLED;
+  counter = 5; // Đặt số đếm cho đèn đỏ
+  display.showNumberDec(counter, true, 2, 0);
+  nextTimeTotal += rTIME;
+  Serial.println("== START ==>");
+
+  // In thông tin ban đầu
+  Serial.print("1. RED \t\t => Next "); Serial.println(nextTimeTotal);
 }
 
 void loop() {
-  // Lấy thời gian hệ thống (giờ)
-  int currentHour = hour(); 
-  int currentMinute = minute();
+  currentMiliseconds = millis();
   
-  Serial.print("Giờ hiện tại: ");
-  Serial.print(currentHour); Serial.print(":"); Serial.println(currentMinute);// Hiển thị giờ hiện tại
+  // Cập nhật số đếm chỉ khi có thay đổi (mỗi giây)
+  if (currentMiliseconds - lastDisplayUpdate >= 1000) {
+    lastDisplayUpdate = currentMiliseconds;
+    NonBlocking_Traffic_Light();
+  }
+}
+
+bool IsReady(ulong &ulTimer, uint32_t milisecond) {
+  if (currentMiliseconds - ulTimer < milisecond) return false;
+  ulTimer = currentMiliseconds;
+  return true;
+}
+
+void NonBlocking_Traffic_Light() {
+  int timeElapsed = 0;
+  int totalTime = 0;
   
-  if (currentHour >= 6 && currentHour < 22) {
-    // Nếu thời gian từ 6h - 22h thì sáng 3 đèn
-    // Đèn xanh sáng trong 10 giây
-    digitalWrite(GREEN_LED, HIGH);
-    digitalWrite(YELLOW_LED, LOW);
-    digitalWrite(RED_LED, LOW);
-    Serial.println("Bật đèn xanh: ");
-    for (int i = 10; i > 0; i--) {
-      
-      Serial.print("Đèn xanh: ");
-      Serial.print(i);
-      Serial.println(" giây");
-      delay(1000);
-    }
+  switch (currentLED) {
+    case rLED: // Đèn đỏ: 5 giây
+      timeElapsed = currentMiliseconds - ledTimeStart;
+      totalTime = rTIME;
+      if (timeElapsed >= totalTime) {
+        digitalWrite(rLED, LOW);
+        digitalWrite(gLED, HIGH);
+        currentLED = gLED;
+        ledTimeStart = currentMiliseconds;
+        counter = gTIME / 1000; // Đặt số đếm khi đèn đỏ tắt và đèn xanh sáng
+        display.showNumberDec(counter, true, 2, 0);
+        nextTimeTotal = gTIME;
+        Serial.print("2. GREEN\t => Next "); Serial.println(nextTimeTotal);        
+      } else {
+        // Giảm số đếm cho đèn đỏ
+        counter = max(0L, (long)(rTIME / 1000 - timeElapsed / 1000));
+        display.showNumberDec(counter, true, 2, 0);
+      }
+      break;
 
-    // Đèn vàng sáng trong 3 giây
-    digitalWrite(GREEN_LED, LOW);
-    digitalWrite(YELLOW_LED, HIGH);
-    digitalWrite(RED_LED, LOW);
-    Serial.println("Bật đèn vàng: ");
-    for (int i = 3; i > 0; i--) {
-      Serial.print("Đèn vàng: ");
-      Serial.print(i);
-      Serial.println(" giây");
-      delay(1000);
-    }
+    case gLED: // Đèn xanh: 7 giây
+      timeElapsed = currentMiliseconds - ledTimeStart;
+      totalTime = gTIME;
+      if (timeElapsed >= totalTime) {
+        digitalWrite(gLED, LOW);
+        digitalWrite(yLED, HIGH);
+        currentLED = yLED;
+        ledTimeStart = currentMiliseconds;
+        counter = yTIME / 1000; // Đặt số đếm khi đèn xanh tắt và đèn vàng sáng
+        display.showNumberDec(counter, true, 2, 0);
+        nextTimeTotal = yTIME ;
+        Serial.print("3. YELLOW\t => Next "); Serial.println(nextTimeTotal);        
+      } else {
+        // Giảm số đếm cho đèn xanh
+        counter = max(0L, (long)(gTIME / 1000 - timeElapsed / 1000));
+        display.showNumberDec(counter, true, 2, 0);
+      }
+      break;
 
-    // Đèn đỏ sáng trong 7 giây
-    digitalWrite(GREEN_LED, LOW);
-    digitalWrite(YELLOW_LED, LOW);
-    digitalWrite(RED_LED, HIGH);
-    Serial.println("Bật đèn đỏ: ");
-    for (int i = 7; i > 0; i--) {
-      Serial.print("Đèn đỏ: ");
-      Serial.print(i);
-      Serial.println(" giây");
-      delay(1000);
-    }
-  } else {
-    // Nếu thời gian từ 22h trở đi thì chỉ sáng đèn vàng
-    digitalWrite(GREEN_LED, LOW);
-    digitalWrite(YELLOW_LED, HIGH);
-    digitalWrite(RED_LED, LOW);
-    
-    Serial.println("Đèn vàng sáng từ 22h - 6h");
-    delay(1000);
-    
+    case yLED: // Đèn vàng: 2 giây
+      timeElapsed = currentMiliseconds - ledTimeStart;
+      totalTime = yTIME;
+      if (timeElapsed >= totalTime) {
+        digitalWrite(yLED, LOW);
+        digitalWrite(rLED, HIGH);
+        currentLED = rLED;
+        ledTimeStart = currentMiliseconds;
+        counter = rTIME / 1000; // Đặt số đếm khi đèn vàng tắt và đèn đỏ sáng
+        display.showNumberDec(counter, true, 2, 0);
+        nextTimeTotal = rTIME ;
+        Serial.print("1. RED \t\t => Next "); Serial.println(nextTimeTotal);        
+      } else {
+        // Giảm số đếm cho đèn vàng
+        counter = max(0L, (long)(yTIME / 1000 - timeElapsed / 1000));
+        display.showNumberDec(counter, true, 2, 0);
+      }
+      break;
   }
 }
