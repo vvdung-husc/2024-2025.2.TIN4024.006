@@ -39,7 +39,9 @@ void setup() {
   currentLED = rLED;
   nextTimeTotal += rTIME;
   Serial.println("== START ==>");
-  Serial.print("1. RED \t\t => Next "); Serial.println(nextTimeTotal);
+  Serial.print("1. RED \t\t => Next "); 
+  Serial.print(nextTimeTotal/1000);
+  Serial.println("s");
 }
 
 int counter = rTIME / 1000;
@@ -74,18 +76,22 @@ void NonBlocking_Traffic_Light() {
         currentLED = gLED;
         nextTimeTotal += gTIME;
         counter = gTIME / 1000;
-        Serial.print("2. GREEN\t => Next "); Serial.println(nextTimeTotal);
+        Serial.print("2. GREEN\t => Next "); 
+        Serial.print(nextTimeTotal/1000);
+        Serial.println("s");
       }
       break;
 
-    case gLED: // Đèn xanh: 7 giây
+    case gLED: // Đèn xanh: 5 giây
       if (IsReady(ledTimeStart, gTIME)) {
         digitalWrite(gLED, LOW);
         digitalWrite(yLED, HIGH);
         currentLED = yLED;
         nextTimeTotal += yTIME;
         counter = yTIME / 1000;
-        Serial.print("3. YELLOW\t => Next "); Serial.println(nextTimeTotal);
+        Serial.print("3. YELLOW\t => Next "); 
+        Serial.print(nextTimeTotal/1000);
+        Serial.println("s");
       }
       break;
 
@@ -96,7 +102,9 @@ void NonBlocking_Traffic_Light() {
         currentLED = rLED;
         nextTimeTotal += rTIME;
         counter = rTIME / 1000;
-        Serial.print("1. RED \t\t => Next "); Serial.println(nextTimeTotal);
+        Serial.print("1. RED \t\t => Next "); 
+        Serial.print(nextTimeTotal/1000);
+        Serial.println("s");
       }
       break;
   }
