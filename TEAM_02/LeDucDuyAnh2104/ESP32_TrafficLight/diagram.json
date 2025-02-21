@@ -27,6 +27,13 @@
       "top": 128.75,
       "left": 336,
       "attrs": { "value": "150" }
+    },
+    {
+      "type": "wokwi-tm1637-7segment",
+      "id": "sevseg1",
+      "top": -105.64,
+      "left": 256.63,
+      "attrs": { "color": "red" }
     }
   ],
   "connections": [
@@ -40,7 +47,11 @@
     [ "led2:A", "r2:2", "gold", [ "v0" ] ],
     [ "r2:1", "esp:17", "gold", [ "v0" ] ],
     [ "led3:A", "r3:2", "green", [ "v0" ] ],
-    [ "r3:1", "esp:16", "green", [ "v0" ] ]
+    [ "r3:1", "esp:16", "green", [ "v0" ] ],
+    [ "esp:5V", "sevseg1:VCC", "red", [ "v28.8", "h427.39" ] ],
+    [ "sevseg1:DIO", "esp:22", "green", [ "h19.2", "v-57.6", "h-326.4", "v172.8" ] ],
+    [ "sevseg1:CLK", "esp:23", "green", [ "h28.8", "v-67.2", "h-355.2", "v182.4" ] ],
+    [ "sevseg1:GND", "esp:GND.3", "black", [ "h38.4", "v-105.6", "h-369.64" ] ]
   ],
   "dependencies": {}
 }
