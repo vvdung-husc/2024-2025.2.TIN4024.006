@@ -25,7 +25,7 @@ int currentLED = 0;           //đèn LED hiện tại đang sáng
 int tmCounter = rTIME / 1000; //biến đếm ngược trên bảng
 ulong counterTime = 0;        //thời gian bắt đầu đếm ngược
 
-int darkThreshold = 1000;     //ngưỡng ánh sáng > 1000 => DARK
+int darkThreshold = 1000;     //ngưỡng ánh sáng < 1000 => DARK
 
 TM1637Display display(CLK, DIO);  //biến kiểu TM1637Display điều khiển bảng đếm ngượcngược
 
