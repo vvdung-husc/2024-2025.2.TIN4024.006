@@ -78,7 +78,7 @@ void NonBlocking_Traffic_Light() {
         ledTimeStart = currentMiliseconds;
         counter = gTIME / 1000; // Đặt số đếm khi đèn đỏ tắt và đèn xanh sáng
         display.showNumberDec(counter, true, 2, 0);
-        nextTimeTotal = gTIME;
+        nextTimeTotal = gTIME / 1000;
         Serial.print("2. GREEN\t => Next "); Serial.println(nextTimeTotal);        
       } else {
         // Giảm số đếm cho đèn đỏ
@@ -97,7 +97,7 @@ void NonBlocking_Traffic_Light() {
         ledTimeStart = currentMiliseconds;
         counter = yTIME / 1000; // Đặt số đếm khi đèn xanh tắt và đèn vàng sáng
         display.showNumberDec(counter, true, 2, 0);
-        nextTimeTotal = yTIME ;
+        nextTimeTotal = yTIME / 1000;
         Serial.print("3. YELLOW\t => Next "); Serial.println(nextTimeTotal);        
       } else {
         // Giảm số đếm cho đèn xanh
@@ -116,7 +116,7 @@ void NonBlocking_Traffic_Light() {
         ledTimeStart = currentMiliseconds;
         counter = rTIME / 1000; // Đặt số đếm khi đèn vàng tắt và đèn đỏ sáng
         display.showNumberDec(counter, true, 2, 0);
-        nextTimeTotal = rTIME ;
+        nextTimeTotal = rTIME / 1000;
         Serial.print("1. RED \t\t => Next "); Serial.println(nextTimeTotal);        
       } else {
         // Giảm số đếm cho đèn vàng
