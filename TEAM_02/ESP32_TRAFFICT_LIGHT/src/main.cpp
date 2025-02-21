@@ -2,13 +2,13 @@
 #include <TM1637Display.h>
 
 //Pin - Các đèn LEDLED
-#define rLED  5
-#define yLED  17
-#define gLED  16
+#define rLED  27
+#define yLED  26
+#define gLED  25
 
 //Pin - TM1637TM1637
-#define CLK   15
-#define DIO   2
+#define CLK   18
+#define DIO   19
 
 //Pin - Cảm biến quang điện trởtrở
 #define ldrPIN  13
