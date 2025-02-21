@@ -1,144 +1,134 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
 
-// Khai báo chân kết nối đèn giao thông
-const int LedDo = 27;
-const int LedVang = 26;
-const int LedXanh = 25;
-const int LedDuong = 21;
-const int button = 23;
-const int LDR = 13;
-const int CLK = 18;
-const int DIO = 19;
+#define led 21
+#define ledRed 27
+#define ledYellow 26
+#define ledGreen 25
+
+#define CLK 18
+#define DIO 19
 TM1637Display display(CLK, DIO);
 
-const int countRedInit = 5;
-const int countYellowInit = 2;
-const int countGreenInit = 7;
+const uint32_t RED_TIME = 5000;
+const uint32_t YELLOW_TIME = 3000;
+const uint32_t GREEN_TIME = 10000;
 
-int countRed = countRedInit;
-int countYellow = countYellowInit;
-int countGreen = countGreenInit;
+int currentState = 0;
+int countdown = 0;
+uint32_t preTime = 0;
 
-ulong ledStart = 0;
-int LedState = 0;
-bool isPaused = false;
-bool buttonPressed = false;
+#define buttonPin 23
+bool isDisplayOn = true;
+bool isLedOn = false;
+bool lastButtonState = LOW;
+unsigned long lastDebouceTime = 0; 
+const unsigned long debouceDelay = 50;
 
-ulong blinkStart = 0;
-bool yellowBlinkState = false;
-bool lastLdrState = false;
-
-// Kiểm tra thời gian không chặn
-bool IsReady(ulong& ulTimer, uint32_t millisecond) {
-    ulong t = millis();
-    if (t - ulTimer < millisecond) return false;
-    ulTimer = t;
-    return true;
+bool isReady(uint32_t &ulTimer, uint32_t milisecond){
+  uint32_t t = millis();
+  if (t - ulTimer < milisecond) return false;
+  
+  ulTimer = t;
+  return true;
 }
 
-void UpdateDisplay(int number) {
-    static int lastNumber = -1;
-    if (lastNumber != number) {
-        display.showNumberDec(number);
-        lastNumber = number;
-    }
+void UpdateDisplay(int seconds){
+  if(isDisplayOn){   
+    display.showNumberDec(seconds, true);
+  }else{
+    display.clear();
+  }
 }
 
-void Use_Non_Blocking() {
-    unsigned long currentMillis = millis();
-    int ldrValue = analogRead(LDR);
-    bool buttonState = digitalRead(button) == LOW;
-
-    // Kiểm tra nút nhấn (Debounce)
-    if (buttonState && !buttonPressed) {
-        isPaused = !isPaused;
-        buttonPressed = true;
-        Serial.println(isPaused ? "TẮT BỘ ĐẾM" : "BẬT BỘ ĐẾM");
-    } else if (!buttonState) {
-        buttonPressed = false;
+void checkButtonPress() {
+  bool buttonState = digitalRead(buttonPin);
+  
+  if (buttonState == LOW && lastButtonState == HIGH) {
+    if (millis() - lastDebouceTime > debouceDelay) {
+      isDisplayOn = !isDisplayOn;  // Đảo trạng thái hiển thị
+      isLedOn = !isLedOn;
+      UpdateDisplay(countdown);    // Cập nhật hiển thị theo trạng thái mới
+      Serial.println(isDisplayOn ? "Màn hình bật" : "Màn hình tắt");
+      
+      lastButtonState = millis();
     }
-
-    // Cập nhật đèn đường theo trạng thái bộ đếm
-    digitalWrite(LedDuong, isPaused ? HIGH : LOW);
-
-    // Kiểm tra ánh sáng môi trường
-    bool isDark = (ldrValue < 50);
-    if (isDark != lastLdrState) {
-        lastLdrState = isDark;
-        Serial.println(isDark ? "Trời tối - Đèn vàng nhấp nháy" : "Trời sáng - Hoạt động bình thường");
-    }
-
-    if (isDark) {
-        digitalWrite(LedDo, LOW);
-        digitalWrite(LedXanh, LOW);
-        if (IsReady(blinkStart, 500)) {
-            yellowBlinkState = !yellowBlinkState;
-            digitalWrite(LedVang, yellowBlinkState);
-        }
-        return;
-    }
-
-    // Điều khiển hệ thống đèn giao thông
-    switch (LedState) {
-        case 0: // Đèn Xanh
-            digitalWrite(LedDo, LOW);
-            digitalWrite(LedVang, LOW);
-            digitalWrite(LedXanh, HIGH);
-            if (!isPaused) UpdateDisplay(countGreen);
-            if (IsReady(ledStart, 1000)) { 
-                if (!isPaused && --countGreen < 0) {
-                    LedState = 1;
-                    countGreen = countGreenInit;
-                }
-            }
-            break;
-        
-        case 1: // Đèn Vàng
-            digitalWrite(LedDo, LOW);
-            digitalWrite(LedVang, HIGH);
-            digitalWrite(LedXanh, LOW);
-            if (!isPaused) UpdateDisplay(countYellow);
-            if (IsReady(ledStart, 1000)) { 
-                if (!isPaused && --countYellow < 0) {
-                    LedState = 2;
-                    countYellow = countYellowInit;
-                }
-            }
-            break;
-
-        case 2: // Đèn Đỏ
-            digitalWrite(LedDo, HIGH);
-            digitalWrite(LedVang, LOW);
-            digitalWrite(LedXanh, LOW);
-            if (!isPaused) UpdateDisplay(countRed);
-            if (IsReady(ledStart, 1000)) { 
-                if (!isPaused && --countRed < 0) {
-                    LedState = 0;
-                    countRed = countRedInit;
-                }
-            }
-            break;
-    }
+  }
+  
+  lastButtonState = buttonState;
 }
+
+void checkLed(){
+  if(isLedOn){
+    digitalWrite(led, LOW);
+  }else{
+    digitalWrite(led, HIGH);
+  }
+}
+
+void Non_block(){
+  static uint32_t countdownTimer = millis();
+
+  // Giảm giá trị đếm lùi mỗi giây
+  if (millis() - countdownTimer >= 1000) {
+    countdownTimer = millis();
+    if (countdown > 0) {
+      countdown--;
+      UpdateDisplay(countdown);
+    }
+  }
+
+  switch(currentState){
+    case 0:
+      if(isReady(preTime, GREEN_TIME)){
+        digitalWrite(ledGreen, LOW);
+        digitalWrite(ledYellow, HIGH);
+        currentState = 1;
+        countdown = YELLOW_TIME / 1000;
+        Serial.print("Đèn vàng sáng !");
+      }
+      break;
+    case 1:
+      if(isReady(preTime, YELLOW_TIME)){
+        digitalWrite(ledYellow, LOW);
+        digitalWrite(ledRed, HIGH);
+        currentState = 2;
+        countdown = RED_TIME / 1000;
+        Serial.print("Đèn đỏ sáng !");
+      }
+      break;
+    case 2:
+      if(isReady(preTime, RED_TIME)){
+        digitalWrite(ledRed, LOW);
+        digitalWrite(ledGreen, HIGH);
+        currentState = 0;
+        countdown = GREEN_TIME / 1000;
+        Serial.print("Đèn đỏ sáng !");
+      }
+      break;
+  }
+}
+
 
 void setup() {
-    Serial.begin(115200);
-    pinMode(LedDo, OUTPUT);
-    pinMode(LedVang, OUTPUT);
-    pinMode(LedXanh, OUTPUT);
-    pinMode(LedDuong, OUTPUT);
-    pinMode(button, INPUT_PULLUP);
-    pinMode(LDR, INPUT);
+  pinMode(ledRed, OUTPUT);
+  pinMode(ledYellow, OUTPUT);
+  pinMode(ledGreen, OUTPUT);
+  pinMode(led, OUTPUT);
 
-    digitalWrite(LedDo, LOW);
-    digitalWrite(LedVang, LOW);
-    digitalWrite(LedXanh, LOW);
-    digitalWrite(LedDuong, LOW);
+  digitalWrite(ledRed, LOW);
+  digitalWrite(ledYellow, LOW);
+  digitalWrite(ledGreen, HIGH);
+  digitalWrite(led, LOW);
 
-    display.setBrightness(0x0f);
+  display.setBrightness(7);  
+  countdown = GREEN_TIME / 1000; 
+  UpdateDisplay(countdown);
+ 
 }
 
 void loop() {
-    Use_Non_Blocking();
+  checkButtonPress();
+  checkLed();
+  Non_block();
 }

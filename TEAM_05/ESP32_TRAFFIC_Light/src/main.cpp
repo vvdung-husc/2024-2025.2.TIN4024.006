@@ -2,39 +2,39 @@
 #include <TM1637Display.h>
 
 // Pin - Đèn giao thông
-#define rLED  5
-#define yLED  17
-#define gLED  16
+#define rLED 5
+#define yLED 17
+#define gLED 16
 
 // Pin - TM1637
-#define CLK   15
-#define DIO   2
+#define CLK 15
+#define DIO 2
 
 // Pin - Cảm biến quang
-#define ldrPIN  13
+#define ldrPIN 13
 
 // Pin - Nút nhấn và đèn xanh dương
-#define btn1  23
-#define bLED  21  // Đèn xanh dương
+#define btn1 23
+#define bLED 21 // Đèn xanh dương
 
 // Thời gian chờ đèn
-uint rTIME = 5000;  
-uint yTIME = 3000;  
-uint gTIME = 10000; 
+uint rTIME = 5000;
+uint yTIME = 3000;
+uint gTIME = 10000;
 
-ulong currentMiliseconds = 0; 
-ulong ledTimeStart = 0;       
-ulong nextTimeTotal = 0;      
-int currentLED = 0;           
-int tmCounter = rTIME / 1000; 
-ulong counterTime = 0;        
+ulong currentMiliseconds = 0;
+ulong ledTimeStart = 0;
+ulong nextTimeTotal = 0;
+int currentLED = 0;
+int tmCounter = rTIME / 1000;
+ulong counterTime = 0;
 
-int darkThreshold = 1000;    
+int darkThreshold = 1000;
 
-TM1637Display display(CLK, DIO);  
+TM1637Display display(CLK, DIO);
 
-bool displayOn = true;   // Trạng thái màn hình mặc định: BẬT
-bool lastButtonState = HIGH; 
+bool displayOn = true; // Trạng thái màn hình mặc định: BẬT
+bool lastButtonState = HIGH;
 
 bool IsReady(ulong &ulTimer, uint32_t milisecond);
 void NonBlocking_Traffic_Light_TM1637();
@@ -42,7 +42,8 @@ bool isDark();
 void YellowLED_Blink();
 void CheckButtonPress();
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   // Khởi tạo các chân đầu ra
@@ -55,135 +56,177 @@ void setup() {
 
   tmCounter = (rTIME / 1000) - 1;
   display.setBrightness(7);
-  
+
   digitalWrite(yLED, LOW);
   digitalWrite(gLED, LOW);
   digitalWrite(rLED, HIGH);
   digitalWrite(bLED, HIGH); // Ban đầu đèn xanh dương tắt
   display.showNumberDec(tmCounter--, true, 2, 2);
-  
+
   currentLED = rLED;
-  nextTimeTotal += rTIME;    
-  Serial.println("== START ==>");  
+  nextTimeTotal += rTIME;
+  Serial.println("== START ==>");
+  Serial.print("1. RED    => GREEN  ");
+  Serial.print((nextTimeTotal / 1000) % 60);
+  Serial.println(" (ms)");
 }
 
-void loop() {  
+void loop()
+{
   currentMiliseconds = millis();
   CheckButtonPress(); // Kiểm tra nút nhấn bật/tắt màn hình
 
-  if (isDark()) YellowLED_Blink();
-  else NonBlocking_Traffic_Light_TM1637();
-}
-
-// 🎯 **Hàm xử lý nút nhấn để bật/tắt màn hình và đèn xanh dương**
-void CheckButtonPress() {
-  bool buttonState = digitalRead(btn1);
-
-  if (buttonState == LOW && lastButtonState == HIGH) { // Khi nút được nhấn
-    displayOn = !displayOn; // Đảo trạng thái màn hình
-
-    if (displayOn) {
-      display.setBrightness(7);  // Bật màn hình
-      display.showNumberDec(tmCounter, true, 2, 2);
-      digitalWrite(bLED, HIGH);  // Đèn bật
-    } else {
-      display.clear();  // Tắt màn hình
-      digitalWrite(bLED, LOW); // Đèn tắt
-    }
-
-    
+  if (isDark())
+  {
+    YellowLED_Blink(); // Nếu trời tối => Nhấp nháy đèn vàng
+    display.clear();
   }
-  lastButtonState = buttonState; // Cập nhật trạng thái nút
+  else
+    NonBlocking_Traffic_Light_TM1637(); // Hiển thị đèn giao thôngthông
 }
 
-// 🎯 **Hàm kiểm tra thời gian đã trôi qua**
-bool IsReady(ulong &ulTimer, uint32_t milisecond) {
-  if (currentMiliseconds - ulTimer < milisecond) return false;
+bool IsReady(ulong &ulTimer, uint32_t milisecond)
+{
+  if (currentMiliseconds - ulTimer < milisecond)
+    return false;
   ulTimer = currentMiliseconds;
   return true;
 }
 
-// 🎯 **Hàm điều khiển đèn giao thông**
-void NonBlocking_Traffic_Light_TM1637(){  
+void NonBlocking_Traffic_Light_TM1637()
+{
   bool bShowCounter = false;
 
-  switch (currentLED) {
-    case rLED:
-      if (IsReady(ledTimeStart, rTIME)) {
-        digitalWrite(rLED, LOW);
-        digitalWrite(gLED, HIGH);
-        currentLED = gLED;
-        nextTimeTotal += gTIME;
-        tmCounter = (gTIME / 1000) - 1 ; 
-        bShowCounter = true;  
-        counterTime = currentMiliseconds;        
-      }
-      break;
-    case gLED:
-      if (IsReady(ledTimeStart,gTIME)) {        
-        digitalWrite(gLED, LOW);
-        digitalWrite(yLED, HIGH);
-        currentLED = yLED;
-        nextTimeTotal += yTIME;
-        tmCounter = (yTIME / 1000) - 1; 
-        bShowCounter = true;   
-        counterTime = currentMiliseconds;    
-      }
-      break;
-    case yLED:
-      if (IsReady(ledTimeStart,yTIME)) {        
-        digitalWrite(yLED, LOW);
-        digitalWrite(rLED, HIGH);
-        currentLED = rLED;
-        nextTimeTotal += rTIME;
-        tmCounter = (rTIME / 1000) - 1; 
-        bShowCounter = true;       
-        counterTime = currentMiliseconds;        
-      }
-      break;
+  switch (currentLED)
+  {
+  case rLED: // Đèn đỏ: 5 giây
+    if (IsReady(ledTimeStart, rTIME))
+    {
+      digitalWrite(rLED, LOW);
+      digitalWrite(gLED, HIGH);
+      currentLED = gLED;
+      nextTimeTotal += gTIME;
+      tmCounter = (gTIME / 1000) - 1;
+      bShowCounter = true;
+      counterTime = currentMiliseconds;
+      Serial.print("2. GREEN  => YELLOW ");
+      Serial.print((nextTimeTotal / 1000) % 60);
+      Serial.println(" (ms)");
+    }
+    break;
+  case gLED: // Đèn xanh: 7 giây
+    if (IsReady(ledTimeStart, gTIME))
+    {
+      digitalWrite(gLED, LOW);
+      digitalWrite(yLED, HIGH);
+      currentLED = yLED;
+      nextTimeTotal += yTIME;
+      tmCounter = (yTIME / 1000) - 1;
+      bShowCounter = true;
+      counterTime = currentMiliseconds;
+      Serial.print("3. YELLOW => RED    ");
+      Serial.print((nextTimeTotal / 1000) % 60);
+      Serial.println(" (ms)");
+    }
+    break;
+  case yLED: // Đèn vàng: 2 giây
+    if (IsReady(ledTimeStart, yTIME))
+    {
+      digitalWrite(yLED, LOW);
+      digitalWrite(rLED, HIGH);
+      currentLED = rLED;
+      nextTimeTotal += rTIME;
+      tmCounter = (rTIME / 1000) - 1;
+      bShowCounter = true;
+      counterTime = currentMiliseconds;
+      Serial.print("1. RED    => GREEN  ");
+      Serial.print((nextTimeTotal / 1000) % 60);
+      Serial.println(" (ms)");
+    }
+    break;
   }
 
-  if (!bShowCounter) bShowCounter = IsReady(counterTime, 1000);
+  if (!bShowCounter)
+    bShowCounter = IsReady(counterTime, 1000);
 
-  if (bShowCounter && displayOn) { 
+  if (bShowCounter && displayOn)
+  {
     display.showNumberDec(tmCounter--, true, 2, 2);
   }
 }
 
-// 🎯 **Hàm kiểm tra trời tối**
-bool isDark(){
+bool isDark()
+{
   static ulong darkTimeStart = 0;
   static uint16_t lastValue = 0;
   static bool bDark = false;
 
-  if (!IsReady(darkTimeStart, 50)) return bDark;
-  uint16_t value = analogRead(ldrPIN);  
-  if (value == lastValue) return bDark;
+  if (!IsReady(darkTimeStart, 50))
+    return bDark;
+  uint16_t value = analogRead(ldrPIN);
+  if (value == lastValue)
+    return bDark;
 
-  if (value < darkThreshold){
-    if (!bDark){
+  if (value < darkThreshold)
+  {
+    if (!bDark)
+    {
       digitalWrite(currentLED, LOW);
-    }   
-    bDark = true;   
+      Serial.print("DARK  value: ");
+      Serial.println(value);
+    }
+    bDark = true;
   }
-  else {
-    if (bDark){
+  else
+  {
+    if (bDark)
+    {
       digitalWrite(currentLED, LOW);
+      Serial.print("LIGHT value: ");
+      Serial.println(value);
     }
     bDark = false;
   }
-  
-  lastValue = value;  
+
+  lastValue = value;
   return bDark;
 }
 
-// 🎯 **Hàm điều khiển đèn vàng nhấp nháy**
-void YellowLED_Blink(){
+void YellowLED_Blink()
+{
   static ulong yLedStart = 0;
   static bool isON = false;
 
-  if (!IsReady(yLedStart,1000)) return;
-  if (!isON) digitalWrite(yLED, HIGH);
-  else digitalWrite(yLED, LOW);
+  if (!IsReady(yLedStart, 1000))
+    return;
+  if (!isON)
+    digitalWrite(yLED, HIGH);
+  else
+    digitalWrite(yLED, LOW);
   isON = !isON;
+}
+
+void CheckButtonPress()
+{
+  bool buttonState = digitalRead(btn1);
+
+  if (buttonState == LOW && lastButtonState == HIGH)
+  {                         // Khi nút được nhấn
+    displayOn = !displayOn; // Đảo trạng thái màn hình
+
+    if (displayOn)
+    {
+      
+      display.showNumberDec(tmCounter, true, 2, 2);
+      digitalWrite(bLED, HIGH); // Đèn bật
+      Serial.println("Button   => ON ");
+    }
+    else
+    {
+      display.clear();         // Tắt màn hình
+      digitalWrite(bLED, LOW); // Đèn tắt
+      Serial.println("Button   => OFF ");
+    }
+  }
+  lastButtonState = buttonState; // Cập nhật trạng thái nút
 }
