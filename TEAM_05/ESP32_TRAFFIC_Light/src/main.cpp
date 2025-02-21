@@ -216,7 +216,7 @@ void CheckButtonPress()
 
     if (displayOn)
     {
-      display.setBrightness(7); // Bật màn hình
+      
       display.showNumberDec(tmCounter, true, 2, 2);
       digitalWrite(bLED, HIGH); // Đèn bật
       Serial.println("Button   => ON ");
