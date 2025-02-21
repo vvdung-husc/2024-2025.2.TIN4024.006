@@ -1,88 +1,129 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
 
-#define PIN_RED 27
-#define PIN_YELLOW 26
-#define PIN_GREEN 25
-#define PIN_BLUE 21
-#define PIN_BUTTON 23
-#define PIN_LDR 13
-#define CLK 18
-#define DIO 19
-
+// Khai báo chân kết nối đèn giao thông
+int LedDo = 27;
+int LedVang = 26;
+int LedXanh = 25;
+int LedDuong = 21;
+int button = 23;
+int LDR = 13;
+int CLK = 18;
+int DIO = 19;
 TM1637Display display(CLK, DIO);
-bool isRunning = false;
 
-unsigned long previousMillis = 0;
-const long redTime = 5000;
-const long yellowTime = 2000;
-const long greenTime = 7000;
-const long blinkInterval = 500;
 
-int currentState = 0;
-unsigned long stateStartTime = 0;
-bool yellowBlinkState = false;
+int countRed = 5;
+int countYellow = 2;
+int countGreen = 7;
 
-void setup() {
-    pinMode(PIN_RED, OUTPUT);
-    pinMode(PIN_YELLOW, OUTPUT);
-    pinMode(PIN_GREEN, OUTPUT);
-    pinMode(PIN_BLUE, OUTPUT);
-    pinMode(PIN_BUTTON, INPUT_PULLUP);
-    pinMode(PIN_LDR, INPUT);
-    display.setBrightness(0x0F);
-    display.showNumberDec(0);
-    stateStartTime = millis();
+// Các biến cho thời gian và trạng thái
+ulong ledStart = 0;
+int LedState = 0;
+
+// Lưu giá trị đếm trước đó để kiểm tra thay đổi
+int lastNumber = -1;
+int lastState = -1;
+
+// Hàm kiểm tra thời gian không chặn (Non-Blocking)
+bool IsReady(ulong& ulTimer, uint32_t millisecond){
+  ulong t = millis();
+  if(t - ulTimer < millisecond) return false;
+  ulTimer = t;
+  return true;
 }
 
+void UpdateDisplay(int number) {
+  // Chỉ cập nhật nếu giá trị thay đổi
+  if (lastNumber != number) {
+    display.showNumberDec(number);
+    lastNumber = number;
+  }
+}
+
+void Use_Non_Blocking() {
+  unsigned long currentMillis = millis();
+  switch (LedState)
+  {
+    case 0: // Đèn Xanh
+      digitalWrite(LedDo, LOW);
+      digitalWrite(LedVang, LOW);
+      digitalWrite(LedXanh, HIGH);
+      UpdateDisplay(countGreen);
+      if (IsReady(ledStart, 1000)) { 
+        countGreen--;
+        if (countGreen < 0) {
+          LedState = 1;
+          ledStart = currentMillis;
+          countGreen = 7; // Reset lại đếm cho lần sau
+          if (lastState != LedState) {
+            Serial.println("ĐÈN XANH -> ĐÈN VÀNG");
+            lastState = LedState;
+          }
+        }
+      }
+      break;
+    
+    case 1: // Đèn Vàng
+      digitalWrite(LedDo, LOW);
+      digitalWrite(LedVang, HIGH);
+      digitalWrite(LedXanh, LOW);
+      UpdateDisplay(countYellow);
+      if (IsReady(ledStart, 1000)) { 
+        countYellow--;
+        if (countYellow < 0) {
+          LedState = 2;
+          ledStart = currentMillis;
+          countYellow = 2; // Reset lại đếm cho lần sau
+          if (lastState != LedState) {
+            Serial.println("ĐÈN VÀNG -> ĐÈN ĐỎ");
+            lastState = LedState;
+          }
+        }
+      }
+      break;
+
+    case 2: // Đèn Đỏ
+      digitalWrite(LedDo, HIGH);
+      digitalWrite(LedVang, LOW);
+      digitalWrite(LedXanh, LOW);
+      UpdateDisplay(countRed);
+      if (IsReady(ledStart, 1000)) { 
+        countRed--;
+        if (countRed < 0) {
+          LedState = 0;
+          ledStart = currentMillis;
+          countRed = 5; // Reset lại đếm cho lần sau
+          if (lastState != LedState) {
+            Serial.println("ĐÈN ĐỎ -> ĐÈN XANH");
+            lastState = LedState;
+          }
+        }
+      }
+      break;
+  }
+}
+
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LedDo, OUTPUT);
+  pinMode(LedVang, OUTPUT);
+  pinMode(LedXanh, OUTPUT);
+
+  // Tắt tất cả các đèn khi bắt đầu
+  digitalWrite(LedDo, LOW);
+  digitalWrite(LedVang, LOW);
+  digitalWrite(LedXanh, LOW);
+
+  display.setBrightness(0x0f); // Độ sáng cao nhất
+
+  // Bắt đầu từ LedState = 0 để hiện đèn Xanh trước
+  LedState = 2;
+  lastState = -1;
+}
+
+
 void loop() {
-    unsigned long currentMillis = millis();
-    int ldrValue = analogRead(PIN_LDR);
-    bool buttonState = digitalRead(PIN_BUTTON) == LOW;
-
-    Serial.println(ldrValue);
-    digitalWrite(PIN_BLUE, buttonState ? HIGH : LOW);
-
-    if (ldrValue < 50) { // Trời tối, chỉ đèn vàng nhấp nháy
-        digitalWrite(PIN_RED, LOW);
-        digitalWrite(PIN_GREEN, LOW);
-        if (currentMillis - previousMillis >= blinkInterval) {
-            previousMillis = currentMillis;
-            yellowBlinkState = !yellowBlinkState;
-            digitalWrite(PIN_YELLOW, yellowBlinkState ? HIGH : LOW);
-        }
-    } else { // Chạy hệ thống đèn giao thông bình thường
-        switch (currentState) {
-            case 0: // Đèn đỏ
-                digitalWrite(PIN_RED, HIGH);
-                digitalWrite(PIN_YELLOW, LOW);
-                digitalWrite(PIN_GREEN, LOW);
-                display.showNumberDec((redTime - (currentMillis - stateStartTime)) / 1000);
-                if (currentMillis - stateStartTime >= redTime) {
-                    currentState = 1;
-                    stateStartTime = currentMillis;
-                }
-                break;
-            case 1: // Đèn xanh
-                digitalWrite(PIN_RED, LOW);
-                digitalWrite(PIN_YELLOW, LOW);
-                digitalWrite(PIN_GREEN, HIGH);
-                display.showNumberDec((greenTime - (currentMillis - stateStartTime)) / 1000);
-                if (currentMillis - stateStartTime >= greenTime) {
-                    currentState = 2;
-                    stateStartTime = currentMillis;
-                }
-                break;
-            case 2: // Đèn vàng
-                digitalWrite(PIN_RED, LOW);
-                digitalWrite(PIN_YELLOW, HIGH);
-                digitalWrite(PIN_GREEN, LOW);
-                display.showNumberDec((yellowTime - (currentMillis - stateStartTime)) / 1000);
-                if (currentMillis - stateStartTime >= yellowTime) {
-                    currentState = 0;
-                    stateStartTime = currentMillis;
-                }
-                break;
-        }
-    }
+  Use_Non_Blocking();
 }
