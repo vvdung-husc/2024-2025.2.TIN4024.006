@@ -1,65 +1,59 @@
 #include <Arduino.h>
-#include <TM1637Display.h>
 
-#define rLED  5
-#define yLED  17
-#define gLED  16
-#define CLK   23
-#define DIO   22
+int ledPin = 5; // Chân GPIO 2 (thường nối sẵn LED trên board)
 
-#define rTIME  5000
-#define yTIME  4000
-#define gTIME  10000
+bool isLED_ON = false;
+ulong ledStart = 0;
 
-TM1637Display display(CLK, DIO);
+void setup()
+{
+  Serial.begin(115200);
+  pinMode(ledPin, OUTPUT);
+}
 
-ulong ledTimeStart, lastUpdate;
-int currentLED = rLED;
-int timeLeft = rTIME / 1000;
-bool firstRun = true;
+void Use_Blocking()
+{
+  digitalWrite(ledPin, HIGH); // Bật LED
+  Serial.println("LED -> ON");
+  delay(1000);               // Đợi 1 giây
+  digitalWrite(ledPin, LOW); // Tắt LED
+  Serial.println("LED -> OFF");
+  delay(1000); // Đợi 1 giây
+}
 
-bool IsReady(ulong &ulTimer, uint32_t milisecond) {
-  if (millis() - ulTimer < milisecond) return false;
-  ulTimer = millis();
+bool IsReady(ulong &ulTimer, uint32_t milisecond)
+{
+  ulong t = millis();
+  if (t - ulTimer < milisecond)
+    return false;
+  ulTimer = t;
   return true;
 }
 
-void UpdateCountdown() {
-  if (millis() - lastUpdate >= 1000) { 
-    lastUpdate = millis();
-    display.showNumberDec(timeLeft = max(0, timeLeft - 1), true, 2, 2);
+void Use_Non_Blocking()
+{
+  if (!IsReady(ledStart, 1000))
+    return;
+
+  if (!isLED_ON)
+  {
+    digitalWrite(ledPin, HIGH); // Bật LED
+    Serial.println("NonBlocking LED -> ON");
   }
+  else
+  {
+    digitalWrite(ledPin, LOW); // Tắt LED
+    Serial.println("NonBlocking LED -> OFF");
+  }
+  isLED_ON = !isLED_ON;
 }
 
-void ChangeLight(int newLED, int newTime) {
-  digitalWrite(currentLED, LOW);
-  digitalWrite(newLED, HIGH);
-  currentLED = newLED;
-  timeLeft = newTime / 1000;
-  Serial.print("Chuyển sang đèn: ");
-  if (newLED == rLED) Serial.println("Đỏ");
-  else if (newLED == gLED) Serial.println("Xanh");
-  else if (newLED == yLED) Serial.println("Vàng");
-}
+void loop()
+{
+  // Use_Blocking();
+  Use_Non_Blocking();
 
-void NonBlocking_Traffic_Light() {
-  UpdateCountdown();
-  if (currentLED == rLED && IsReady(ledTimeStart, rTIME)) ChangeLight(gLED, gTIME);
-  else if (currentLED == gLED && IsReady(ledTimeStart, gTIME)) ChangeLight(yLED, yTIME);
-  else if (currentLED == yLED && IsReady(ledTimeStart, yTIME)) ChangeLight(rLED, rTIME);
-}
-
-void setup() {
-  Serial.begin(115200);
-  pinMode(rLED, OUTPUT);
-  pinMode(yLED, OUTPUT);
-  pinMode(gLED, OUTPUT);
-  display.setBrightness(7);
-  ChangeLight(rLED, rTIME);
-  ledTimeStart = millis();
-  Serial.println("== START ==> Đèn giao thông hoạt động!");
-}
-
-void loop() {
-  NonBlocking_Traffic_Light();
+  ulong t = millis();
+  Serial.print("Timer :");
+  Serial.println(t);
 }
