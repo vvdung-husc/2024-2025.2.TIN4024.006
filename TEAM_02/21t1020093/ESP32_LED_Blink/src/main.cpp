@@ -8,13 +8,13 @@
 const int CLK = 23;
 const int DIO = 22;
 
-// Định nghĩa thời gian cho mỗi đèn (tính bằng giây)
-const int GREEN_TIME = 5;  // Đèn xanh 5 giây
-const int YELLOW_TIME = 3;  // Đèn vàng 3 giây
-const int RED_TIME = 5;    // Đèn đỏ 5 giây
+
+const int GREEN_TIME = 5; 
+const int YELLOW_TIME = 3;  
+const int RED_TIME = 5;    
 
 ulong previousMillis = 0;
-int state = 0;  // 0: đỏ, 1: xanh, 2: vàng
+int state = 0;  
 int countdown = 0;
 bool needChange = false;  // Biến đánh dấu cần chuyển đèn
 TM1637Display display(CLK, DIO);
@@ -39,7 +39,7 @@ void setup() {
 void loop() {
   ulong currentMillis = millis();
 
-  // Xử lý đếm ngược
+  
   if (currentMillis - previousMillis >= 1000) {
     previousMillis = currentMillis;
     
@@ -52,9 +52,9 @@ void loop() {
       needChange = true;  // Đánh dấu cần chuyển đèn ở chu kỳ tiếp theo
     }
     
-    countdown--;  // Giảm bộ đếm
+    countdown--;  
     
-    // Xử lý chuyển trạng thái sau khi hiển thị 0
+    
     if (needChange) {
       needChange = false;  // Reset biến đánh dấu
       
