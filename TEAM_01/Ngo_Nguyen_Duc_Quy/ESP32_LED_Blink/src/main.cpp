@@ -1,78 +1,115 @@
 #include <Arduino.h>
+#include <TM1637Display.h>
 
-int ledPin = 5;
-bool IsLed_On = false;
-ulong led_start = 0;
-// put function declarations here:
-int myFunction(int, int);
+// Khai báo chân kết nối đèn giao thông
+int LedDo = 5;
+int LedVang = 17;
+int LedXanh = 4;
+int CLK = 0;
+int DIO = 2;
+TM1637Display display(CLK, DIO);
 
-void setup() { // đoạn code khởi tạo
-  // put your setup code here, to run once:
-  Serial.begin(115200);
+int countRed = 5;
+int countYellow = 2;
+int countGreen = 7;
 
-  int result = myFunction(2, 3);
-  Serial.println("IOT welcome");
-  pinMode(ledPin, OUTPUT);
-}
+// Các biến cho thời gian và trạng thái
+ulong ledStart = 0;
+int LedState = 0;
 
-void Use_Blocking(){
-  digitalWrite(ledPin, HIGH); // Bật
-  Serial.println("LED -> ON");
-  delay(1000);                // Chờ 1 giây có cơ chế block
-  digitalWrite(ledPin, LOW);  // tắt
-  Serial.println("LED -> OFF");
-  delay(1000);
-}
+// Lưu giá trị đếm trước đó để kiểm tra thay đổi
+int lastNumber = -1;
+int lastState = -1;
 
-bool iSReady(ulong& ulTimer, uint32_t milisecond){
+// Hàm kiểm tra thời gian không chặn (Non-Blocking)
+bool IsReady(ulong& ulTimer, uint32_t millisecond){
   ulong t = millis();
-  if(t - ulTimer < milisecond) return false;
+  if(t - ulTimer < millisecond) return false;
   ulTimer = t;
   return true;
 }
 
-void Use_Non_Blocking(){
-  if(!iSReady(led_start,1000)) return;
-  if(!IsLed_On){
-    digitalWrite(ledPin, HIGH); // Bật
-    Serial.println("NonBlocking LED -> ON");
-  }else{
-    digitalWrite(ledPin, LOW); // Bật
-    Serial.println("NonBlocking LED -> OFF");
+void UpdateDisplay(int number) {
+  // Chỉ cập nhật nếu giá trị thay đổi
+  if (lastNumber != number) {
+    display.showNumberDec(number);
+    lastNumber = number;
   }
-  IsLed_On = !IsLed_On;
 }
 
-void loop() { 
+void Use_Non_Blocking() {
+    unsigned long currentMillis = millis();
+    switch (LedState)
+    {
+      case 0:  // Đèn đỏ
+        digitalWrite(LedDo, HIGH);
+        digitalWrite(LedVang, LOW);
+        digitalWrite(LedXanh, LOW);
+        UpdateDisplay(countRed);
+        if (IsReady(ledStart,1000)) { 
+          countRed--;
+          if (countRed < 0) {
+            LedState = 1;
+            ledStart = currentMillis;
+            countRed = 5; // Reset lại đếm cho lần sau
+            if (lastState != LedState) {
+              Serial.println("DEN DO -> DEN XANH ");
+              lastState = LedState;
+            }
+          }
+        }
+        break;
+      
+      case 1:  // Đèn xanh
+        digitalWrite(LedDo, LOW);
+        digitalWrite(LedVang, LOW);
+        digitalWrite(LedXanh, HIGH);
+        UpdateDisplay(countGreen);
+        if (IsReady(ledStart,1000)) { 
+          countGreen--;
+          if (countGreen < 0) {
+            LedState = 2;
+            ledStart = currentMillis;
+            countGreen = 7; // Reset lại đếm cho lần sau
+            if (lastState != LedState) {
+              Serial.println("DEN XANH -> DEN VANG ");
+              lastState = LedState;
+            }
+          }
+        }
+        break;
+  
+      case 2:  // Đèn vàng
+        digitalWrite(LedDo, LOW);
+        digitalWrite(LedVang, HIGH);
+        digitalWrite(LedXanh, LOW);
+        UpdateDisplay(countYellow);
+        if (IsReady(ledStart,1000)) { 
+          countYellow--;
+          if (countYellow < 0) {
+            LedState = 0;
+            ledStart = currentMillis;
+            countYellow = 2; // Reset lại đếm cho lần sau
+            if (lastState != LedState) {
+              Serial.println("DEN VANG -> DEN DO ");
+              lastState = LedState;
+            }
+          }
+        }
+        break;
+    }
+  }
+  
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LedDo, OUTPUT);
+  pinMode(LedVang, OUTPUT);
+  pinMode(LedXanh, OUTPUT);
+
+  display.setBrightness(0x0f); // Độ sáng cao nhất
+}
+
+void loop() {
   Use_Non_Blocking();
-
-  ulong t = millis();
-  Serial.print("Timer : ");
-  Serial.println(t);
-}
-// void loop() { // lặp mãi mãi
-//   // put your main code here, to run repeatedly:
-//   // static uint32_t i = 0;
-//   // ++i; 
-//   // delay(1000); // dừng chương trình theo mili giây
-//   // ulong t = millis(); // thời gian kể từ lúc chương trình khởi động và quay lại 0 khi mà nó bị tràn
-//   // Serial.print("Loop i = ");
-//   // Serial.print(i);
-
-//   // Serial.print(" Timer = ");
-//   // Serial.println(t);
-
-//   digitalWrite(ledPin, HIGH); // Bật
-//   Serial.println("LED -> ON");
-//   delay(1000);                // Chờ 1 giây có cơ chế block
-//   digitalWrite(ledPin, LOW);  // tắt
-//   Serial.println("LED -> OFF");
-//   delay(1000);
-
-// }
-
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
 }
