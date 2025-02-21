@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
-//Nhóm 5
+
 // Pin - Đèn giao thông
 #define rLED 5
 #define yLED 17
@@ -216,7 +216,7 @@ void CheckButtonPress()
 
     if (displayOn)
     {
-      display.setBrightness(7); // Bật màn hình
+      
       display.showNumberDec(tmCounter, true, 2, 2);
       digitalWrite(bLED, HIGH); // Đèn bật
       Serial.println("Button   => ON ");
