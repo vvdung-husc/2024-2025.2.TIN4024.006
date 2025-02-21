@@ -3,7 +3,7 @@
   "author": "Trung Lê Đình",
   "editor": "wokwi",
   "parts": [
-    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": -4.76, "attrs": {} },
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 24.04, "attrs": {} },
     { "type": "wokwi-led", "id": "led1", "top": 25.2, "left": 167, "attrs": { "color": "red" } },
     {
       "type": "wokwi-led",
@@ -32,6 +32,13 @@
       "top": 138.35,
       "left": 230.4,
       "attrs": { "value": "330" }
+    },
+    {
+      "type": "wokwi-tm1637-7segment",
+      "id": "sevseg1",
+      "top": -105.64,
+      "left": 131.83,
+      "attrs": { "color": "red" }
     }
   ],
   "connections": [
@@ -44,7 +51,11 @@
     [ "led2:A", "r1:2", "green", [ "v0" ] ],
     [ "r1:1", "esp:16", "green", [ "v0" ] ],
     [ "led3:A", "r2:2", "green", [ "v0" ] ],
-    [ "r2:1", "esp:4", "green", [ "v0" ] ]
+    [ "r2:1", "esp:4", "green", [ "v0" ] ],
+    [ "sevseg1:VCC", "esp:5V", "red", [ "h19.2", "v297.6", "h-297.75" ] ],
+    [ "sevseg1:GND", "esp:GND.3", "black", [ "v134.4", "h-182.4" ] ],
+    [ "sevseg1:DIO", "esp:22", "green", [ "h38.4", "v86.4", "h-192", "v28.8" ] ],
+    [ "esp:23", "sevseg1:CLK", "green", [ "h19.2", "v-28.8", "h172.8", "v-86.4" ] ]
   ],
   "dependencies": {}
 }
