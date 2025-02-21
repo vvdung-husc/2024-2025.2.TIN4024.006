@@ -1,85 +1,59 @@
 #include <Arduino.h>
-#include <TimeLib.h>  // Thư viện hỗ trợ lấy giờ
 
-// Khai báo các chân điều khiển các đèn LED
-int ledRed = 17;
-int ledYellow = 4;
-int ledGreen = 5;
+int ledPin = 5; // Chân GPIO 2 (thường nối sẵn LED trên board)
 
-// Thời gian bật đèn (tính bằng milliseconds)
-unsigned long greenDuration = 10000;  // 10 giây
-unsigned long yellowDuration = 3000;  // 3 giây
-unsigned long redDuration = 5000;     // 5 giây
+bool isLED_ON = false;
+ulong ledStart = 0;
 
-// Biến lưu trữ thời gian cho đèn giao thông
-unsigned long lastChangeTime = 0;
-int currentState = 0;  // 0: xanh, 1: vàng, 2: đỏ
-unsigned long blinkStartTime = 0;
-
-// Hàm bật đèn
-void turnOnLed(int ledPin) {
-  digitalWrite(ledPin, HIGH);
+void setup()
+{
+  Serial.begin(115200);
+  pinMode(ledPin, OUTPUT);
 }
 
-// Hàm tắt đèn
-void turnOffLed(int ledPin) {
-  digitalWrite(ledPin, LOW);
+void Use_Blocking()
+{
+  digitalWrite(ledPin, HIGH); // Bật LED
+  Serial.println("LED -> ON");
+  delay(1000);               // Đợi 1 giây
+  digitalWrite(ledPin, LOW); // Tắt LED
+  Serial.println("LED -> OFF");
+  delay(1000); // Đợi 1 giây
 }
 
-bool IsReady(unsigned long& ulTimer, uint32_t milliseconds) {
-  unsigned long currentTime = millis();
-  if (currentTime - ulTimer < milliseconds) {
+bool IsReady(ulong &ulTimer, uint32_t milisecond)
+{
+  ulong t = millis();
+  if (t - ulTimer < milisecond)
     return false;
-  }
-  ulTimer = currentTime;
+  ulTimer = t;
   return true;
 }
 
-void setup() {
-  Serial.begin(115200);
-  pinMode(ledRed, OUTPUT);
-  pinMode(ledYellow, OUTPUT);
-  pinMode(ledGreen, OUTPUT);
+void Use_Non_Blocking()
+{
+  if (!IsReady(ledStart, 1000))
+    return;
 
-  // Khởi tạo thời gian hệ thống
-  setTime(6, 0, 0, 1, 1, 2025);  // Ví dụ: set giờ là 6h sáng ngày 1 tháng 1 năm 2025
+  if (!isLED_ON)
+  {
+    digitalWrite(ledPin, HIGH); // Bật LED
+    Serial.println("NonBlocking LED -> ON");
+  }
+  else
+  {
+    digitalWrite(ledPin, LOW); // Tắt LED
+    Serial.println("NonBlocking LED -> OFF");
+  }
+  isLED_ON = !isLED_ON;
 }
 
-void loop() {
-  // Lấy giờ hiện tại
-  int currentHour = hour();
+void loop()
+{
+  // Use_Blocking();
+  Use_Non_Blocking();
 
-  // Nếu giờ trong khoảng từ 6h đến 22h
-  if (currentHour >= 6 && currentHour < 22) {
-    // Luân phiên đèn giao thông
-    if (IsReady(lastChangeTime, currentState == 0 ? greenDuration : (currentState == 1 ? yellowDuration : redDuration))) {
-      // Tắt tất cả đèn
-      turnOffLed(ledRed);
-      turnOffLed(ledYellow);
-      turnOffLed(ledGreen);
-
-      // Bật đèn theo trạng thái
-      if (currentState == 0) {
-        turnOnLed(ledGreen);  // Bật đèn xanh
-      } else if (currentState == 1) {
-        turnOnLed(ledYellow);  // Bật đèn vàng
-      } else {
-        turnOnLed(ledRed);  // Bật đèn đỏ
-      }
-
-      // Chuyển sang trạng thái tiếp theo
-      currentState = (currentState + 1) % 3;
-    }
-  }
-  // Nếu ngoài khoảng 22h, chỉ bật đèn vàng nhấp nháy
-  else {
-    if (IsReady(blinkStartTime, 500)) {  // Mỗi 500ms nhấp nháy
-      // Tắt đèn vàng nếu đang bật
-      if (digitalRead(ledYellow) == HIGH) {
-        turnOffLed(ledYellow);
-      } else {
-        turnOnLed(ledYellow);  // Bật đèn vàng
-      }
-    }
-  }
+  ulong t = millis();
+  Serial.print("Timer :");
+  Serial.println(t);
 }
