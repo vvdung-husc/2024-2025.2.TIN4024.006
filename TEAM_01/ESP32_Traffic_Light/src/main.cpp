@@ -115,7 +115,7 @@ void Non_block() {
         case 1:
             if (isReady(preTime, YELLOW_TIME)) {
                 digitalWrite(ledYellow, LOW);
-                digitalWrite(ledRed, HIGH);
+digitalWrite(ledRed, HIGH);
                 currentState = 2;
                 countdown = RED_TIME / 1000;
                 Serial.println("Đèn đỏ sáng!");
@@ -155,4 +155,5 @@ void loop() {
     checkButtonPress();
     checkLed();
     Non_block();
+
 }
