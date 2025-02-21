@@ -60,9 +60,9 @@ void checkButtonPress() {
 
 void checkLed(){
   if(isLedOn){
-    digitalWrite(led, HIGH);
-  }else{
     digitalWrite(led, LOW);
+  }else{
+    digitalWrite(led, HIGH);
   }
 }
 
