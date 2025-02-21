@@ -63,26 +63,26 @@ void NonBlocking_Traffic_Light() {
     case rLED: // Đèn đỏ
       if (IsReady(ledTimeStart, rTIME)) {
         digitalWrite(rLED, LOW);
-        digitalWrite(gLED, HIGH);
-        currentLED = gLED;
-        counter = gTIME / 1000; // Reset bộ đếm theo thời gian đèn xanh
-        Serial.print("2. GREEN\t => Next "); Serial.println(gTIME);
-      }
-      break;
-
-    case gLED: // Đèn xanh
-      if (IsReady(ledTimeStart, gTIME)) {
-        digitalWrite(gLED, LOW);
         digitalWrite(yLED, HIGH);
-        currentLED = yLED;
-        counter = yTIME / 1000; // Reset bộ đếm theo thời gian đèn vàng
-        Serial.print("3. YELLOW\t => Next "); Serial.println(yTIME);
+        currentLED = gLED;
+        counter = gTIME / 1000; // Reset bộ đếm theo thời gian đèn vàng
+        Serial.print("2.YELLOW \t => Next "); Serial.println(gTIME);
       }
       break;
 
-    case yLED: // Đèn vàng
-      if (IsReady(ledTimeStart, yTIME)) {
+    case gLED: // Đèn vàng
+      if (IsReady(ledTimeStart, gTIME)) {
         digitalWrite(yLED, LOW);
+        digitalWrite(gLED, HIGH);
+        currentLED = yLED;
+        counter = yTIME / 1000; // Reset bộ đếm theo thời gian đèn xanh
+        Serial.print("3. GREEN\t => Next "); Serial.println(yTIME);
+      }
+      break;
+
+    case yLED: // Đèn xanh
+      if (IsReady(ledTimeStart, yTIME)) {
+        digitalWrite(gLED, LOW);
         digitalWrite(rLED, HIGH);
         currentLED = rLED;
         counter = rTIME / 1000; // Reset bộ đếm theo thời gian đèn đỏ

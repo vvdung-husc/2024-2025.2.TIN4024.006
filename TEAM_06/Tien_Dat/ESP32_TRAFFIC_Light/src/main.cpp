@@ -13,7 +13,7 @@
 #define rTIME  5000   // Đèn đỏ 5 giây
 #define yTIME  2000   // Đèn vàng 2 giây
 #define gTIME  7000   // Đèn xanh 7 giây
-
+//a
 ulong ledTimeStart = 0;
 int currentLED = rLED;
 int countdown = rTIME / 1000;
