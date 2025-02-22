@@ -9,6 +9,7 @@
     "version": "0.2.0",
     "configurations": [
         {
+<<<<<<< HEAD
             "name": "C/C++ Runner: Debug Session",
             "type": "cppdbg",
             "request": "launch",
@@ -34,6 +35,14 @@
             "executable": "d:/LapTrinhIOT/2024-2025.2.TIN4024.006/TEAM_02/ESP32_TRAFFICT_LIGHT/.pio/build/nodemcu-32s/firmware.elf",
             "projectEnvName": "nodemcu-32s",
             "toolchainBinDir": "C:/Users/Admin/.platformio/packages/toolchain-xtensa-esp32/bin",
+=======
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug",
+            "executable": "d:/IoT/2024-2025.2.TIN4024.006/TEAM_02/ESP32_TRAFFICT_LIGHT/.pio/build/nodemcu-32s/firmware.elf",
+            "projectEnvName": "nodemcu-32s",
+            "toolchainBinDir": "C:/Users/Duy Anh/.platformio/packages/toolchain-xtensa-esp32/bin",
+>>>>>>> 861073be7ee52a8c7051d9460868720a51f54b5f
             "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": {
                 "type": "PlatformIO",
@@ -44,18 +53,30 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
+<<<<<<< HEAD
             "executable": "d:/LapTrinhIOT/2024-2025.2.TIN4024.006/TEAM_02/ESP32_TRAFFICT_LIGHT/.pio/build/nodemcu-32s/firmware.elf",
             "projectEnvName": "nodemcu-32s",
             "toolchainBinDir": "C:/Users/Admin/.platformio/packages/toolchain-xtensa-esp32/bin",
+=======
+            "executable": "d:/IoT/2024-2025.2.TIN4024.006/TEAM_02/ESP32_TRAFFICT_LIGHT/.pio/build/nodemcu-32s/firmware.elf",
+            "projectEnvName": "nodemcu-32s",
+            "toolchainBinDir": "C:/Users/Duy Anh/.platformio/packages/toolchain-xtensa-esp32/bin",
+>>>>>>> 861073be7ee52a8c7051d9460868720a51f54b5f
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
+<<<<<<< HEAD
             "executable": "d:/LapTrinhIOT/2024-2025.2.TIN4024.006/TEAM_02/ESP32_TRAFFICT_LIGHT/.pio/build/nodemcu-32s/firmware.elf",
             "projectEnvName": "nodemcu-32s",
             "toolchainBinDir": "C:/Users/Admin/.platformio/packages/toolchain-xtensa-esp32/bin",
+=======
+            "executable": "d:/IoT/2024-2025.2.TIN4024.006/TEAM_02/ESP32_TRAFFICT_LIGHT/.pio/build/nodemcu-32s/firmware.elf",
+            "projectEnvName": "nodemcu-32s",
+            "toolchainBinDir": "C:/Users/Duy Anh/.platformio/packages/toolchain-xtensa-esp32/bin",
+>>>>>>> 861073be7ee52a8c7051d9460868720a51f54b5f
             "internalConsoleOptions": "openOnSessionStart",
             "loadMode": "manual"
         }
