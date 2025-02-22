@@ -10,7 +10,7 @@
 #define CLK   15
 #define DIO   2
 
-//Pin - Cảm biến quang điện trởtrở
+//Pin - Cảm biến quang điện trở
 #define ldrPIN  13
 
 //1000 ms = 1 seconds
