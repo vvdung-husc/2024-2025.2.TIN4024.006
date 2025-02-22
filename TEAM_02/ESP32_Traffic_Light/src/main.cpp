@@ -10,6 +10,8 @@ int bluePin = 21; // Đèn xanh dương
 const int buttonPin = 12; // Nút nhấn
 bool isPaused = false;    // Biến kiểm soát dừng hiển thị
 unsigned long lastButtonPress = 0;
+const float GAMMA = 0.7;
+const float RL10 = 50;
 
 const int CLK = 23;
 const int DIO = 22;
@@ -87,10 +89,16 @@ void checkButtonPress() {
 
 // Hàm tính Lux từ cảm biến LDR
 float calculateLux(int adcValue) {
-    if (adcValue == 0) return 0; // Tránh chia cho 0
+    if (adcValue == 0) return 0; // Tránh lỗi chia cho 0
 
-    float resistance = (4095.0 / adcValue - 1) * 10000; // 10kΩ là điện trở cố định
-    float lux = 500 / (resistance / 1000); // Công thức gần đúng
+    // Chuyển đổi giá trị ADC thành điện áp (ESP32 có ADC 12-bit: 0 - 4095)
+    float voltage = adcValue / 4095.0 * 5.0;
+    
+    // Tính toán giá trị điện trở của LDR
+    float resistance = 2000 * voltage / (1 - voltage / 5);
+    
+    // Tính toán lux dựa trên công thức tham khảo
+    float lux = pow(RL10 * 1e3 * pow(10, GAMMA) / resistance, (1 / GAMMA));
 
     return lux;
 }
