@@ -77,12 +77,14 @@ void checkButtonPress() {
 
             if (isPaused) {
                 digitalWrite(bluePin, HIGH);
+                display.clear(); // Tắt màn hình số
             } else {
                 digitalWrite(bluePin, LOW);
+                display.showNumberDec(countdown, true); // Hiển thị lại số
             }
 
             Serial.print("Trạng thái hiển thị: ");
-            Serial.println(isPaused ? "DỪNG" : "CHẠY");
+            Serial.println(isPaused ? "TẮT MÀN HÌNH" : "BẬT MÀN HÌNH");
         }
     }
 }
