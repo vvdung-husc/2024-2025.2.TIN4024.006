@@ -2,19 +2,19 @@
 #include <TM1637Display.h>
 
 // Khai báo chân đèn giao thông
-int redPin = 5;
-int yellowPin = 17;
-int greenPin = 16;
+int redPin = 27;
+int yellowPin = 26;
+int greenPin = 25;
 int bluePin = 21; // Đèn xanh dương
 
-const int buttonPin = 12; // Nút nhấn
+const int buttonPin = 23; // Nút nhấn
 bool isPaused = false;    // Biến kiểm soát dừng hiển thị
 unsigned long lastButtonPress = 0;
 const float GAMMA = 0.7;
 const float RL10 = 50;
 
-const int CLK = 23;
-const int DIO = 22;
+const int CLK = 18;
+const int DIO = 19;
 const int ldrPin = 13; // Cảm biến ánh sáng
 TM1637Display display(CLK, DIO);
 
