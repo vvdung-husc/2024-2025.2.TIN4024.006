@@ -5,56 +5,96 @@
 #define LED_YELLOW 26
 #define LED_GREEN 25
 #define BTN_PIN 23
+#define LDR_PIN 34  // Chân đọc cảm biến ánh sáng (ESP32 dùng ADC34)
 
 #define TM1637_CLK 18
 #define TM1637_DIO 19
 
 TM1637Display display(TM1637_CLK, TM1637_DIO);
-bool showTime = true;  // Trạng thái hiển thị đồng hồ
-bool lastButtonState = HIGH; // Lưu trạng thái nút trước đó
+bool showTime = true;
+bool lastButtonState = HIGH;
+unsigned long lastDebounceTime = 0;
+const unsigned long debounceDelay = 50;
+
+const int lightThreshold = 500; // Ngưỡng để xác định trời tối (0-4095 trên ESP32)
 
 void setup() {
     pinMode(LED_RED, OUTPUT);
     pinMode(LED_YELLOW, OUTPUT);
     pinMode(LED_GREEN, OUTPUT);
     pinMode(BTN_PIN, INPUT_PULLUP);
-    display.setBrightness(7); // Độ sáng tối đa
+    display.setBrightness(7);
 }
 
-void countDown(int);
+void handleButton();
+void countDownNonBlocking(int);
+void blinkYellowLight();
+
 void loop() {
-    // Kiểm tra nếu nút được nhấn để bật/tắt màn hình
+    handleButton(); // Xử lý nút nhấn
+    int lightLevel = analogRead(LDR_PIN); // Đọc cảm biến ánh sáng
+
+    if (lightLevel < lightThreshold) {
+        blinkYellowLight(); // Trời tối → chỉ bật đèn vàng nhấp nháy
+    } else {
+        digitalWrite(LED_RED, HIGH);
+        countDownNonBlocking(5);
+        digitalWrite(LED_RED, LOW);
+
+        digitalWrite(LED_GREEN, HIGH);
+        countDownNonBlocking(5);
+        digitalWrite(LED_GREEN, LOW);
+
+        digitalWrite(LED_YELLOW, HIGH);
+        countDownNonBlocking(2);
+        digitalWrite(LED_YELLOW, LOW);
+    }
+}
+
+// Xử lý nút nhấn bật/tắt màn hình
+void handleButton() {
     bool buttonState = digitalRead(BTN_PIN);
-    if (buttonState == LOW && lastButtonState == HIGH) {
-        showTime = !showTime;
-        delay(200); // Chống dội phím
+    if (buttonState != lastButtonState) {
+        lastDebounceTime = millis();
+    }
+    if ((millis() - lastDebounceTime) > debounceDelay) {
+        if (buttonState == LOW && lastButtonState == HIGH) {
+            showTime = !showTime;
+        }
     }
     lastButtonState = buttonState;
-
-    // Đèn đỏ sáng 5s
-    digitalWrite(LED_RED, HIGH);
-    countDown(5);
-    digitalWrite(LED_RED, LOW);
-
-    // Đèn xanh sáng 5s
-    digitalWrite(LED_GREEN, HIGH);
-    countDown(5);
-    digitalWrite(LED_GREEN, LOW);
-
-    // Đèn vàng sáng 2s
-    digitalWrite(LED_YELLOW, HIGH);
-    countDown(2);
-    digitalWrite(LED_YELLOW, LOW);
 }
 
-// Hàm đếm ngược hiển thị trên TM1637
-void countDown(int seconds) {
-    for (int i = seconds; i >= 0; i--) {
-        if (showTime) {
-            display.showNumberDec(i, true);
-        } else {
-            display.clear();
+// Đếm ngược không chặn vòng lặp
+void countDownNonBlocking(int seconds) {
+    unsigned long startTime = millis();
+    int remainingTime = seconds;
+    while (remainingTime >= 0) {
+        if (millis() - startTime >= 1000) {
+            startTime = millis();
+            if (showTime) {
+                display.showNumberDec(remainingTime, true);
+            } else {
+                display.clear();
+            }
+            remainingTime--;
         }
-        delay(1000);
+        handleButton();
+    }
+}
+
+// Chế độ đèn vàng nhấp nháy khi trời tối
+void blinkYellowLight() {
+    while (true) {
+        digitalWrite(LED_YELLOW, HIGH);
+        delay(500);
+        digitalWrite(LED_YELLOW, LOW);
+        delay(500);
+
+        handleButton();
+        int lightLevel = analogRead(LDR_PIN);
+        if (lightLevel >= lightThreshold) {
+            return; // Khi trời sáng lại, thoát chế độ nhấp nháy
+        }
     }
 }
