@@ -19,7 +19,7 @@ int buttonState = 0;
 int lastButtonState = HIGH;
 bool displayOn = true;
 int ldrValue = 0;
-int countdown = 5; // Bắt đầu đếm từ 10 (cho đèn xanh)
+int countdown = 5; // Bắt đầu đếm từ 5
 unsigned long previousMillis = 0;
 const long interval = 1000; // Thời gian đếm lùi (1 giây)
 unsigned long blinkMillis = 0;
@@ -31,6 +31,13 @@ bool lightStateChanged = true; // Theo dõi thay đổi trạng thái đèn
 
 enum TrafficLightState { GREEN, YELLOW, RED }; // Trạng thái đèn giao thông
 TrafficLightState lightState = GREEN;         // Đèn bắt đầu từ xanh
+
+void resetLights() {
+    digitalWrite(LED_GREEN, LOW);
+    digitalWrite(LED_YELLOW, LOW);
+    digitalWrite(LED_RED, LOW);
+    digitalWrite(LED_BLUE, LOW);
+}
 
 void setup() {
     // Cài đặt chế độ cho các chân
@@ -50,56 +57,43 @@ void setup() {
     Serial.println("Hệ thống đèn giao thông khởi động...");
 }
 
-void loop() {
-    unsigned long currentMillis = millis();
-
-    // Đọc giá trị cảm biến ánh sáng (LDR) và chuyển đổi sang lux
-    int ldrRaw = analogRead(LDR_PIN);
-    float ldrLux = map(ldrRaw, 0, 4095, 0, 1000); // Giả định 0-4095 tương ứng 0-1000 lux
-
-    // Kiểm tra nút nhấn để bật/tắt hiển thị
+void checkButton(unsigned long currentMillis) {
     buttonState = digitalRead(BUTTON_PIN);
     if (buttonState == LOW && lastButtonState == HIGH && (currentMillis - lastDebounceTime) > debounceDelay) {
         displayOn = !displayOn;
         if (!displayOn) {
             display.clear();
+        } else {
+            display.showNumberDec(countdown >= 0 ? countdown : 0);
         }
         lastDebounceTime = currentMillis;
     }
     lastButtonState = buttonState;
+}
 
-    // Nếu trời tối hoàn toàn (lux < 10), bật chế độ ban đêm
-    if (ldrLux < 10) {
-        digitalWrite(LED_GREEN, LOW);
-        digitalWrite(LED_YELLOW, LOW);
-        digitalWrite(LED_RED, LOW);
-        digitalWrite(LED_BLUE, HIGH); // Bật đèn xanh dương (chế độ ban đêm)
+void nightMode(float ldrLux) {
+    resetLights();
+    digitalWrite(LED_BLUE, HIGH); // Bật đèn xanh dương (chế độ ban đêm)
 
-        if (displayOn) display.clear(); // Tắt màn hình hiển thị
-        Serial.println("Chế độ ban đêm: Bật đèn xanh dương (BLUE)");
-        return; // Dừng loop để không chạy logic đèn giao thông
-    } else {
-        digitalWrite(LED_BLUE, LOW); // Tắt đèn xanh dương khi trời sáng hơn
+    if (displayOn) display.clear(); // Tắt màn hình hiển thị
+    Serial.println("Chế độ ban đêm: Bật đèn xanh dương (BLUE)");
+}
+
+void warningMode(unsigned long currentMillis) {
+    resetLights();
+    digitalWrite(LED_BLUE, HIGH); // Bật đèn xanh dương sáng liên tục
+
+    if (currentMillis - blinkMillis >= blinkInterval) {
+        blinkMillis = currentMillis;
+        yellowBlinkState = !yellowBlinkState;
+        digitalWrite(LED_YELLOW, yellowBlinkState);
     }
 
-    // Nếu trời tối nhẹ (10 ≤ lux < 50), bật đèn vàng nhấp nháy
-    if (ldrLux < 50) {
-      digitalWrite(LED_GREEN, LOW);
-      digitalWrite(LED_RED, LOW);
-      digitalWrite(LED_BLUE, HIGH); // Bật đèn xanh dương sáng liên tục
-  
-      if (currentMillis - blinkMillis >= blinkInterval) {
-          blinkMillis = currentMillis;
-          yellowBlinkState = !yellowBlinkState;
-          digitalWrite(LED_YELLOW, yellowBlinkState);
-      }
-  
-      if (displayOn) display.clear(); // Tắt màn hình hiển thị
-      Serial.println("Chế độ cảnh báo: Đèn vàng nhấp nháy, đèn xanh dương bật");
-      return; // Dừng loop để không chạy logic đèn giao thông
-  }
+    if (displayOn) display.clear(); // Tắt màn hình hiển thị
+    Serial.println("Chế độ cảnh báo: Đèn vàng nhấp nháy, đèn xanh dương bật");
+}
 
-    // Nếu trời sáng (lux >= 50), chạy đèn giao thông bình thường
+void trafficLightCycle(unsigned long currentMillis) {
     if (currentMillis - previousMillis >= interval) {
         previousMillis = currentMillis;
         countdown--;
@@ -125,48 +119,57 @@ void loop() {
         }
 
         if (displayOn) {
-            display.showNumberDec(countdown);
+            display.showNumberDec(countdown >= 0 ? countdown : 0);
+        }
+
+        Serial.print("LDR Lux: ");
+        Serial.print(analogRead(LDR_PIN));
+        Serial.print(" | Tín hiệu: ");
+        switch (lightState) {
+            case GREEN:
+                Serial.println("XANH (GREEN)");
+                break;
+            case YELLOW:
+                Serial.println("VÀNG (YELLOW)");
+                break;
+            case RED:
+                Serial.println("ĐỎ (RED)");
+                break;
         }
     }
 
-    // Điều khiển đèn giao thông và hiển thị trạng thái
     if (lightStateChanged) {
+        resetLights();
         switch (lightState) {
             case GREEN:
                 digitalWrite(LED_GREEN, HIGH);
-                digitalWrite(LED_YELLOW, LOW);
-                digitalWrite(LED_RED, LOW);
-                Serial.println("Tín hiệu: XANH (GREEN)");
                 break;
             case YELLOW:
-                digitalWrite(LED_GREEN, LOW);
                 digitalWrite(LED_YELLOW, HIGH);
-                digitalWrite(LED_RED, LOW);
-                Serial.println("Tín hiệu: VÀNG (YELLOW)");
                 break;
             case RED:
-                digitalWrite(LED_GREEN, LOW);
-                digitalWrite(LED_YELLOW, LOW);
                 digitalWrite(LED_RED, HIGH);
-                Serial.println("Tín hiệu: ĐỎ (RED)");
                 break;
         }
-        lightStateChanged = false; // Đánh dấu đã cập nhật trạng thái đèn
+        lightStateChanged = false;
     }
+}
 
-    // In giá trị ánh sáng và tín hiệu đèn liên tục
-    Serial.print("LDR Lux: ");
-    Serial.print(ldrLux);
-    Serial.print(" | Tín hiệu: ");
-    switch (lightState) {
-        case GREEN:
-            Serial.println("XANH (GREEN)");
-            break;
-        case YELLOW:
-            Serial.println("VÀNG (YELLOW)");
-            break;
-        case RED:
-            Serial.println("ĐỎ (RED)");
-            break;
+void loop() {
+    unsigned long currentMillis = millis();
+
+    // Đọc giá trị cảm biến ánh sáng (LDR) và chuyển đổi sang lux
+    int ldrRaw = analogRead(LDR_PIN);
+    float ldrLux = map(ldrRaw, 0, 4095, 0, 1000); // Giả định 0-4095 tương ứng 0-1000 lux (ESP32)
+
+    checkButton(currentMillis);
+
+    if (ldrLux < 10) {
+        nightMode(ldrLux);
+    } else if (ldrLux < 50) {
+        warningMode(currentMillis);
+    } else {
+        resetLights();
+        trafficLightCycle(currentMillis);
     }
 }
