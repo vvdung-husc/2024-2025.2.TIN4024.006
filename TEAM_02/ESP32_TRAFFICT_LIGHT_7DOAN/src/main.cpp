@@ -159,7 +159,6 @@ void displayNumber(uint8_t number)
 }
 
 // Hàm xử lý hiển thị LED 7 đoạn
-// Hàm xử lý hiển thị LED 7 đoạn
 void updateDisplayState()
 {
   // Cập nhật trạng thái hiển thị dựa trên lựa chọn người dùng và chế độ ban đêm
@@ -209,15 +208,15 @@ void changeState(TrafficState newState)
     {
     case RED_STATE:
       digitalWrite(RED_PIN, HIGH);
-      countdown = RED_DURATION / 1000 - 1; // Bắt đầu từ 19 thay vì 20
+      countdown = RED_DURATION / 1000 - 1;
       break;
     case GREEN_STATE:
       digitalWrite(GREEN_PIN, HIGH);
-      countdown = GREEN_DURATION / 1000 - 1; // Bắt đầu từ 9 thay vì 10
+      countdown = GREEN_DURATION / 1000 - 1;
       break;
     case YELLOW_STATE:
       digitalWrite(YELLOW_PIN, HIGH);
-      countdown = YELLOW_DURATION / 1000 - 1; // Bắt đầu từ 2 thay vì 3
+      countdown = YELLOW_DURATION / 1000 - 1;
       break;
     }
   }
