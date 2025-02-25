@@ -7,13 +7,18 @@
 #define ledYellow 26
 #define ledGreen 25
 
+
+
 #define CLK 18
 #define DIO 19
 TM1637Display display(CLK, DIO);
 
+
+
 const uint32_t RED_TIME = 5000;
 const uint32_t YELLOW_TIME = 3000;
 const uint32_t GREEN_TIME = 10000;
+
 
 int currentState = 0;
 int countdown = 0;
@@ -95,11 +100,10 @@ void Non_block() {
     }
 
     int ldrValue = analogRead(ldrPin);
-    
     Serial.print("Lux: ");
     Serial.println(ldrValue);
     
-    if (ldrValue < 50) {
+    if (ldrValue < 500) {
         // Nếu ánh sáng yếu, đèn vàng nhấp nháy, tắt các đèn khác
         digitalWrite(ledRed, LOW);
         digitalWrite(ledGreen, LOW);

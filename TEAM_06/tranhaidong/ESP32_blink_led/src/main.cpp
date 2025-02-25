@@ -2,9 +2,9 @@
 #include <TM1637Display.h>
 
 /* Fill in information from Blynk Device Info here */
-#define BLYNK_TEMPLATE_ID "TMPL6wIZoVPPK"
-#define BLYNK_TEMPLATE_NAME "ESP32 LED Blink"
-#define BLYNK_AUTH_TOKEN "AOJMCCNRL0S1Uqsjy6A0Z-_CYIcfzQ1t"
+#define BLYNK_TEMPLATE_ID "TMPL6ooOf6hHn"
+#define BLYNK_TEMPLATE_NAME "ESP32 Blink Led"
+#define BLYNK_AUTH_TOKEN "7DHp9Bq-93jqhNLSFTQx0VNUj6qwXqUx"
 // Phải để trước khai báo sử dụng thư viện Blynk
 
 #include <WiFi.h>
@@ -73,7 +73,7 @@ bool IsReady(ulong &ulTimer, uint32_t milisecond)
 void updateBlueButton(){
   static ulong lastTime = 0;
   static int lastValue = HIGH;
-  if (!IsReady(lastTime, 50)) return; //Hạn chế bấm nút quá nhanh - 50ms mỗi lần bấm
+  if (!IsReady(lastTime, 50)) return;
   int v = digitalRead(btnBLED);
   if (v == lastValue) return;
   lastValue = v;
@@ -96,7 +96,7 @@ void updateBlueButton(){
 
 void uptimeBlynk(){
   static ulong lastTime = 0;
-if (!IsReady(lastTime, 1000)) return; //Kiểm tra và cập nhật lastTime sau mỗi 1 giây
+  if (!IsReady(lastTime, 1000)) return; //Kiểm tra và cập nhật lastTime sau mỗi 1 giây
   ulong value = lastTime / 1000;
   Blynk.virtualWrite(V0, value);  //Gửi giá trị lên chân ảo V0 trên ứng dụng Blynk.
   if (blueButtonON){
