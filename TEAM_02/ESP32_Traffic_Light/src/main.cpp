@@ -112,8 +112,8 @@ void loop() {
     float lux = calculateLux(ldrValue); // Chuyển đổi sang lux
 
     // 🟡 In giá trị LDR & Lux ra Serial để kiểm tra
-    Serial.print("LDR ADC: "); Serial.print(ldrValue);
-    Serial.print(" → Lux: "); Serial.println(lux);
+    // Serial.print("LDR ADC: "); Serial.print(ldrValue);
+    Serial.print("Lux: "); Serial.println(lux);
 
     if (lux < 50) { // Trời tối → Chỉ đèn vàng sáng, tắt màn hình
         digitalWrite(redPin, LOW);
