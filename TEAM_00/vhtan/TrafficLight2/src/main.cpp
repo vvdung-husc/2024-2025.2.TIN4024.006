@@ -1,24 +1,23 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
 
-// Pin definitions
+// Pin kết nối 
 #define rLED  27
 #define yLED  26
 #define gLED  25
 #define blueLED 21
-
 #define CLK   18
 #define DIO   19
 #define BUTTON_PIN 23
 #define LDR_PIN 13
 
-// Timing constants (milliseconds)
+// Thời gian của mỗi đèn (ms)
 #define rTIME  5000
 #define yTIME  2000
 #define gTIME  5000
 
 TM1637Display display(CLK, DIO);
-
+// biến thời gian và trạng thái
 ulong currentMiliseconds = 0;
 ulong ledTimeStart = 0;
 int currentLED = rLED;
