@@ -53,7 +53,7 @@ bool blueLedOn = true;                 // Trạng thái đèn LED xanh dương
 bool buttonState = HIGH;               // Trạng thái nút nhấn (HIGH khi không nhấn)
 bool lastButtonState = HIGH;           // Trạng thái nút nhấn trước đó
 uint32_t lastDebounceTime = 0;         // Thời điểm debounce nút nhấn gần nhất
-const uint32_t debounceDelay = 50;     // Thời gian debounce: 50ms
+const uint32_t debounceDelay = 20;     // Thời gian debounce: 20ms
 bool isNightMode = false;              // Chế độ đêm (khi trời tối)
 bool yellowBlinkState = false;         // Trạng thái nhấp nháy đèn vàng
 bool manualMode = false;               // Chế độ điều khiển thủ công qua Blynk
@@ -230,8 +230,6 @@ void changeState(TrafficState newState)
   updateBlynkLights();
 }
 
-// Xử lý nút nhấn vật lý
-// Xử lý nút nhấn vật lý
 void handleButton()
 {
   // Đọc trạng thái nút nhấn
@@ -243,10 +241,10 @@ void handleButton()
     lastDebounceTime = millis();
   }
 
-  // Nếu đã qua thời gian debounce và trạng thái ổn định
+  // Kiểm tra trạng thái nút sau thời gian debounce
   if ((millis() - lastDebounceTime) > debounceDelay)
   {
-    // Nếu trạng thái nút nhấn đã thay đổi
+    // Nếu trạng thái đã thay đổi sau debounce
     if (reading != buttonState)
     {
       buttonState = reading;
@@ -254,24 +252,22 @@ void handleButton()
       // Nếu nút được nhấn (LOW với INPUT_PULLUP)
       if (buttonState == LOW)
       {
-        // Đảo trạng thái hiển thị
+        // Đảo trạng thái hiển thị ngay lập tức
         displayUserChoice = !displayUserChoice;
 
-        // Cập nhật trạng thái hiển thị và đèn xanh dương
-        updateDisplayState();
-
-        // Cập nhật đèn xanh dương - bật khi màn hình bật, tắt khi màn hình tắt
+        // Cập nhật LED ngay lập tức không đợi hàm updateDisplayState
         digitalWrite(BLUE_PIN, displayUserChoice ? HIGH : LOW);
 
+        // Sau đó mới cập nhật các thành phần khác
+        updateDisplayState();
+
         Serial.print("Màn hình được chuyển bởi nút nhấn: ");
-        Serial.println(displayUserChoice ? "BẬT" : "TẮT");
-        Serial.print("Đèn xanh dương: ");
         Serial.println(displayUserChoice ? "BẬT" : "TẮT");
       }
     }
   }
 
-  // Lưu trạng thái nút nhấn hiện tại để so sánh lần sau
+  // Lưu trạng thái nút nhấn hiện tại
   lastButtonState = reading;
 }
 void handleLightSensor()
@@ -384,6 +380,7 @@ void setup()
 
 void loop()
 {
+  handleButton();
   // Chạy Blynk
   Blynk.run();
 
