@@ -95,11 +95,10 @@ void Non_block() {
     }
 
     int ldrValue = analogRead(ldrPin);
-    
     Serial.print("Lux: ");
     Serial.println(ldrValue);
     
-    if (ldrValue < 50) {
+    if (ldrValue < 500) {
         // Nếu ánh sáng yếu, đèn vàng nhấp nháy, tắt các đèn khác
         digitalWrite(ledRed, LOW);
         digitalWrite(ledGreen, LOW);
