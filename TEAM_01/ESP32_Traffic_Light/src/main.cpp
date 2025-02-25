@@ -95,15 +95,11 @@ void Non_block() {
     }
 
     int ldrValue = analogRead(ldrPin);
-    float analogValue = 250250 / ldrValue;
-    float voltage = analogValue / 1024. * 5;
-    float resistance = 2000 * voltage / (1 - voltage / 5);
-    float lux = pow(RL10 * 1e3 * pow(10, GAMMA) / resistance, (1 / GAMMA));
     
     Serial.print("Lux: ");
-    Serial.println(lux);
+    Serial.println(ldrValue);
     
-    if (lux < 50) {
+    if (ldrValue < 50) {
         // Nếu ánh sáng yếu, đèn vàng nhấp nháy, tắt các đèn khác
         digitalWrite(ledRed, LOW);
         digitalWrite(ledGreen, LOW);
