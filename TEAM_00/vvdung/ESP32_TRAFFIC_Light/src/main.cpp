@@ -10,13 +10,13 @@
 #define CLK 15
 #define DIO 2
 
-// Pin - Cảm biến quang điện trởtrở
-#define ldrPIN 13
+//Pin - Cảm biến quang điện trở
+#define ldrPIN  13
 
-// 1000 ms = 1 seconds
-uint rTIME = 5000;  // thời gian chờ đèn đỏ    5 giây
-uint yTIME = 3000;  // thời gian chờ đèn vàng  3 giây
-uint gTIME = 10000; // thời gian chờ đèn xanh 10 giây
+//1000 ms = 1 seconds
+uint rTIME = 5000;  //thời gian chờ đèn đỏ    5 giây
+uint yTIME = 3000;  //thời gian chờ đèn vàng  3 giây
+uint gTIME = 10000; //thời gian chờ đèn xanh 10 giây
 
 ulong currentMiliseconds = 0; // miliseconds hiện tại
 ulong ledTimeStart = 0;       // thời gian bắt đầu chạy LED

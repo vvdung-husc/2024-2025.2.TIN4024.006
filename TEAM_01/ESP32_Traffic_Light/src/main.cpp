@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
 
+
 #define led 21
 #define ledRed 27
 #define ledYellow 26
@@ -22,6 +23,9 @@ const uint32_t GREEN_TIME = 10000;
 int currentState = 0;
 int countdown = 0;
 uint32_t preTime = 0;
+
+const float GAMMA = 0.7;
+const float RL10 = 50;
 
 #define buttonPin 23
 #define ldrPin 13 // Chân analog của LDR
@@ -96,9 +100,9 @@ void Non_block() {
     }
 
     int ldrValue = analogRead(ldrPin);
-    Serial.print("LDR Value: ");
+    Serial.print("Lux: ");
     Serial.println(ldrValue);
-
+    
     if (ldrValue < 500) {
         // Nếu ánh sáng yếu, đèn vàng nhấp nháy, tắt các đèn khác
         digitalWrite(ledRed, LOW);
