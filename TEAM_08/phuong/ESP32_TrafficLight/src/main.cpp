@@ -71,10 +71,6 @@ void toggleDisplay()
     if (currentTime - lastButtonPress > 300) // Chống nhiễu (debounce)
     {
         isDisplayOn = !isDisplayOn;
-        if (!isDisplayOn)
-        {
-            display.clear();
-        }
         lastButtonPress = currentTime;
     }
 }
@@ -116,16 +112,20 @@ void loop()
 
         currentMiliseconds = millis();
         NonBlocking_Traffic_Light();
-        if (isDisplayOn)
-        {
-            Testing_Display();
-        }
+        Testing_Display();
     }
 }
 
 void Testing_Display()
 {
-    display.showNumberDec(counter, true, 3, 1);
+    if (isDisplayOn)
+    {
+        display.showNumberDec(counter, true, 3, 1);
+    }
+    else
+    {
+        display.clear();
+    }
     if (counter > 0)
     {
         counter--;
@@ -152,9 +152,6 @@ void NonBlocking_Traffic_Light()
             digitalWrite(gLED, HIGH);
             currentLED = gLED;
             counter = gTIME / 1000;
-            Serial.print("GREEN light\t : ");
-            Serial.print(counter);
-            Serial.println("s");
         }
         break;
 
@@ -165,9 +162,6 @@ void NonBlocking_Traffic_Light()
             digitalWrite(yLED, HIGH);
             currentLED = yLED;
             counter = yTIME / 1000;
-            Serial.print("YELLOW light\t : ");
-            Serial.print(counter);
-            Serial.println("s");
         }
         break;
 
@@ -178,9 +172,6 @@ void NonBlocking_Traffic_Light()
             digitalWrite(rLED, HIGH);
             currentLED = rLED;
             counter = rTIME / 1000;
-            Serial.print("RED light\t : ");
-            Serial.print(counter);
-            Serial.println("s");
         }
         break;
     }
