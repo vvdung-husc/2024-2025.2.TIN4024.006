@@ -152,6 +152,9 @@ void NonBlocking_Traffic_Light()
             digitalWrite(gLED, HIGH);
             currentLED = gLED;
             counter = gTIME / 1000;
+
+            // Luôn hiển thị trên Serial Monitor
+            Serial.println("Green light\t: 5s");
         }
         break;
 
@@ -162,6 +165,8 @@ void NonBlocking_Traffic_Light()
             digitalWrite(yLED, HIGH);
             currentLED = yLED;
             counter = yTIME / 1000;
+
+            Serial.println("Yellow light\t: 2s");
         }
         break;
 
@@ -172,10 +177,13 @@ void NonBlocking_Traffic_Light()
             digitalWrite(rLED, HIGH);
             currentLED = rLED;
             counter = rTIME / 1000;
+
+            Serial.println("Red light\t: 5s");
         }
         break;
     }
 }
+
 
 void yLED_Blink()
 {
