@@ -38,9 +38,9 @@
   "C_Cpp_Runner.compilerArgs": [],
   "C_Cpp_Runner.linkerArgs": [],
   "C_Cpp_Runner.includePaths": [
-    "D:/HKII/IOT/2024-2025.2.TIN4024.006/TEAM_00/vhtan/TrafficLight2/include",
-    "D:/HKII/IOT/2024-2025.2.TIN4024.006/TEAM_00/vhtan/TrafficLight2/src",
-    "D:/HKII/IOT/2024-2025.2.TIN4024.006/TEAM_00/vhtan/TrafficLight2/.pio/libdeps/nodemcu-32s/TM1637",
+    "D:/HKII/LapTrinhIOT/2024-2025.2.TIN4024.006/TEAM_08/TestTrafficLight/include",
+    "D:/HKII/LapTrinhIOT/2024-2025.2.TIN4024.006/TEAM_08/TestTrafficLight/src",
+    "D:/HKII/LapTrinhIOT/2024-2025.2.TIN4024.006/TEAM_08/TestTrafficLight/.pio/libdeps/nodemcu-32s/TM1637",
     "C:/Users/vhtan/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include",
     "C:/Users/vhtan/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include",
     "C:/Users/vhtan/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include/esp_additions/freertos",
