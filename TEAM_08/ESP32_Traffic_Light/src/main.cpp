@@ -6,6 +6,7 @@
 #define rLED 27 // Đèn đỏ
 #define yLED 26 // Đèn vàng
 #define gLED 25 // Đèn xanh
+
 // Đèn trời tối
 #define blueLED 21
 
@@ -13,9 +14,10 @@
 #define CLK 18
 #define DIO 19
 
-// Nút nhấn để tạm dừng.
+// Nút nhấn để bật/tắt hiển thị số
 #define BUTTON_PIN 23
-// Cảm biến quang (LDR) để nhận biết trời tối.
+
+// Cảm biến quang (LDR) để nhận biết trời tối
 #define LDR_PIN 13
 
 // Khai báo thời gian của mỗi tín hiệu đèn (ms)
@@ -24,18 +26,20 @@
 #define gTIME 5000
 
 TM1637Display display(CLK, DIO);
-// biến thời gian và trạng thái
+
+// Biến thời gian và trạng thái
 ulong currentMiliseconds = 0; // Thời gian hiện tại
 ulong ledTimeStart = 0;       // Thời điểm đèn đổi màu
 int currentLED = rLED;        // Đèn hiện tại đang sáng
-bool isPaused = false;        // Trạng thái dừng
+bool isDisplayOn = true;      // Trạng thái hiển thị số
 int counter = rTIME / 1000;   // Thời gian hiển thị đếm ngược (s)
+ulong lastButtonPress = 0;    // Lưu thời gian nhấn nút gần nhất
 
-void togglePause();                                // Tạm dừng hoặc tiếp tục hệ thống
+void toggleDisplay();                               // Bật/tắt màn hình số
 bool IsReady(ulong &ulTimer, uint32_t milisecond); // Kiểm tra xem đã hết thời gian đèn chưa
 void NonBlocking_Traffic_Light();                  // Điều khiển đèn giao thông không dùng delay
-void Testing_Display();                            // Hiển thị thời gian đếm ngược trên  TM1637
-bool isNightMode = false; // Lưu trạng thái hiện tại (mặc định là ban ngày)
+void Testing_Display();                            // Hiển thị thời gian đếm ngược trên TM1637
+bool isNightMode = false;                          // Lưu trạng thái hiện tại (mặc định là ban ngày)
 void yLED_Blink();
 
 void setup()
@@ -54,38 +58,20 @@ void setup()
     digitalWrite(rLED, HIGH);
     currentLED = rLED;
 
-    attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), togglePause, FALLING);
+    attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), toggleDisplay, FALLING);
     Serial.println("<== START ==>");
     Serial.print("RED light \t : ");
     Serial.print(counter);
     Serial.println("s");
 }
 
-void togglePause()
+void toggleDisplay()
 {
-    isPaused = !isPaused;
-    if (isPaused)
+    ulong currentTime = millis();
+    if (currentTime - lastButtonPress > 300) // Chống nhiễu (debounce)
     {
-        // Tắt tất cả đèn giao thông khi tạm dừng
-        digitalWrite(rLED, LOW);
-        digitalWrite(yLED, LOW);
-        digitalWrite(gLED, LOW);
-    }
-    else
-    {
-        // Khi tiếp tục, bật lại đèn theo trạng thái hiện tại
-        switch (currentLED)
-        {
-        case rLED:
-            digitalWrite(rLED, HIGH);
-            break;
-        case yLED:
-            digitalWrite(yLED, HIGH);
-            break;
-        case gLED:
-            digitalWrite(gLED, HIGH);
-            break;
-        }
+        isDisplayOn = !isDisplayOn;
+        lastButtonPress = currentTime;
     }
 }
 
@@ -124,20 +110,22 @@ void loop()
         digitalWrite(blueLED, LOW);
         digitalWrite(yLED, LOW);
 
-        if (!isPaused)
-        {
-            currentMiliseconds = millis();
-            NonBlocking_Traffic_Light();
-            Testing_Display();
-        }
+        currentMiliseconds = millis();
+        NonBlocking_Traffic_Light();
+        Testing_Display();
     }
 }
 
-
-
 void Testing_Display()
 {
-    display.showNumberDec(counter, true, 3, 1);
+    if (isDisplayOn)
+    {
+        display.showNumberDec(counter, true, 3, 1);
+    }
+    else
+    {
+        display.clear();
+    }
     if (counter > 0)
     {
         counter--;
@@ -164,9 +152,9 @@ void NonBlocking_Traffic_Light()
             digitalWrite(gLED, HIGH);
             currentLED = gLED;
             counter = gTIME / 1000;
-            Serial.print("GREEN light\t : ");
-            Serial.print(counter);
-            Serial.println("s");
+
+            // Luôn hiển thị trên Serial Monitor
+            Serial.println("Green light\t: 5s");
         }
         break;
 
@@ -177,9 +165,8 @@ void NonBlocking_Traffic_Light()
             digitalWrite(yLED, HIGH);
             currentLED = yLED;
             counter = yTIME / 1000;
-            Serial.print("YELLOW light\t : ");
-            Serial.print(counter);
-            Serial.println("s");
+
+            Serial.println("Yellow light\t: 2s");
         }
         break;
 
@@ -190,22 +177,24 @@ void NonBlocking_Traffic_Light()
             digitalWrite(rLED, HIGH);
             currentLED = rLED;
             counter = rTIME / 1000;
-            Serial.print("RED light\t : ");
-            Serial.print(counter);
-            Serial.println("s");
+
+            Serial.println("Red light\t: 5s");
         }
         break;
     }
 }
+
+
 void yLED_Blink()
 {
-    static ulong lastBlinkTime = 0;  // Lưu thời gian lần nhấp nháy trước
-    static bool isOn = false;        // Trạng thái đèn vàng
+    static ulong lastBlinkTime = 0; // Lưu thời gian lần nhấp nháy trước
+    static bool isOn = false;       // Trạng thái đèn vàng
 
-    if (millis() - lastBlinkTime >= 100)  // Mỗi 100ms đổi trạng thái đèn vàng
+    if (millis() - lastBlinkTime >= 100) // Mỗi 100ms đổi trạng thái đèn vàng
     {
         isOn = !isOn;
         digitalWrite(yLED, isOn ? HIGH : LOW);
-        lastBlinkTime = millis();  // Cập nhật thời gian nhấp nháy
+        lastBlinkTime = millis(); // Cập nhật thời gian nhấp nháy
     }
 }
+//1-3-2025
