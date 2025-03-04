@@ -7,6 +7,11 @@
 #define yLED  26
 #define gLED  25
 
+#define bLED  21
+const int buttonPin = 23;
+int oldValue = HIGH;
+bool screenOn = true;
+
 //Pin - TM1637TM1637
 #define CLK   18
 #define DIO   19
@@ -41,8 +46,10 @@ void setup() {
   pinMode(rLED, OUTPUT);
   pinMode(yLED, OUTPUT);
   pinMode(gLED, OUTPUT);
+  pinMode(bLED, OUTPUT);
 
   pinMode(ldrPIN,INPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
 
   tmCounter = (rTIME / 1000) - 1;
   display.setBrightness(7);
@@ -50,6 +57,7 @@ void setup() {
   digitalWrite(yLED, LOW);
   digitalWrite(gLED, LOW);
   digitalWrite(rLED, HIGH);
+  digitalWrite(bLED, HIGH);
   display.showNumberDec(tmCounter--, true, 2, 2);
   
   currentLED = rLED;
@@ -57,10 +65,27 @@ void setup() {
   Serial.println("== START ==>");  
   Serial.print("1. RED    => GREEN  "); Serial.print((nextTimeTotal/1000)%60);Serial.println(" (ms)"); 
 }
+void btnPress() {
+  int newValue = digitalRead(buttonPin);
+  if (newValue != oldValue) {
+    if (newValue == LOW) { 
+      screenOn = !screenOn;
 
+      if (screenOn) {
+        display.setBrightness(7);
+        display.showNumberDec(tmCounter, true, 2, 2); 
+        digitalWrite(bLED, HIGH); 
+      } else {
+        display.clear(); 
+        digitalWrite(bLED, LOW); 
+      }
+    }
+    oldValue = newValue; 
+  }
+}
 void loop() {  
-  // put your main code here, to run repeatedly:
   currentMiliseconds = millis();
+  btnPress(); 
   if (isDark()) YellowLED_Blink();        //Nếu trời tối => Nhấp nháy đèn vàng
   else NonBlocking_Traffic_Light_TM1637();//Hiển thị đèn giao thôngthông
   
