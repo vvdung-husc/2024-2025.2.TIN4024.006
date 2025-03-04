@@ -1,4 +1,18 @@
 #include <Arduino.h>
+#include <WiFi.h>
+#include <WiFiClient.h>
+
+// Định nghĩa Blynk
+#define BLYNK_TEMPLATE_ID "TMPL6iCGrZMtN"
+#define BLYNK_TEMPLATE_NAME "GiaoThong"
+#define BLYNK_AUTH_TOKEN "T1BUOkWPkXPjSX7DRL3-M5lElbGjUqX8"
+#define BLYNK_PRINT Serial
+
+#include <BlynkSimpleEsp32.h>
+
+// Thông tin WiFi - Hãy thay thế bằng thông tin WiFi của bạn
+char ssid[] = "Wokwi-GUEST";
+char pass[] = "";
 
 // Định nghĩa chân kết nối cho đèn giao thông
 const uint8_t RED_PIN = 16, YELLOW_PIN = 17, GREEN_PIN = 5;
@@ -21,9 +35,9 @@ enum TrafficState : uint8_t
 };
 
 // Định nghĩa thời gian cho mỗi trạng thái (đơn vị milli giây)
-const uint32_t RED_DURATION = 20000;      // Thời gian đèn đỏ: 20 giây
-const uint32_t GREEN_DURATION = 10000;    // Thời gian đèn xanh: 10 giây
-const uint32_t YELLOW_DURATION = 3000;    // Thời gian đèn vàng: 3 giây
+uint32_t RED_DURATION = 20000;            // Thời gian đèn đỏ: 20 giây
+uint32_t GREEN_DURATION = 10000;          // Thời gian đèn xanh: 10 giây
+uint32_t YELLOW_DURATION = 3000;          // Thời gian đèn vàng: 3 giây
 const uint32_t COUNTDOWN_INTERVAL = 1000; // Chu kỳ đếm ngược: 1 giây
 const uint32_t BLINK_INTERVAL = 500;      // Chu kỳ nhấp nháy đèn vàng: 0.5 giây
 
@@ -39,9 +53,13 @@ bool blueLedOn = true;                 // Trạng thái đèn LED xanh dương
 bool buttonState = HIGH;               // Trạng thái nút nhấn (HIGH khi không nhấn)
 bool lastButtonState = HIGH;           // Trạng thái nút nhấn trước đó
 uint32_t lastDebounceTime = 0;         // Thời điểm debounce nút nhấn gần nhất
-const uint32_t debounceDelay = 50;     // Thời gian debounce: 50ms
+const uint32_t debounceDelay = 20;     // Thời gian debounce: 20ms
 bool isNightMode = false;              // Chế độ đêm (khi trời tối)
 bool yellowBlinkState = false;         // Trạng thái nhấp nháy đèn vàng
+bool manualMode = false;               // Chế độ điều khiển thủ công qua Blynk
+
+// Timer để cập nhật Blynk
+BlynkTimer timer;
 
 // Mảng các bit cho LED 7 đoạn (0 để sáng, 1 để tắt)
 const uint8_t PROGMEM digits[10][7] = {
@@ -57,6 +75,21 @@ const uint8_t PROGMEM digits[10][7] = {
     {0, 0, 0, 0, 1, 0, 0}  // Số 9
 };
 
+// Cập nhật trạng thái đèn giao thông lên Blynk
+void updateBlynkLights()
+{
+  // Gửi trạng thái đèn giao thông hiện tại đến Blynk
+  // Sử dụng các kênh ảo V0, V1, V2 cho đèn đỏ, xanh, vàng
+  Blynk.virtualWrite(V0, currentState == RED_STATE ? 1 : 0);
+  Blynk.virtualWrite(V1, currentState == GREEN_STATE ? 1 : 0);
+  Blynk.virtualWrite(V2, currentState == YELLOW_STATE ? 1 : 0);
+
+  // Gửi thời gian đếm ngược
+  Blynk.virtualWrite(V3, countdown);
+
+  // Gửi thông tin về chế độ ban đêm
+  Blynk.virtualWrite(V5, isNightMode ? 1 : 0);
+}
 // Hàm để lấy tên trạng thái dưới dạng String
 String getStateName(TrafficState state)
 {
@@ -125,6 +158,7 @@ void displayNumber(uint8_t number)
   }
 }
 
+// Hàm xử lý hiển thị LED 7 đoạn
 void updateDisplayState()
 {
   // Cập nhật trạng thái hiển thị dựa trên lựa chọn người dùng và chế độ ban đêm
@@ -140,8 +174,13 @@ void updateDisplayState()
   {
     turnOffDisplay();
   }
-}
 
+  // Cập nhật đèn xanh dương - bật khi màn hình bật, tắt khi màn hình tắt
+  digitalWrite(BLUE_PIN, displayOn ? HIGH : LOW);
+
+  // Gửi trạng thái hiện tại đến Blynk
+  Blynk.virtualWrite(V4, displayUserChoice ? 1 : 0);
+}
 void changeState(TrafficState newState)
 {
   // Lấy tên trạng thái hiện tại và mới
@@ -169,15 +208,15 @@ void changeState(TrafficState newState)
     {
     case RED_STATE:
       digitalWrite(RED_PIN, HIGH);
-      countdown = RED_DURATION / 1000 - 1; // Bắt đầu từ 19 thay vì 20
+      countdown = RED_DURATION / 1000 - 1;
       break;
     case GREEN_STATE:
       digitalWrite(GREEN_PIN, HIGH);
-      countdown = GREEN_DURATION / 1000 - 1; // Bắt đầu từ 9 thay vì 10
+      countdown = GREEN_DURATION / 1000 - 1;
       break;
     case YELLOW_STATE:
       digitalWrite(YELLOW_PIN, HIGH);
-      countdown = YELLOW_DURATION / 1000 - 1; // Bắt đầu từ 2 thay vì 3
+      countdown = YELLOW_DURATION / 1000 - 1;
       break;
     }
   }
@@ -185,6 +224,9 @@ void changeState(TrafficState newState)
   currentState = newState;
   stateStartMillis = millis();
   updateDisplayState();
+
+  // Cập nhật trạng thái đèn trên Blynk
+  updateBlynkLights();
 }
 
 void handleButton()
@@ -192,16 +234,16 @@ void handleButton()
   // Đọc trạng thái nút nhấn
   int reading = digitalRead(BUTTON_PIN);
 
-  // Kiểm tra xem nút nhấn có thay đổi trạng thái không
+  // Kiểm tra nếu trạng thái nút nhấn đã thay đổi
   if (reading != lastButtonState)
   {
     lastDebounceTime = millis();
   }
 
-  // Nếu đã qua thời gian debounce và trạng thái ổn định
+  // Kiểm tra trạng thái nút sau thời gian debounce
   if ((millis() - lastDebounceTime) > debounceDelay)
   {
-    // Nếu trạng thái nút nhấn đã thay đổi
+    // Nếu trạng thái đã thay đổi sau debounce
     if (reading != buttonState)
     {
       buttonState = reading;
@@ -209,33 +251,28 @@ void handleButton()
       // Nếu nút được nhấn (LOW với INPUT_PULLUP)
       if (buttonState == LOW)
       {
-        // Đảo trạng thái lựa chọn hiển thị của người dùng
+        // Đảo trạng thái hiển thị ngay lập tức
         displayUserChoice = !displayUserChoice;
-        blueLedOn = !blueLedOn;
 
-        // Cập nhật LED xanh dương ngay lập tức
-        digitalWrite(BLUE_PIN, blueLedOn ? HIGH : LOW);
+        // Cập nhật LED ngay lập tức không đợi hàm updateDisplayState
+        digitalWrite(BLUE_PIN, displayUserChoice ? HIGH : LOW);
 
-        // Cập nhật trạng thái hiển thị màn hình LED dựa trên lựa chọn mới
+        // Sau đó mới cập nhật các thành phần khác
         updateDisplayState();
 
-        // In ra trạng thái debug
-        Serial.print("Display user choice: ");
-        Serial.println(displayUserChoice ? "ON" : "OFF");
-        Serial.print("Actual display: ");
-        Serial.println(displayOn ? "ON" : "OFF");
+        Serial.print("Màn hình được chuyển bởi nút nhấn: ");
+        Serial.println(displayUserChoice ? "BẬT" : "TẮT");
       }
     }
   }
 
-  // Lưu trạng thái nút nhấn hiện tại để so sánh trong lần tiếp theo
+  // Lưu trạng thái nút nhấn hiện tại
   lastButtonState = reading;
 }
-
 void handleLightSensor()
 {
   // Đọc giá trị từ cảm biến ánh sáng (LOW khi trời tối, HIGH khi trời sáng)
-  bool isDark = digitalRead(LIGHT_SENSOR_PIN) == LOW;
+  bool isDark = digitalRead(LIGHT_SENSOR_PIN) == HIGH;
 
   // Nếu có sự thay đổi trạng thái ánh sáng
   if (isDark != isNightMode)
@@ -283,6 +320,27 @@ void handleNightMode()
     digitalWrite(YELLOW_PIN, yellowBlinkState ? HIGH : LOW);
   }
 }
+// Trong hàm sendSensorData(), cập nhật trạng thái màn hình lên Blynk
+void sendSensorData()
+{
+  // Cập nhật trạng thái đèn
+  updateBlynkLights();
+
+  // Cập nhật trạng thái màn hình
+  Blynk.virtualWrite(V4, displayUserChoice ? 1 : 0);
+}
+// Điều khiển bật/tắt màn hình từ Blynk - sử dụng V4
+BLYNK_WRITE(V4)
+{
+  // Lấy giá trị từ Blynk (0 hoặc 1)
+  displayUserChoice = param.asInt();
+
+  // Cập nhật trạng thái hiển thị
+  updateDisplayState();
+
+  Serial.print("Màn hình được chuyển bởi Blynk: ");
+  Serial.println(displayUserChoice ? "BẬT" : "TẮT");
+}
 
 void setup()
 {
@@ -307,13 +365,27 @@ void setup()
 
   // Khởi tạo Serial để debug
   Serial.begin(115200);
-  Serial.println("Traffic Light System Starting...");
+  Serial.println("Traffic Light System Starting with Blynk...");
+
+  // Kết nối đến Blynk
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+
+  // Thiết lập timer để gửi dữ liệu lên Blynk mỗi 1 giây
+  timer.setInterval(1000L, sendSensorData);
 
   // Khởi tạo trạng thái ban đầu là đèn đỏ
   changeState(RED_STATE);
 }
+
 void loop()
 {
+  handleButton();
+  // Chạy Blynk
+  Blynk.run();
+
+  // Chạy timer
+  timer.run();
+
   uint32_t currentMillis = millis();
 
   // Xử lý nút nhấn
@@ -325,8 +397,8 @@ void loop()
   // Xử lý chế độ đêm (nhấp nháy đèn vàng)
   handleNightMode();
 
-  // Nếu đang ở chế độ đêm, không xử lý đèn giao thông bình thường
-  if (isNightMode)
+  // Nếu đang ở chế độ đêm hoặc chế độ thủ công, không xử lý đèn giao thông tự động
+  if (isNightMode || manualMode)
   {
     return;
   }
