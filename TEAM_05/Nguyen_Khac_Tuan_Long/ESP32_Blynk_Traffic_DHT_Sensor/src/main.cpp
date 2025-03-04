@@ -131,9 +131,7 @@ void updateDHT22() {
   Blynk.virtualWrite(V2, temp); // Gửi nhiệt độ lên Blynk
   Blynk.virtualWrite(V3, hum);  // Gửi độ ẩm lên Blynk
 
-  if (blueButtonON) {
-    display.showNumberDec((int)temp); // Hiển thị nhiệt độ lên TM1637
-  }
+ 
 }
 
 //được gọi mỗi khi có dữ liệu mới được gửi từ ứng dụng Blynk đến thiết bị.
