@@ -2,9 +2,9 @@
 #include <TM1637Display.h>
 
 /* Fill in information from Blynk Device Info here */
-#define BLYNK_TEMPLATE_ID "TMPL6K_KQYBE2"
-#define BLYNK_TEMPLATE_NAME "VD"
-#define BLYNK_AUTH_TOKEN "XDMqsXO-sSkPYCq-4VgIgL6yKtTWvXj1"
+#define BLYNK_TEMPLATE_ID "TMPL6DPYYaeB5"
+#define BLYNK_TEMPLATE_NAME "TrafficDHTSensor"
+#define BLYNK_AUTH_TOKEN "IgFU7RYkyQl5aUUAQPucJA-4aDNOnXh3"
 // Phải để trước khai báo sử dụng thư viện Blynk
 
 #include <WiFi.h>
@@ -22,6 +22,11 @@ char pass[] = "";             //Mật khẩu mạng WiFi
 #define CLK 18  //Chân kết nối CLK của TM1637
 #define DIO 19  //Chân kết nối DIO của TM1637
 
+#include <DHT.h>
+#define DHTPIN 16       // Chân kết nối cảm biến DHT22
+#define DHTTYPE DHT22   // Loại cảm biến
+DHT dht(DHTPIN, DHTTYPE);
+
 //Biến toàn cục
 ulong currentMiliseconds = 0; //Thời gian hiện tại - miliseconds 
 bool blueButtonON = true;     //Trạng thái của nút bấm ON -> đèn Xanh sáng và hiển thị LED TM1637
@@ -32,13 +37,16 @@ TM1637Display display(CLK, DIO);
 bool IsReady(ulong &ulTimer, uint32_t milisecond);
 void updateBlueButton();
 void uptimeBlynk();
+void updateDHT22();
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   pinMode(pinBLED, OUTPUT);
   pinMode(btnBLED, INPUT_PULLUP);
-    
+  
+  dht.begin();//DHT bat dau
+
   display.setBrightness(0x0f);
   
   // Start the WiFi connection
@@ -61,6 +69,7 @@ void loop() {
   currentMiliseconds = millis();
   uptimeBlynk();
   updateBlueButton();
+  updateDHT22();
 }
 
 // put function definitions here:
@@ -101,6 +110,29 @@ void uptimeBlynk(){
   Blynk.virtualWrite(V0, value);  //Gửi giá trị lên chân ảo V0 trên ứng dụng Blynk.
   if (blueButtonON){
     display.showNumberDec(value);
+  }
+}
+
+void updateDHT22() {
+  static ulong lastDHTTime = 0;
+  if (!IsReady(lastDHTTime, 2000)) return; // Đọc mỗi 2 giây
+
+  float temp = dht.readTemperature(); // Đọc nhiệt độ (°C)
+  float hum = dht.readHumidity();     // Đọc độ ẩm (%)
+
+  if (isnan(temp) || isnan(hum)) {
+    Serial.println("Lỗi đọc DHT22!");
+    return;
+  }
+
+  Serial.print("Nhiệt độ: "); Serial.print(temp); Serial.print("°C  ");
+  Serial.print("Độ ẩm: "); Serial.print(hum); Serial.println("%");
+
+  Blynk.virtualWrite(V2, temp); // Gửi nhiệt độ lên Blynk
+  Blynk.virtualWrite(V3, hum);  // Gửi độ ẩm lên Blynk
+
+  if (blueButtonON) {
+    display.showNumberDec((int)temp); // Hiển thị nhiệt độ lên TM1637
   }
 }
 
