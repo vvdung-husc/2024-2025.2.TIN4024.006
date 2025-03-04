@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "author": "An Văn Huỳnh Tường",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 134.4, "left": -235.16, "attrs": {} },
+    { "type": "wokwi-led", "id": "led1", "top": -80.4, "left": -265, "attrs": { "color": "red" } },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": -42,
+      "left": -226.6,
+      "attrs": { "color": "blue" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led3",
+      "top": -3.6,
+      "left": -188.2,
+      "attrs": { "color": "limegreen" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led4",
+      "top": 34.8,
+      "left": -140.2,
+      "attrs": { "color": "yellow" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "led1:C", "led2:C", "black", [ "v0" ] ],
+    [ "led2:C", "led3:C", "black", [ "v0" ] ],
+    [ "led3:C", "led4:C", "black", [ "v0" ] ],
+    [ "led4:C", "esp:GND.2", "black", [ "v0" ] ],
+    [ "led2:A", "esp:25", "green", [ "v0" ] ],
+    [ "led1:A", "esp:26", "green", [ "v0" ] ],
+    [ "led3:A", "esp:33", "green", [ "v0" ] ],
+    [ "led4:A", "esp:32", "green", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
