@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "author": "Trần Hải Đông",
+  "author": "Nhóm 6",
   "editor": "wokwi",
   "parts": [
     { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 259.2, "left": 388.84, "attrs": {} },

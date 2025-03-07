@@ -2,6 +2,9 @@
 #define BLYNK_TEMPLATE_NAME "Nhan"
 #define BLYNK_AUTH_TOKEN "IOg3DFoDvjBPSbxdbu3OOYGlKXGeGv52"
 
+
+
+
 #define WIFI_SSID "Wokwi-GUEST"
 #define WIFI_PASS ""
 
@@ -13,40 +16,39 @@
 
 #define DHTPIN 16
 #define DHTTYPE DHT22
-
-#define GREEN_LED 25    
-#define YELLOW_LED 26   
-#define RED_LED 27      
-#define BLUE_LED 21     
-
+#define GREEN_LED 25
+#define YELLOW_LED 26
+#define RED_LED 27
+#define BLUE_LED 21
 #define LDR_PIN 34
-
-#define BUTTON_PIN 23  
-#define CLK 18        
-#define DIO 19        
+#define BUTTON_PIN 23
+#define CLK 18
+#define DIO 19
 
 DHT dht(DHTPIN, DHTTYPE);
 TM1637Display display(CLK, DIO);
 BlynkTimer timer;
 
-bool ledState = false; // Trạng thái của Blue LED (true = bật, false = tắt)
-
-bool displayState = false; // Trạng thái của màn hình (true = bật, false = tắt)
-
+bool ledState = false;
+bool displayState = false;
 unsigned long lastButtonPress = 0;
-float temperature = 0;  
-float humidity = 0;     
-bool useBlynkData = false; 
+float temperature = 0;
+float humidity = 0;
+bool useBlynkData = false;
 
-int counter = 0;  
-int lightState = 0;  // 0 = Xanh, 1 = Vàng, 2 = Đỏ
+int counter = 0;
+int lightState = 0;
 unsigned long lightTimer = 0;
-int countdown = 5;  // Giá trị đếm ngược ban đầu
-bool useBlynkLightData = false;  // Xác định có dùng dữ liệu từ Blynk không
+int countdown = 5;
+bool useBlynkLightData = false;
 
-int darkThreshold = 1000;  // Ngưỡng độ sáng mặc định
-bool lowLightMode = false; // Chế độ ánh sáng thấp
+int darkThreshold = 1000;
+bool lowLightMode = false;
 
+float lastTemperature = -1;
+float lastHumidity = -1;
+int lastLightLevel = -1;
+int lastLightState = -1;
 
 // Kết nối WiFi
 void connectWiFi() {
@@ -62,8 +64,12 @@ void connectWiFi() {
 // Gửi dữ liệu cảm biến lên Blynk
 void sendSensorData() {
     if (!useBlynkData) {
-        temperature = dht.readTemperature();
-        humidity = dht.readHumidity();
+        float newTemp = dht.readTemperature();
+        float newHumidity = dht.readHumidity();
+        if (!isnan(newTemp) && !isnan(newHumidity)) {
+            temperature = newTemp;
+            humidity = newHumidity;
+        }
     }
 
     if (isnan(temperature) || isnan(humidity)) {
@@ -75,14 +81,23 @@ void sendSensorData() {
     Blynk.virtualWrite(V0, temperature);
     Blynk.virtualWrite(V1, humidity);
     Blynk.virtualWrite(V3, counter);
-    
-    counter++;  
+    counter++;
+
+    if (temperature != lastTemperature || humidity != lastHumidity) {
+        Serial.print("Nhiệt độ: ");
+        Serial.print(temperature);
+        Serial.print(" °C, Độ ẩm: ");
+        Serial.print(humidity);
+        Serial.println(" %");
+        lastTemperature = temperature;
+        lastHumidity = humidity;
+    }
 }
 
 // Nhận giá trị ngưỡng ánh sáng từ Blynk
 BLYNK_WRITE(V6) {
     darkThreshold = param.asInt();
-    useBlynkLightData = true;  // Đánh dấu rằng dữ liệu từ Blynk đang được sử dụng
+    useBlynkLightData = true;
     Serial.print("Cập nhật ngưỡng ánh sáng từ Blynk: ");
     Serial.println(darkThreshold);
 }
@@ -102,17 +117,15 @@ BLYNK_WRITE(V5) {
 // Kiểm tra nút nhấn và cập nhật trạng thái màn hình
 void checkButton() {
     if (digitalRead(BUTTON_PIN) == LOW) {
-        if (millis() - lastButtonPress > 300) {  
+        if (millis() - lastButtonPress > 300) {
             ledState = !ledState;
             digitalWrite(BLUE_LED, ledState);
             Blynk.virtualWrite(V2, ledState);
-            
-            displayState = !displayState; 
-
+            displayState = !displayState;
             if (!displayState) {
-                display.clear(); 
+                display.clear();
             } else {
-                display.showNumberDec(countdown); 
+                display.showNumberDec(countdown);
             }
 
             lastButtonPress = millis();
@@ -128,7 +141,7 @@ BLYNK_WRITE(V2) {
     displayState = ledState;
 
     if (!displayState) {
-        display.clear(); 
+        display.clear();
     } else {
         display.showNumberDec(countdown);
     }
@@ -146,8 +159,14 @@ void checkLightLevel() {
         darkThreshold = lightLevel;
         lowLightMode = (darkThreshold < 1000);
     }
+
+    if (lightLevel != lastLightLevel) {
+        Serial.print("Ánh sáng hiện tại: ");
+        Serial.println(lightLevel);
+        lastLightLevel = lightLevel;
+    }
 }
-// Quản lý đèn giao thông và đếm ngược
+
 void updateTrafficLights() {
     checkLightLevel();
 
@@ -155,8 +174,7 @@ void updateTrafficLights() {
         // Chế độ ánh sáng yếu: Đèn vàng nhấp nháy, màn hình hiển thị "0000"
         digitalWrite(GREEN_LED, LOW);
         digitalWrite(RED_LED, LOW);
-        
-        for (int i = 0; i < 5; i++) {  
+        for (int i = 0; i < 5; i++) {
             digitalWrite(YELLOW_LED, HIGH);
             delay(500);
             digitalWrite(YELLOW_LED, LOW);
@@ -172,21 +190,13 @@ void updateTrafficLights() {
             lightTimer = millis();
 
             if (countdown > 0) {
-                countdown--; 
+                countdown--;
             } else {
-                if (lightState == 0) {  
-                    lightState = 1;
-                    countdown = 2;
-                } else if (lightState == 1) {  
-                    lightState = 2;
-                    countdown = 3;
-                } else {  
-                    lightState = 0;
-                    countdown = 5;
-                }
+                lightState = (lightState + 1) % 3;
+                countdown = (lightState == 0) ? 5 : (lightState == 1) ? 2 : 3;
             }
         }
-        // Điều khiển LED theo trạng thái
+
         digitalWrite(GREEN_LED, lightState == 0);
         digitalWrite(YELLOW_LED, lightState == 1);
         digitalWrite(RED_LED, lightState == 2);
@@ -194,6 +204,11 @@ void updateTrafficLights() {
         // Cập nhật màn hình LED nếu đang bật
         if (displayState) {
             display.showNumberDec(countdown);
+        }
+
+        if (lightState != lastLightState) {
+            Serial.println(lightState == 0 ? "🟢 Xanh" : lightState == 1 ? "🟡 Vàng" : "🔴 Đỏ");
+            lastLightState = lightState;
         }
     }
 }
@@ -210,14 +225,11 @@ void setup() {
     pinMode(BLUE_LED, OUTPUT);
     pinMode(BUTTON_PIN, INPUT_PULLUP);
     pinMode(LDR_PIN, INPUT);
-
-    display.clear();   
-    Blynk.virtualWrite(V3, counter);  
-    Blynk.virtualWrite(V6, darkThreshold);  
-
+    display.clear();
+    Blynk.virtualWrite(V3, counter);
+    Blynk.virtualWrite(V6, darkThreshold);
     dht.begin();
-    display.setBrightness(7); 
-    
+    display.setBrightness(7);
     timer.setInterval(2000L, sendSensorData);
 }
 
