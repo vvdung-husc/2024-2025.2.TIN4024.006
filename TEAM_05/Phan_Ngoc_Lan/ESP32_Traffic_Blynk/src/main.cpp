@@ -54,6 +54,7 @@ ulong counterTime = 0;
 bool blueButtonON = true; // Trạng thái của nút bấm ON -> đèn Xanh sáng và hiển thị LED TM1637
 
 int darkThreshold = 1000; // Ngưỡng độ sáng để bật/tắt đèn vàng
+
 TM1637Display display(CLK, DIO);
 
 bool displayOn = true; // Trạng thái màn hình mặc định: BẬT
@@ -66,6 +67,7 @@ void YellowLED_Blink();
 void updateBlueButton();
 void uptimeBlynk();
 void readDHT();
+void readLDR();
 void setup()
 {
   Serial.begin(115200);
@@ -111,6 +113,7 @@ void loop()
   currentMiliseconds = millis();
   updateBlueButton();
   readDHT();
+  readLDR();
   uptimeBlynk();
   if (isDark())
   {
@@ -118,7 +121,7 @@ void loop()
     display.clear();
   }
   else
-    NonBlocking_Traffic_Light_TM1637(); // Hiển thị đèn giao thôngthông
+    NonBlocking_Traffic_Light_TM1637();
 }
 bool IsReady(ulong &ulTimer, uint32_t milisecond)
 {
@@ -139,9 +142,13 @@ void NonBlocking_Traffic_Light_TM1637()
       digitalWrite(rLED, LOW);
       digitalWrite(gLED, HIGH);
       currentLED = gLED;
+      nextTimeTotal += gTIME;
       tmCounter = (gTIME / 1000) - 1;
       bShowCounter = true;
       counterTime = currentMiliseconds;
+      Serial.print("2. GREEN  => YELLOW ");
+      Serial.print((nextTimeTotal / 1000) % 60);
+      Serial.println(" (ms)");
     }
     break;
   case gLED:
@@ -150,9 +157,13 @@ void NonBlocking_Traffic_Light_TM1637()
       digitalWrite(gLED, LOW);
       digitalWrite(yLED, HIGH);
       currentLED = yLED;
+      nextTimeTotal += yTIME;
       tmCounter = (yTIME / 1000) - 1;
       bShowCounter = true;
       counterTime = currentMiliseconds;
+      Serial.print("3. YELLOW => RED    ");
+      Serial.print((nextTimeTotal / 1000) % 60);
+      Serial.println(" (ms)");
     }
     break;
   case yLED:
@@ -161,9 +172,13 @@ void NonBlocking_Traffic_Light_TM1637()
       digitalWrite(yLED, LOW);
       digitalWrite(rLED, HIGH);
       currentLED = rLED;
+      nextTimeTotal += rTIME;
       tmCounter = (rTIME / 1000) - 1;
       bShowCounter = true;
       counterTime = currentMiliseconds;
+      Serial.print("1. RED    => GREEN  ");
+      Serial.print((nextTimeTotal / 1000) % 60);
+      Serial.println(" (ms)");
     }
     break;
   }
@@ -183,35 +198,38 @@ bool isDark()
   static ulong darkTimeStart = 0;
   static uint16_t lastValue = 0;
   static bool bDark = false;
+  static int lastThreshold = 0;
 
   if (!IsReady(darkTimeStart, 50))
     return bDark;
   uint16_t value = analogRead(ldrPIN);
-  if (value == lastValue)
-    return bDark;
 
-  if (value < darkThreshold)
+  if (value != lastValue || darkThreshold != lastThreshold)
   {
-    if (!bDark)
+    if (value < darkThreshold)
     {
-      digitalWrite(currentLED, LOW);
-      Serial.print("DARK  value: ");
-      Serial.println(value);
+      if (!bDark)
+      {
+        digitalWrite(currentLED, LOW);
+        Serial.print("DARK  value: ");
+        Serial.println(value);
+      }
+      bDark = true;
     }
-    bDark = true;
-  }
-  else
-  {
-    if (bDark)
+    else
     {
-      digitalWrite(currentLED, LOW);
-      Serial.print("LIGHT value: ");
-      Serial.println(value);
+      if (bDark)
+      {
+        digitalWrite(currentLED, LOW);
+        Serial.print("LIGHT value: ");
+        Serial.println(value);
+      }
+      bDark = false;
     }
-    bDark = false;
   }
 
   lastValue = value;
+  lastThreshold = darkThreshold;
   return bDark;
 }
 
@@ -234,7 +252,7 @@ void updateBlueButton()
   static ulong lastTime = 0;
   static int lastValue = HIGH;
   if (!IsReady(lastTime, 50))
-    return; // Hạn chế bấm nút quá nhanh - 50ms mỗi lần bấm
+    return;
   int v = digitalRead(btn1);
   if (v == lastValue)
     return;
@@ -244,14 +262,14 @@ void updateBlueButton()
 
   if (!blueButtonON)
   {
-    Serial.println("Blue Light ON");
+    Serial.println("Button   => ON ");
     digitalWrite(bLED, HIGH);
     blueButtonON = true;
     Blynk.virtualWrite(V1, blueButtonON); // Gửi giá trị lên chân ảo V1 trên ứng dụng Blynk.
   }
   else
   {
-    Serial.println("Blue Light OFF");
+    Serial.println("Button   => OF");
     digitalWrite(bLED, LOW);
     blueButtonON = false;
     Blynk.virtualWrite(V1, blueButtonON); // Gửi giá trị lên chân ảo V1 trên ứng dụng Blynk.
@@ -316,15 +334,19 @@ void readDHT()
   Serial.print(humidity);
   Serial.println("%");
 }
+void readLDR()
+{
+  Blynk.virtualWrite(V4, darkThreshold);
+}
 // Hàm nhận giá trị ngưỡng ánh sáng từ Blynk
+
 BLYNK_WRITE(V4)
 {
-
   int newDarkThreshold = param.asInt();
   if (newDarkThreshold > 0)
   {
     darkThreshold = newDarkThreshold;
-    Serial.print("Ngưỡng ánh sáng cập nhật từ Blynk:");
+    Serial.print("Ngưỡng ánh sáng cập nhật từ Blynk: ");
     Serial.println(darkThreshold);
   }
 }
