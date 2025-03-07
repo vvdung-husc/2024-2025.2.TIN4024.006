@@ -2,10 +2,21 @@
 #include <TM1637Display.h>
 #include <DHT.h>
 
+// Phan Ngọc Lân
 /* Fill in information from Blynk Device Info here */
-#define BLYNK_TEMPLATE_ID "TMPL6t-OvCkox"
-#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Blynk"
-#define BLYNK_AUTH_TOKEN "Htp2pF3wBuKNSg17EwNLUDdx7mPoqLKw"
+// #define BLYNK_TEMPLATE_ID "TMPL6t-OvCkox"
+// #define BLYNK_TEMPLATE_NAME "ESP32 Traffic Blynk"
+// #define BLYNK_AUTH_TOKEN "Htp2pF3wBuKNSg17EwNLUDdx7mPoqLKw"
+
+// Nguyễn Khắc Tuấn Long
+// #define BLYNK_TEMPLATE_ID "TMPL6Qo6YWqmI"
+// #define BLYNK_TEMPLATE_NAME "ESP32 Traffic Blynk"
+// #define BLYNK_AUTH_TOKEN "oANYuPhR9L9Z8cL7H6LIHHJ-dr8bMzuN"
+
+// Văn Viết Hiếu
+#define BLYNK_TEMPLATE_ID "TMPL6XiRGNNM_" 
+#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Blynk" 
+#define BLYNK_AUTH_TOKEN "LxFKoKU0VuT5SONVNq0Da9oCeqJRcxLu"
 // Phải để trước khai báo sử dụng thư viện Blynk
 
 #include <WiFi.h>
@@ -139,9 +150,13 @@ void NonBlocking_Traffic_Light_TM1637()
       digitalWrite(rLED, LOW);
       digitalWrite(gLED, HIGH);
       currentLED = gLED;
+      nextTimeTotal += gTIME;
       tmCounter = (gTIME / 1000) - 1;
       bShowCounter = true;
       counterTime = currentMiliseconds;
+      Serial.print("2. GREEN  => YELLOW ");
+      Serial.print((nextTimeTotal / 1000) % 60);
+      Serial.println(" (ms)");
     }
     break;
   case gLED:
@@ -150,9 +165,13 @@ void NonBlocking_Traffic_Light_TM1637()
       digitalWrite(gLED, LOW);
       digitalWrite(yLED, HIGH);
       currentLED = yLED;
+      nextTimeTotal += yTIME;
       tmCounter = (yTIME / 1000) - 1;
       bShowCounter = true;
       counterTime = currentMiliseconds;
+      Serial.print("3. YELLOW => RED    ");
+      Serial.print((nextTimeTotal / 1000) % 60);
+      Serial.println(" (ms)");
     }
     break;
   case yLED:
@@ -161,9 +180,13 @@ void NonBlocking_Traffic_Light_TM1637()
       digitalWrite(yLED, LOW);
       digitalWrite(rLED, HIGH);
       currentLED = rLED;
+      nextTimeTotal += rTIME;
       tmCounter = (rTIME / 1000) - 1;
       bShowCounter = true;
       counterTime = currentMiliseconds;
+      Serial.print("1. RED    => GREEN  ");
+      Serial.print((nextTimeTotal / 1000) % 60);
+      Serial.println(" (ms)");
     }
     break;
   }
@@ -183,36 +206,38 @@ bool isDark()
   static ulong darkTimeStart = 0;
   static uint16_t lastValue = 0;
   static bool bDark = false;
+  static uint16_t lastDarkThreshold = 0;
 
   if (!IsReady(darkTimeStart, 50))
     return bDark;
   uint16_t value = analogRead(ldrPIN);
-  if (value == lastValue)
+
+  if (value != lastValue || lastDarkThreshold != darkThreshold)
+  {
+    if (value < darkThreshold)
+    {
+      if (!bDark)
+      {
+        digitalWrite(currentLED, LOW);
+        Serial.print("DARK  value: ");
+        Serial.println(value);
+      }
+      bDark = true;
+    }
+    else
+    {
+      if (bDark)
+      {
+        digitalWrite(currentLED, LOW);
+        Serial.print("LIGHT value: ");
+        Serial.println(value);
+      }
+      bDark = false;
+    }
+    lastDarkThreshold = darkThreshold;
+    lastValue = value;
     return bDark;
-
-  if (value < darkThreshold)
-  {
-    if (!bDark)
-    {
-      digitalWrite(currentLED, LOW);
-      Serial.print("DARK  value: ");
-      Serial.println(value);
-    }
-    bDark = true;
   }
-  else
-  {
-    if (bDark)
-    {
-      digitalWrite(currentLED, LOW);
-      Serial.print("LIGHT value: ");
-      Serial.println(value);
-    }
-    bDark = false;
-  }
-
-  lastValue = value;
-  return bDark;
 }
 
 void YellowLED_Blink()
