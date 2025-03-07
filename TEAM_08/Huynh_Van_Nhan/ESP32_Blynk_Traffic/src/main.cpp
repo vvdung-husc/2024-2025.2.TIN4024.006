@@ -64,6 +64,8 @@ void sendSensorData() {
     if (!useBlynkData) {
         temperature = dht.readTemperature();
         humidity = dht.readHumidity();
+        
+        
     }
 
     if (isnan(temperature) || isnan(humidity)) {
@@ -91,12 +93,22 @@ BLYNK_WRITE(V6) {
 BLYNK_WRITE(V4) {
     temperature = param.asFloat();
     useBlynkData = true;
+    // In giá trị nhiệt độ và độ ẩm ra Serial Monitor
+    Serial.print("Temperature: ");
+    Serial.print(temperature);
+    Serial.println(" °C");
+
+    
 }
 
 // Nhận độ ẩm từ Blynk
 BLYNK_WRITE(V5) {
     humidity = param.asFloat();
     useBlynkData = true;
+
+    Serial.print("Humidity: ");
+    Serial.print(humidity);
+    Serial.println(" %");
 }
 
 // Kiểm tra nút nhấn và cập nhật trạng thái màn hình
@@ -110,9 +122,11 @@ void checkButton() {
             displayState = !displayState; 
 
             if (!displayState) {
-                display.clear(); 
+                display.clear();
+                Serial.println("Off");  // In ra "Off" khi displayState là false
             } else {
-                display.showNumberDec(countdown); 
+                display.showNumberDec(countdown);
+                Serial.println("On");   // In ra "On" khi displayState là true
             }
 
             lastButtonPress = millis();
@@ -129,8 +143,10 @@ BLYNK_WRITE(V2) {
 
     if (!displayState) {
         display.clear(); 
+        Serial.println("Off");  // In ra "Off" khi displayState là false
     } else {
         display.showNumberDec(countdown);
+        Serial.println("On");   // In ra "On" khi displayState là true
     }
 }
 
