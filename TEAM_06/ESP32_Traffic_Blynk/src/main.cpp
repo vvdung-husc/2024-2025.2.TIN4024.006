@@ -149,16 +149,16 @@ void docCamBienAnhSang() {
 }
 
 // Điều khiển đèn giao thông
+// Điều khiển đèn giao thông
 void dieuKhienDenGiaoThong() {
   static ulong lanCuoi = 0;
-  static int trangThaiDen = 0;
+  static int trangThaiDen = 0;  // 0: Xanh, 1: Vàng, 2: Đỏ
 
   if (laBanDem) {
     if (kiemTraThoiGian(lanCuoi, 500)) {
       digitalWrite(denDo, LOW);
       digitalWrite(denXanh, LOW);
       digitalWrite(denVang, !digitalRead(denVang));
-
       Serial.println("🌙 Trời tối - Nhấp nháy đèn vàng");
 
       Blynk.virtualWrite(V6, 0);
@@ -167,20 +167,22 @@ void dieuKhienDenGiaoThong() {
     }
   } else {
     if (kiemTraThoiGian(lanCuoi, 3000)) {
-      trangThaiDen = (trangThaiDen + 1) % 3;
+      if (trangThaiDen == 0) trangThaiDen = 1;  // Xanh -> Vàng
+      else if (trangThaiDen == 1) trangThaiDen = 2; // Vàng -> Đỏ
+      else trangThaiDen = 0;  // Đỏ -> Xanh
 
-      digitalWrite(denDo, trangThaiDen == 0);
+      digitalWrite(denDo, trangThaiDen == 2);
       digitalWrite(denVang, trangThaiDen == 1);
-      digitalWrite(denXanh, trangThaiDen == 2);
+      digitalWrite(denXanh, trangThaiDen == 0);
 
       Serial.print("☀️ Trời sáng - Đèn giao thông: ");
-      if (trangThaiDen == 0) Serial.println("🔴 Đèn đỏ");
+      if (trangThaiDen == 2) Serial.println("🔴 Đèn đỏ");
       else if (trangThaiDen == 1) Serial.println("🟡 Đèn vàng");
       else Serial.println("🟢 Đèn xanh");
 
-      Blynk.virtualWrite(V6, trangThaiDen == 0);
+      Blynk.virtualWrite(V6, trangThaiDen == 2);
       Blynk.virtualWrite(V5, trangThaiDen == 1);
-      Blynk.virtualWrite(V4, trangThaiDen == 2);
+      Blynk.virtualWrite(V4, trangThaiDen == 0);
     }
   }
 }
