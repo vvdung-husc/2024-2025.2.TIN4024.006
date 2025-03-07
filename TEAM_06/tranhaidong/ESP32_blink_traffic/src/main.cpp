@@ -3,9 +3,14 @@
 #include <DHT.h>
 
 /* Fill in information from Blynk Device Info here */
-#define BLYNK_TEMPLATE_ID "TMPL6nbCvap-d"
-#define BLYNK_TEMPLATE_NAME "ESP32 blink trafic DHT senor"
-#define BLYNK_AUTH_TOKEN "PrTa8hHSCix_9LUGZmtwoXA--43GftEg"
+// #define BLYNK_TEMPLATE_ID "TMPL6nbCvap-d"
+// #define BLYNK_TEMPLATE_NAME "ESP32 blink trafic DHT senor"
+// #define BLYNK_AUTH_TOKEN "PrTa8hHSCix_9LUGZmtwoXA--43GftEg"
+
+//Trần Hải Đông
+#define BLYNK_TEMPLATE_ID "TMPL6CrjN4tCi"
+#define BLYNK_TEMPLATE_NAME "ESP32 Blynkk Trafic Project"
+#define BLYNK_AUTH_TOKEN "s87JscYfMFpl9SSk6QHRNTUyZawlW5Bc"
 
 // Thư viện Blynk và kết nối WiFi
 #include <WiFi.h>
