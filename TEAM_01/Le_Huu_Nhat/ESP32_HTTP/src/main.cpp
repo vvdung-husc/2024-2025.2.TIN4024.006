@@ -7,7 +7,6 @@
 #define BLYNK_TEMPLATE_NAME "ESP32 HTTP"
 #define BLYNK_AUTH_TOKEN "WHlC9VrqrGYPyETlm1QcIJNX9ff-jyRU"
 
-#include <WiFi.h>
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
 // Thông tin WiFi
