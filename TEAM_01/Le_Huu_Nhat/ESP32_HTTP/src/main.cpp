@@ -2,10 +2,23 @@
 #include <HTTPClient.h>
 #include <Arduino.h>
 
+
+#define BLYNK_TEMPLATE_ID "TMPL6eFYYlr0t"
+#define BLYNK_TEMPLATE_NAME "ESP32 HTTP"
+#define BLYNK_AUTH_TOKEN "WHlC9VrqrGYPyETlm1QcIJNX9ff-jyRU"
+
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
 // Thông tin WiFi
 char ssid[] = "Wokwi-GUEST";  //Tên mạng WiFi
 char pass[] = "";             //Mật khẩu mạng WiFi
 
+ulong currentMiliseconds = 0;
+bool blueButtonON = true; 
+
+bool IsReady(ulong &ulTimer, uint32_t milisecond);
+void uptimeBlynk();
 // URL API
 const char* serverName = "http://ip4.iothings.vn?geo=1";
 
@@ -34,6 +47,19 @@ String convertToDMS(float coord, char pos, char neg) {
     snprintf(buf, sizeof(buf), "%d°%d'%.1f\"%c", degrees, minutes, seconds, direction);
     return String(buf);
 }
+bool IsReady(ulong &ulTimer, uint32_t milisecond)
+{
+  if (currentMiliseconds - ulTimer < milisecond) return false;
+  ulTimer = currentMiliseconds;
+  return true;
+}
+
+void uptimeBlynk(){
+    static ulong lastTime = 0;
+  if (!IsReady(lastTime, 1000)) return; //Kiểm tra và cập nhật lastTime sau mỗi 1 giây
+    ulong value = lastTime / 1000;
+    Blynk.virtualWrite(V0, value);  //Gửi giá trị lên chân ảo V0 trên ứng dụng Blynk.
+  }
 
 void setup() {
     Serial.begin(115200);
@@ -48,9 +74,20 @@ void setup() {
     }
     
     Serial.println("\nWiFi đã kết nối!");
+    // Start the WiFi connection
+  Serial.print("Connecting to ");Serial.println(ssid);
+  Blynk.begin(BLYNK_AUTH_TOKEN,ssid, pass); //Kết nối đến mạng WiFi
+
+  Serial.println();
+  Serial.println("WiFi connected");
+
+  Serial.println("== START ==>");
 }
 
 void loop() {
+    Blynk.run();
+    currentMiliseconds = millis();
+    uptimeBlynk();
     if (WiFi.status() == WL_CONNECTED) {
         HTTPClient http;
 
@@ -102,9 +139,11 @@ void loop() {
                 Serial.print(latitudeDMS); 
                 Serial.print(", ");
                 Serial.println(longitudeDMS);
-                
+                Blynk.virtualWrite(V1, result[0]);
                 // Tạo link Google Maps
                 Serial.println("Google Maps: http://www.google.com/maps/place/" + String(latitude) + "," + String(longitude));
+                String gg = "http://www.google.com/maps/place/"+String(latitude) + "," + String(longitude);
+                Blynk.virtualWrite(V2, gg);
                 Serial.println("================================");
             } else {
                 Serial.println("Lỗi: Chuỗi phản hồi không đúng định dạng.");
