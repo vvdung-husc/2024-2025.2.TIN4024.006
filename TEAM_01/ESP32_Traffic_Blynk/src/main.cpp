@@ -2,11 +2,14 @@
 #include <TM1637Display.h>
 #include <dht.h>
 
+//NGO NGUYEN DUC QUY
+#define BLYNK_TEMPLATE_ID "TMPL69AI-gkDM"
+#define BLYNK_TEMPLATE_NAME "ESP32 LED TM1637 2"
+#define BLYNK_AUTH_TOKEN "b8rpMHpj9nG_SeeXqgX9q0jx0sg_B_10"
 //LE HUU NHAT
 #define BLYNK_TEMPLATE_ID "TMPL6VOd5sqsE"
 #define BLYNK_TEMPLATE_NAME "ESP32 LED TM1637"
 #define BLYNK_AUTH_TOKEN "Z24-FlFOg2_-WIKTamwxA2uDvk7UWmz6"
-
 
 #include <WiFi.h>
 #include <WiFiClient.h>
