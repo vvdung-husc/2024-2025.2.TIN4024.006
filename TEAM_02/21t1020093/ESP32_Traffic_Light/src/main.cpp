@@ -24,6 +24,9 @@ int countdown = 0;
 int state = 0;
 bool nightMode = false; // Chế độ ban đêm
 
+const int NUM_SAMPLES = 5;
+float getLuxFiltered()
+
 void setup() {
     pinMode(redPin, OUTPUT);
     pinMode(yellowPin, OUTPUT);
@@ -94,7 +97,7 @@ float calculateLux(int adcValue) {
     if (adcValue == 0) return 0; // Tránh lỗi chia cho 0
 
     // Chuyển đổi giá trị ADC thành điện áp (ESP32 có ADC 12-bit: 0 - 4095)
-    float voltage = adcValue / 4095.0 * 5.0;
+    float voltage = adcValue / 4095.0 * 3.3;
     
     // Tính toán giá trị điện trở của LDR
     float resistance = 2000 * voltage / (1 - voltage / 5);

@@ -38,8 +38,8 @@
   "C_Cpp_Runner.compilerArgs": [],
   "C_Cpp_Runner.linkerArgs": [],
   "C_Cpp_Runner.includePaths": [
-    "D:/HKII/IOT/2024-2025.2.TIN4024.006/TEAM_00/vhtan/ESP32_LED_Blink/include",
-    "D:/HKII/IOT/2024-2025.2.TIN4024.006/TEAM_00/vhtan/ESP32_LED_Blink/src",
+    "D:/HKII/IOT/2024-2025.2.TIN4024.006/TEAM_08/vhtan/ESP32_LED_BLINK/include",
+    "D:/HKII/IOT/2024-2025.2.TIN4024.006/TEAM_08/vhtan/ESP32_LED_BLINK/src",
     "C:/Users/vhtan/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include",
     "C:/Users/vhtan/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include",
     "C:/Users/vhtan/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include/esp_additions/freertos",
