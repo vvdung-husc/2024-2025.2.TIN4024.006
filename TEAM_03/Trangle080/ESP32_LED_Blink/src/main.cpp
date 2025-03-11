@@ -4,7 +4,7 @@
 int myFunction(int, int);
 
 
-
+ 
 int ledPin = 5; // Chân GPIO 2 (thường nối sẵn LED trên board)
 
 void setup() {
