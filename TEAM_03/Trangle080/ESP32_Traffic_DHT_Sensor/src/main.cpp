@@ -5,9 +5,13 @@
 #include <DHT.h>
 
 /* Fill in information from Blynk Device Info here */
-#define BLYNK_TEMPLATE_ID "TMPL6ZJ29O7kP"
-#define BLYNK_TEMPLATE_NAME "ESMART3"
-#define BLYNK_AUTH_TOKEN "b6CL9SqPsJrmcrjSfVsuBa4bSxIKTFLt"
+// #define BLYNK_TEMPLATE_ID "TMPL6ZJ29O7kP"
+// #define BLYNK_TEMPLATE_NAME "ESMART3"
+// #define BLYNK_AUTH_TOKEN "b6CL9SqPsJrmcrjSfVsuBa4bSxIKTFLt"
+#define BLYNK_TEMPLATE_ID "TMPL6i1PVifIH"
+#define BLYNK_TEMPLATE_NAME "Sensor"
+#define BLYNK_AUTH_TOKEN "vDlShrkiSaIRhQymoL5H9jFwTHDZkfov"
+
 // Phải để trước khai báo sử dụng thư viện Blynk
 
 #include <WiFi.h>
