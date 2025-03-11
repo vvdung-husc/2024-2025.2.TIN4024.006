@@ -1,19 +1,23 @@
 #include <Arduino.h>
-#include <WiFi.h>
-#include <WiFiClient.h>
+
+#include <DHT.h>
 
 // Định nghĩa Blynk
-#define BLYNK_TEMPLATE_ID "TMPL6iCGrZMtN"
-#define BLYNK_TEMPLATE_NAME "GiaoThong"
-#define BLYNK_AUTH_TOKEN "T1BUOkWPkXPjSX7DRL3-M5lElbGjUqX8"
+#define BLYNK_TEMPLATE_ID "TMPL6lD14z4JL"
+#define BLYNK_TEMPLATE_NAME "ESP 32 Led controll"
+#define BLYNK_AUTH_TOKEN "SsfKH68GnPaMpwFo7SuSHWogtbX80vw3"
 #define BLYNK_PRINT Serial
 
 #include <BlynkSimpleEsp32.h>
-
+#include <WiFi.h>
+#include <WiFiClient.h>
 // Thông tin WiFi - Hãy thay thế bằng thông tin WiFi của bạn
 char ssid[] = "Wokwi-GUEST";
 char pass[] = "";
 
+#define DHTPIN 35
+#define DHTTYPE DHT22
+DHT dht(DHTPIN, DHTTYPE);
 // Định nghĩa chân kết nối cho đèn giao thông
 const uint8_t RED_PIN = 16, YELLOW_PIN = 17, GREEN_PIN = 5;
 const uint8_t BLUE_PIN = 22;         // Chân cho đèn LED xanh dương
@@ -75,21 +79,38 @@ const uint8_t PROGMEM digits[10][7] = {
     {0, 0, 0, 0, 1, 0, 0}  // Số 9
 };
 
-// Cập nhật trạng thái đèn giao thông lên Blynk
-void updateBlynkLights()
+void sendSensor()
 {
-  // Gửi trạng thái đèn giao thông hiện tại đến Blynk
-  // Sử dụng các kênh ảo V0, V1, V2 cho đèn đỏ, xanh, vàng
-  Blynk.virtualWrite(V0, currentState == RED_STATE ? 1 : 0);
-  Blynk.virtualWrite(V1, currentState == GREEN_STATE ? 1 : 0);
-  Blynk.virtualWrite(V2, currentState == YELLOW_STATE ? 1 : 0);
-
-  // Gửi thời gian đếm ngược
-  Blynk.virtualWrite(V3, countdown);
-
-  // Gửi thông tin về chế độ ban đêm
-  Blynk.virtualWrite(V5, isNightMode ? 1 : 0);
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Lỗi đọc cảm biến DHT22!");
+    return;
+  }
+  Serial.print("Nhiệt độ: ");
+  Serial.print(t);
+  Serial.println("°C");
+  Serial.print("Độ ẩm: ");
+  Serial.print(h);
+  Serial.println("%");
+  Blynk.virtualWrite(V3, t);
+  Blynk.virtualWrite(V2, h);
 }
+// Cập nhật trạng thái đèn giao thông lên Blynk
+// void updateBlynkLights()
+// {
+//   Gửi trạng thái đèn giao thông hiện tại đến Blynk
+//   Sử dụng các kênh ảo V0, V1, V2 cho đèn đỏ, xanh, vàng
+//   Blynk.virtualWrite(V0, currentState == RED_STATE ? 1 : 0);
+//   Blynk.virtualWrite(V1, currentState == GREEN_STATE ? 1 : 0);
+//   Blynk.virtualWrite(V2, currentState == YELLOW_STATE ? 1 : 0);
+
+//   Gửi thời gian đếm ngược
+//   Blynk.virtualWrite(V3, countdown);
+
+//   Gửi thông tin về chế độ ban đêm
+//   Blynk.virtualWrite(V5, isNightMode ? 1 : 0);
+// }
 // Hàm để lấy tên trạng thái dưới dạng String
 String getStateName(TrafficState state)
 {
@@ -179,7 +200,7 @@ void updateDisplayState()
   digitalWrite(BLUE_PIN, displayOn ? HIGH : LOW);
 
   // Gửi trạng thái hiện tại đến Blynk
-  Blynk.virtualWrite(V4, displayUserChoice ? 1 : 0);
+  Blynk.virtualWrite(V1, displayUserChoice ? 1 : 0);
 }
 void changeState(TrafficState newState)
 {
@@ -226,7 +247,7 @@ void changeState(TrafficState newState)
   updateDisplayState();
 
   // Cập nhật trạng thái đèn trên Blynk
-  updateBlynkLights();
+  // updateBlynkLights();
 }
 
 void handleButton()
@@ -324,13 +345,13 @@ void handleNightMode()
 void sendSensorData()
 {
   // Cập nhật trạng thái đèn
-  updateBlynkLights();
+  // updateBlynkLights();
 
   // Cập nhật trạng thái màn hình
-  Blynk.virtualWrite(V4, displayUserChoice ? 1 : 0);
+  Blynk.virtualWrite(V1, displayUserChoice ? 1 : 0);
 }
 // Điều khiển bật/tắt màn hình từ Blynk - sử dụng V4
-BLYNK_WRITE(V4)
+BLYNK_WRITE(V1)
 {
   // Lấy giá trị từ Blynk (0 hoặc 1)
   displayUserChoice = param.asInt();
@@ -344,6 +365,11 @@ BLYNK_WRITE(V4)
 
 void setup()
 {
+  Serial.begin(115200);
+  WiFi.begin(ssid, pass);
+  dht.begin();
+  // Kết nối đến Blynk
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
   // Cài đặt chế độ OUTPUT cho tất cả các chân
   for (uint8_t i = 0; i < 7; i++)
   {
@@ -364,15 +390,15 @@ void setup()
   digitalWrite(BLUE_PIN, HIGH);
 
   // Khởi tạo Serial để debug
-  Serial.begin(115200);
+
   Serial.println("Traffic Light System Starting with Blynk...");
-
-  // Kết nối đến Blynk
-  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
-
+  Blynk.virtualWrite(V2, dht.readHumidity());
+  Blynk.virtualWrite(V3, dht.readTemperature());
+  // Thiết lập đọc độ ẩm, nhiệt độ gửi lên mỗi lần 2s
+  timer.setInterval(2000L, sendSensor);
   // Thiết lập timer để gửi dữ liệu lên Blynk mỗi 1 giây
   timer.setInterval(1000L, sendSensorData);
-
+  
   // Khởi tạo trạng thái ban đầu là đèn đỏ
   changeState(RED_STATE);
 }
