@@ -18,21 +18,21 @@ char pass[] = "";
 #define CLK 18
 #define DIO 19
 #define RELAY_PIN 21
+#define BUTTON_PIN 23
 
 DHT dht(DHTPIN, DHTTYPE);
 TM1637Display display(CLK, DIO);
 BlynkTimer timer;
 bool systemState = true;
+bool lastButtonState = HIGH;
 
 BLYNK_WRITE(V2) {
   systemState = param.asInt();
   digitalWrite(RELAY_PIN, systemState ? HIGH : LOW);
   Serial.print("Hệ thống: "); Serial.println(systemState ? "Bật" : "Tắt");
 
-  // Đồng bộ trạng thái hệ thống lên Blynk
   Blynk.virtualWrite(V2, systemState);
 
-  // Xóa màn hình nếu tắt hệ thống
   if (!systemState) {
     display.clear();
   }
@@ -67,8 +67,24 @@ void updateUptime() {
   Serial.print(uptime / 60); Serial.print(" phút ");
   Serial.print(uptime % 60); Serial.println(" giây");
 
-  // Hiển thị thời gian hoạt động lên TM1637
   display.showNumberDec(uptime);
+}
+
+void checkButton() {
+  bool buttonState = digitalRead(BUTTON_PIN);
+  if (buttonState == LOW && lastButtonState == HIGH) {
+    delay(50);
+    if (digitalRead(BUTTON_PIN) == LOW) {
+      systemState = !systemState;
+      digitalWrite(RELAY_PIN, systemState ? HIGH : LOW);
+      Serial.print("Hệ thống: "); Serial.println(systemState ? "Bật" : "Tắt");
+      Blynk.virtualWrite(V2, systemState);
+      if (!systemState) {
+        display.clear();
+      }
+    }
+  }
+  lastButtonState = buttonState;
 }
 
 void setup() {
@@ -79,14 +95,15 @@ void setup() {
 
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, HIGH);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
 
-  // Đồng bộ trạng thái hệ thống khi khởi động
   Blynk.virtualWrite(V2, systemState);
 
-  timer.setInterval(2000L, sendSensor); // Cập nhật nhiệt độ & độ ẩm mỗi 2 giây
-  timer.setInterval(1000L, updateUptime); // Cập nhật thời gian hoạt động mỗi giây
+  timer.setInterval(2000L, sendSensor);
+  timer.setInterval(1000L, updateUptime);
+  timer.setInterval(100L, checkButton);
 }
 
 void loop() {
