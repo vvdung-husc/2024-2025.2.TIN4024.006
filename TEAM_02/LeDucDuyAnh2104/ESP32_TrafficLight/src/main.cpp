@@ -7,6 +7,8 @@ int greenPin = 16;
 const int CLK = 23;
 const int DIO = 22;
 
+const int ldrPin = 13;
+
 TM1637Display display(CLK, DIO);
 
 unsigned long previousMillis = 0;
@@ -66,4 +68,4 @@ void loop(){
     countdown--;
 
   }
-}
+} 

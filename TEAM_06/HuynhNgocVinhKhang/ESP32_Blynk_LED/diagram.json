@@ -1,0 +1,42 @@
+{
+    "version": 1,
+    "author": "Anonymous maker",
+    "editor": "wokwi",
+    "parts": [
+      { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 4.84, "attrs": {} },
+      {
+        "type": "wokwi-tm1637-7segment",
+        "id": "sevseg1",
+        "top": -105.64,
+        "left": 16.63,
+        "attrs": { "color": "red" }
+      },
+      {
+        "type": "wokwi-pushbutton",
+        "id": "btn1",
+        "top": 6.2,
+        "left": 163.2,
+        "attrs": { "color": "blue", "xray": "1" }
+      },
+      {
+        "type": "wokwi-led",
+        "id": "led1",
+        "top": 34.8,
+        "left": 129,
+        "attrs": { "color": "blue", "flip": "1" }
+      }
+    ],
+    "connections": [
+      [ "esp:TX", "$serialMonitor:RX", "", [] ],
+      [ "esp:RX", "$serialMonitor:TX", "", [] ],
+      [ "esp:GND.3", "led1:C", "black", [ "h0" ] ],
+      [ "esp:GND.3", "sevseg1:GND", "black", [ "h144", "v-134.4" ] ],
+      [ "esp:GND.2", "btn1:1.l", "black", [ "v0" ] ],
+      [ "esp:23", "btn1:2.l", "blue", [ "h0" ] ],
+      [ "esp:21", "led1:A", "blue", [ "h0" ] ],
+      [ "sevseg1:VCC", "esp:5V", "red", [ "h86.4", "v278.4", "h-268.95" ] ],
+      [ "sevseg1:CLK", "esp:18", "green", [ "h76.8", "v182.4" ] ],
+      [ "sevseg1:DIO", "esp:19", "green", [ "h67.2", "v163.2" ] ]
+    ],
+    "dependencies": {}
+  }

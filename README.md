@@ -45,7 +45,57 @@
 #### [Lập trình ESP32 GPIO Digital Input và Digital Output](https://khuenguyencreator.com/lap-trinh-esp32-gpio-digital-input-va-digital-output/)
 
 ---
+### - Esp32 | API HTTP GET
 
+#### Tham khảo
+
++ [ESP32 HTTP Client phương thức Get](https://khuenguyencreator.com/lay-du-lieu-thoi-tiet-voi-esp32-http-client-phuong-thuc-get/)
+
+#### Một số phần mềm
+
++ [CURL for Windows](https://curl.se/windows/)
++ [Postman - Kiểm thử API](https://www.postman.com/)
+
+#### http://ip4.iothings.vn?geo=1
+>Thông tin địa chỉ IPv4 đang sử dụng và vị trí địa lý (Geolocation - Latitude: Vĩ độ, Longitude: Kinh độ) 
+
+#### http://www.google.com/maps/place/16.4591267,107.5901477
+>Google Maps tại Latitude, Longitude
+
+## => Hãy lập trình trong ESP32 sử dụng API HTTP GET để lấy được IPv4, Latitude, Longitude và đưa ra Link Google Maps (Hiển thị tại Terminal)
+
+---
+### - [Blynk | Traffic & DHT Sensor](https://wokwi.com/projects/424198235739151361)
++ ***Thư viện sử dụng***
+	> **# DHT sensor library** by Avishay - Arduino library for DHT11, DHT22, etc Temp & Humidity Sensors
+	
+![](https://raw.githubusercontent.com/vvdung/storage/refs/heads/main/IOT/traffic_blynk_1.png)
+
+---
+### - [Esp32 | Blynk & Wokwi](https://wokwi.com/projects/423790624312911873)
+
+#### Tham khảo
+
++ [Sử dụng Blynk IOT với ESP32](https://dienthongminhesmart.com/lap-trinh-esp32/blynk-iot-va-esp32/)
++ ***Thư viện sử dụng***
+	> **TM1637** by Avishay - Arduino library for TM1637
+	
+	> **Blynk** by Volodymyr Shymanskyy
+
++ [Sử dụng Blynk IOT trên ESP32 (nếu không xem được từ youtube)](https://it.iothings.vn/downloads/mp4/Blynk_IOT_ESP32_WEB.mp4)
+
++ [https://it.iothings.vn/downloads/mp4](https://it.iothings.vn/downloads/mp4/)
+
+#### Nên sử dụng AI để tìm hiểu 
+
+
+[https://chatgpt.com/](https://chatgpt.com/)
+
+[https://chat.deepseek.com/](https://chat.deepseek.com/)
+
+[https://grok.com/](https://grok.com/)
+
+---
 ### - [Blink an LED on ESP32](https://wokwi.com/projects/305566932847821378)
 
 #### Tham khảo
@@ -59,7 +109,7 @@
 + [Wokwi for VS Code](https://docs.wokwi.com/vscode/getting-started)
 
   
-
++ [Cài đặt thư viện cho PlatformIO](https://khuenguyencreator.com/huong-dan-cai-dat-platform-io-lap-trinh-esp32/#Cai_dat_thu_vien_cho_Platformio)
 -------------------------------
 
 ![](https://raw.githubusercontent.com/vvdung/storage/refs/heads/main/IOT/diagram_one.png)
