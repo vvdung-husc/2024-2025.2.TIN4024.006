@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "author": "Anonymous maker",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": -38.4, "left": 81.64, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": 9.9, "left": -207, "attrs": {} },
+    {
+      "type": "board-ssd1306",
+      "id": "oled1",
+      "top": -227.26,
+      "left": 57.83,
+      "attrs": { "i2cAddress": "0x3c" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": -44.05,
+      "left": -115.2,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": -44.05,
+      "left": 278.4,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": -128.4,
+      "left": 13.4,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": -138,
+      "left": 224.6,
+      "attrs": { "color": "green" }
+    },
+    {
+      "type": "wokwi-pushbutton-6mm",
+      "id": "btn1",
+      "top": 161,
+      "left": 297.6,
+      "attrs": { "color": "green", "xray": "1" }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "smoke_sensor",
+      "top": -164.5,
+      "left": -201.8,
+      "attrs": { "value": "500" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "dht1:VCC", "esp:3V3", "red", [ "v-28.8", "h182.4" ] ],
+    [ "esp:GND.1", "dht1:GND", "black", [ "h0" ] ],
+    [ "esp:26", "dht1:SDA", "green", [ "h-163.05", "v-57.6" ] ],
+    [ "oled1:VCC", "esp:3V3", "red", [] ],
+    [ "oled1:GND", "esp:GND.1", "black", [] ],
+    [ "oled1:SDA", "esp:21", "green", [] ],
+    [ "oled1:SCL", "esp:22", "blue", [] ],
+    [ "esp:GND.1", "led1:C", "black", [] ],
+    [ "esp:14", "r1:2", "red", [] ],
+    [ "r1:1", "led1:A", "green", [] ],
+    [ "esp:GND.1", "led2:C", "black", [] ],
+    [ "esp:27", "r2:2", "green", [] ],
+    [ "r2:1", "led2:A", "green", [] ],
+    [ "btn1:2", "esp:25", "yellow", [] ],
+    [ "btn1:1", "esp:GND.1", "black", [] ],
+    [ "smoke_sensor:SIG", "esp:34", "purple", [] ]
+
+
+  ],
+  "dependencies": {}
+}
