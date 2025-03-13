@@ -2,10 +2,9 @@
 #include <HTTPClient.h>
 #include <Arduino.h>
 
-
-#define BLYNK_TEMPLATE_ID "TMPL6eFYYlr0t"
-#define BLYNK_TEMPLATE_NAME "ESP32 HTTP"
-#define BLYNK_AUTH_TOKEN "WHlC9VrqrGYPyETlm1QcIJNX9ff-jyRU"
+#define BLYNK_TEMPLATE_ID "TMPL6sgfMUn-r"
+#define BLYNK_TEMPLATE_NAME "IOT"
+#define BLYNK_AUTH_TOKEN "CxU89qjWLucJlR2b99uw2k8Xv14yKWdV"
 
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>

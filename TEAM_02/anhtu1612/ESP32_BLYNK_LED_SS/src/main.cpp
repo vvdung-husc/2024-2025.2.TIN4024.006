@@ -1,10 +1,11 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
+#include <dht.h>
 
 /* Fill in information from Blynk Device Info here */
-#define BLYNK_TEMPLATE_ID "TMPL6sgfMUn-r"
-#define BLYNK_TEMPLATE_NAME "IOT"
-#define BLYNK_AUTH_TOKEN "CxU89qjWLucJlR2b99uw2k8Xv14yKWdV"
+#define BLYNK_TEMPLATE_ID "TMPL6VOd5sqsE"
+#define BLYNK_TEMPLATE_NAME "ESP32 LED TM1637"
+#define BLYNK_AUTH_TOKEN "Z24-FlFOg2_-WIKTamwxA2uDvk7UWmz6"
 // Phải để trước khai báo sử dụng thư viện Blynk
 
 #include <WiFi.h>
@@ -22,6 +23,9 @@ char pass[] = "";             //Mật khẩu mạng WiFi
 #define CLK 18  //Chân kết nối CLK của TM1637
 #define DIO 19  //Chân kết nối DIO của TM1637
 
+#define DHTTYPE DHT22 
+#define DHT22_PIN 16
+DHT dht(DHT22_PIN, DHTTYPE);
 //Biến toàn cục
 ulong currentMiliseconds = 0; //Thời gian hiện tại - miliseconds 
 bool blueButtonON = true;     //Trạng thái của nút bấm ON -> đèn Xanh sáng và hiển thị LED TM1637
@@ -33,6 +37,18 @@ bool IsReady(ulong &ulTimer, uint32_t milisecond);
 void updateBlueButton();
 void uptimeBlynk();
 
+
+void DoamBlynk(){
+  float h = dht.readHumidity();
+  Blynk.virtualWrite(V3, h);  
+}
+
+void NhietdoBlynk(){
+  float t = dht.readTemperature();
+  Blynk.virtualWrite(V2, t); 
+  
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -40,6 +56,7 @@ void setup() {
   pinMode(btnBLED, INPUT_PULLUP);
     
   display.setBrightness(0x0f);
+  dht.begin();
   
   // Start the WiFi connection
   Serial.print("Connecting to ");Serial.println(ssid);
@@ -61,7 +78,11 @@ void loop() {
   currentMiliseconds = millis();
   uptimeBlynk();
   updateBlueButton();
+  DoamBlynk();
+  NhietdoBlynk();
 }
+
+
 
 // put function definitions here:
 bool IsReady(ulong &ulTimer, uint32_t milisecond)
@@ -73,7 +94,7 @@ bool IsReady(ulong &ulTimer, uint32_t milisecond)
 void updateBlueButton(){
   static ulong lastTime = 0;
   static int lastValue = HIGH;
-  if (!IsReady(lastTime, 50)) return;
+  if (!IsReady(lastTime, 50)) return; //Hạn chế bấm nút quá nhanh - 50ms mỗi lần bấm
   int v = digitalRead(btnBLED);
   if (v == lastValue) return;
   lastValue = v;
@@ -96,7 +117,7 @@ void updateBlueButton(){
 
 void uptimeBlynk(){
   static ulong lastTime = 0;
-  if (!IsReady(lastTime, 1000)) return; //Kiểm tra và cập nhật lastTime sau mỗi 1 giây
+if (!IsReady(lastTime, 1000)) return; //Kiểm tra và cập nhật lastTime sau mỗi 1 giây
   ulong value = lastTime / 1000;
   Blynk.virtualWrite(V0, value);  //Gửi giá trị lên chân ảo V0 trên ứng dụng Blynk.
   if (blueButtonON){
