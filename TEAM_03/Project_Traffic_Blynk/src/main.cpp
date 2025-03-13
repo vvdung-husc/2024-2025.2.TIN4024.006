@@ -29,7 +29,7 @@ char pass[] = "";             //Mật khẩu mạng WiFi
 #define DHTTYPE DHT22    // Loại cảm biến
 
 //Pin - Cảm biến quang điện trởtrở
-#define ldrPIN  13
+#define ldrPIN  32
 
 //1000 ms = 1 seconds
 uint rTIME = 5000;  //thời gian chờ đèn đỏ    5 giây
