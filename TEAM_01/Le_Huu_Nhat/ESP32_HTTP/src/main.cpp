@@ -15,8 +15,9 @@
 char ssid[] = "Wokwi-GUEST";  //Tên mạng WiFi
 char pass[] = "";             //Mật khẩu mạng WiFi
 
-BlynkTimer timer;
-long uptime = 0;
+unsigned long previousMillis = 0;
+const long interval = 1000;  // 1 giây
+
 
 
 // URL API
@@ -50,10 +51,19 @@ String convertToDMS(float coord, char pos, char neg) {
     return String(buf);
 }
 
-void sendUptime() {
-    uptime++;
-    Blynk.virtualWrite(V0, uptime);  // Gửi thời gian hoạt động lên Blynk
-  }
+void upTime(){
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+
+        float uptimeSeconds = millis() / 1000.0;  // Uptime tính bằng giây
+        Blynk.virtualWrite(V0, uptimeSeconds);   // Hiển thị trên Blynk (có thể đổi V4)
+        
+        Serial.print("Uptime: ");
+        Serial.println(uptimeSeconds);
+    }
+}
+
 
 void setup() {
     Serial.begin(115200);
@@ -78,14 +88,12 @@ void setup() {
 
     Serial.println("== START ==>");
     requestAPI();
-    timer.setInterval(1000L, sendUptime);  // Cập nhật uptime mỗi giây
+    
 }
 
 void loop() {
     Blynk.run();
-    timer.run();
-      // Gửi request API
-
+    upTime();
 }
 
 
