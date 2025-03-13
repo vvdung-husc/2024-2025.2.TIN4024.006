@@ -1,7 +1,8 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <Arduino.h>
-
+#include <ArduinoJson.h>
+#include <WiFiClientSecure.h> // Thêm thư viện cho HTTPS
 
 #define BLYNK_TEMPLATE_ID "TMPL6eFYYlr0t"
 #define BLYNK_TEMPLATE_NAME "ESP32 HTTP"
@@ -9,17 +10,19 @@
 
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
+
 // Thông tin WiFi
 char ssid[] = "Wokwi-GUEST";  //Tên mạng WiFi
 char pass[] = "";             //Mật khẩu mạng WiFi
 
-ulong currentMiliseconds = 0;
-bool blueButtonON = true; 
+BlynkTimer timer;
+long uptime = 0;
 
-bool IsReady(ulong &ulTimer, uint32_t milisecond);
-void uptimeBlynk();
+
 // URL API
 const char* serverName = "http://ip4.iothings.vn?geo=1";
+const char* API_KEY = "efc4a20bb6b3dd8adb622ed8cbf5f9ed";
+void requestAPI();
 
 // Hàm tách chuỗi theo ký tự '|'
 void splitString(String data, String output[], int maxParts, char delimiter = '|') {
@@ -46,23 +49,15 @@ String convertToDMS(float coord, char pos, char neg) {
     snprintf(buf, sizeof(buf), "%d°%d'%.1f\"%c", degrees, minutes, seconds, direction);
     return String(buf);
 }
-bool IsReady(ulong &ulTimer, uint32_t milisecond)
-{
-  if (currentMiliseconds - ulTimer < milisecond) return false;
-  ulTimer = currentMiliseconds;
-  return true;
-}
 
-void uptimeBlynk(){
-    static ulong lastTime = 0;
-  if (!IsReady(lastTime, 1000)) return; //Kiểm tra và cập nhật lastTime sau mỗi 1 giây
-    ulong value = lastTime / 1000;
-    Blynk.virtualWrite(V0, value);  //Gửi giá trị lên chân ảo V0 trên ứng dụng Blynk.
+void sendUptime() {
+    uptime++;
+    Blynk.virtualWrite(V0, uptime);  // Gửi thời gian hoạt động lên Blynk
   }
 
 void setup() {
     Serial.begin(115200);
-    
+
     // Kết nối WiFi
     WiFi.begin(ssid, pass);
     Serial.print("Đang kết nối WiFi...");
@@ -72,23 +67,30 @@ void setup() {
         Serial.print(".");
     }
     
+    
     Serial.println("\nWiFi đã kết nối!");
     // Start the WiFi connection
-  Serial.print("Connecting to ");Serial.println(ssid);
-  Blynk.begin(BLYNK_AUTH_TOKEN,ssid, pass); //Kết nối đến mạng WiFi
+    Serial.print("Connecting to ");
+    Blynk.begin(BLYNK_AUTH_TOKEN,ssid, pass); //Kết nối đến mạng WiFi
 
-  Serial.println();
-  Serial.println("WiFi connected");
+    Serial.println();
+    Serial.println("WiFi connected");
 
-  Serial.println("== START ==>");
+    Serial.println("== START ==>");
+    requestAPI();
+    timer.setInterval(1000L, sendUptime);  // Cập nhật uptime mỗi giây
 }
 
 void loop() {
     Blynk.run();
-    currentMiliseconds = millis();
-    uptimeBlynk();
-    if (WiFi.status() == WL_CONNECTED) {
-        HTTPClient http;
+    timer.run();
+      // Gửi request API
+
+}
+
+
+void requestAPI(){
+    HTTPClient http;
 
         String url = String(serverName);
 
@@ -144,6 +146,44 @@ void loop() {
                 String gg = "http://www.google.com/maps/place/"+String(latitude) + "," + String(longitude);
                 Blynk.virtualWrite(V2, gg);
                 Serial.println("================================");
+
+                String api = "https://api.openweathermap.org/data/2.5/weather?lat="+String(latitude)+"&lon="+String(longitude)+"&units=metric&appid="+ String(API_KEY);
+                
+                WiFiClientSecure client;
+                client.setInsecure(); // Bỏ qua SSL
+            
+                HTTPClient http;
+                http.begin(client, api); // Sử dụng client bảo mật cho HTTPS
+            
+                Serial.println("Đang gửi request đến OpenWeatherMap...");
+                int httpCode = http.GET();
+            
+                if (httpCode > 0) {
+                    String payload = http.getString();
+                    Serial.println("Dữ liệu JSON nhận được:");
+                    Serial.println(payload);
+            
+                    // Phân tích JSON
+                    StaticJsonDocument<1024> doc;
+                    DeserializationError error = deserializeJson(doc, payload);
+            
+                    if (error) {
+                        Serial.print("Lỗi parse JSON: ");
+                        Serial.println(error.f_str());
+                    } else {
+                        float temp = doc["main"]["temp"]; // Lấy nhiệt độ
+                        Serial.print("Nhiệt độ hiện tại: ");
+                        Serial.print(temp);
+                        Blynk.virtualWrite(V3, temp);
+                        Serial.println("°C");
+                    }
+                } else {
+                    Serial.print("Lỗi HTTP: ");
+                    Serial.println(httpCode);
+                }
+                
+                
+                Serial.println("================================");
             } else {
                 Serial.println("Lỗi: Chuỗi phản hồi không đúng định dạng.");
             }
@@ -153,9 +193,6 @@ void loop() {
         }
 
         http.end();
-    } else {
-        Serial.println("Mất kết nối WiFi!");
-    }
-
-    delay(10000); // Gửi request mỗi 10 giây
 }
+
+
