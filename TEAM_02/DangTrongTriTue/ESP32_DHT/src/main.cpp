@@ -120,4 +120,3 @@ void loop() {
   digitalWrite(ledNumber, LOW);  
   if (!bCamON) digitalWrite(LED_CAM, LOW);
 }
-

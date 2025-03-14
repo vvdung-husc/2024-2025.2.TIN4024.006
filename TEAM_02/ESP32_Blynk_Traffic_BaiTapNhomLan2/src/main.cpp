@@ -13,6 +13,12 @@
 #define DIO_PIN 19      // Chân DIO của TM1637
 #define DHT_PIN 16      // Chân DHT22
 
+//Nguyễn Hoàng Anh Tú
+// #define BLYNK_TEMPLATE_ID "TMPL6BZfffxJA"
+// #define BLYNK_TEMPLATE_NAME "BAITAPNHOM"
+// #define BLYNK_AUTH_TOKEN "qbKOyl_8WYeS6SZ0T1sn2zUKx1Z66KSx"
+
+//Lê Đức Duy Anh
 #define BLYNK_TEMPLATE_ID "TMPL6V7RZZSM7"
 #define BLYNK_TEMPLATE_NAME "ESP32 BAITAPNHOM"
 #define BLYNK_AUTH_TOKEN "9hmYK4FgSUgn_ApmyYaZ_nwjZXrvm2Oc"

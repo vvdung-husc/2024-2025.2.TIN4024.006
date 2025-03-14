@@ -1,11 +1,10 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
-#include <dht.h>
 
 /* Fill in information from Blynk Device Info here */
-#define BLYNK_TEMPLATE_ID "TMPL6QndjTXOs"
-#define BLYNK_TEMPLATE_NAME "LED TM1637"
-#define BLYNK_AUTH_TOKEN "LVjv9nG2RoN5UPnqxnCCqePv0evlNJ3q"
+#define BLYNK_TEMPLATE_ID "TMPL6lD14z4JL"
+#define BLYNK_TEMPLATE_NAME "ESP 32 Led controll"
+#define BLYNK_AUTH_TOKEN "SsfKH68GnPaMpwFo7SuSHWogtbX80vw3"
 // Phải để trước khai báo sử dụng thư viện Blynk
 
 #include <WiFi.h>
@@ -23,9 +22,6 @@ char pass[] = "";             //Mật khẩu mạng WiFi
 #define CLK 18  //Chân kết nối CLK của TM1637
 #define DIO 19  //Chân kết nối DIO của TM1637
 
-#define DHTTYPE DHT22 
-#define DHT22_PIN 16
-DHT dht(DHT22_PIN, DHTTYPE);
 //Biến toàn cục
 ulong currentMiliseconds = 0; //Thời gian hiện tại - miliseconds 
 bool blueButtonON = true;     //Trạng thái của nút bấm ON -> đèn Xanh sáng và hiển thị LED TM1637
@@ -37,18 +33,6 @@ bool IsReady(ulong &ulTimer, uint32_t milisecond);
 void updateBlueButton();
 void uptimeBlynk();
 
-
-void DoamBlynk(){
-  float h = dht.readHumidity();
-  Blynk.virtualWrite(V3, h);  
-}
-
-void NhietdoBlynk(){
-  float t = dht.readTemperature();
-  Blynk.virtualWrite(V2, t); 
-  
-}
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -56,7 +40,6 @@ void setup() {
   pinMode(btnBLED, INPUT_PULLUP);
     
   display.setBrightness(0x0f);
-  dht.begin();
   
   // Start the WiFi connection
   Serial.print("Connecting to ");Serial.println(ssid);
@@ -78,11 +61,7 @@ void loop() {
   currentMiliseconds = millis();
   uptimeBlynk();
   updateBlueButton();
-  DoamBlynk();
-  NhietdoBlynk();
 }
-
-
 
 // put function definitions here:
 bool IsReady(ulong &ulTimer, uint32_t milisecond)
@@ -117,7 +96,7 @@ void updateBlueButton(){
 
 void uptimeBlynk(){
   static ulong lastTime = 0;
-if (!IsReady(lastTime, 1000)) return; //Kiểm tra và cập nhật lastTime sau mỗi 1 giây
+  if (!IsReady(lastTime, 1000)) return; //Kiểm tra và cập nhật lastTime sau mỗi 1 giây
   ulong value = lastTime / 1000;
   Blynk.virtualWrite(V0, value);  //Gửi giá trị lên chân ảo V0 trên ứng dụng Blynk.
   if (blueButtonON){
