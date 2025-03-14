@@ -1,19 +1,27 @@
+#define BLYNK_TEMPLATE_ID "TMPL6bjAR67yg"
+#define BLYNK_TEMPLATE_NAME "ESP32 Http"
+#define BLYNK_AUTH_TOKEN "PBFaD9ZL3e4gXvUiB7kNJBkiz1FQVvEv"
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <BlynkSimpleEsp32.h>
 #include <Arduino.h>
 
-// Wokwi sử dụng mạng WiFi "Wokwi-GUEST" không cần mật khẩu
-char ssid[] = "Wokwi-GUEST";
-char pass[] = "";
+
+
+char ssid[] = "Wokwi-GUEST";  // WiFi SSID
+char pass[] = "";             // WiFi Password
+
+BlynkTimer timer;
+long uptime = 0; // Biến đếm thời gian hoạt động (giây)
 
 void TachChuoi(String data) {
-  char buf[data.length() + 1];  // Chuyển `String` thành `char array`
+  char buf[data.length() + 1];  
   data.toCharArray(buf, sizeof(buf));
 
   char *token;
-  const char *delim = "|";  // Dấu phân tách
+  const char *delim = "|";  
 
-  char *parts[7];  // Mảng chứa các phần tử tách ra
+  char *parts[7];  
   int index = 0;
 
   token = strtok(buf, delim);
@@ -22,15 +30,14 @@ void TachChuoi(String data) {
     token = strtok(NULL, delim);
   }
 
-  // Kiểm tra xem có đủ phần tử không
   if (index < 7) {
     Serial.println("Lỗi: Dữ liệu không hợp lệ!");
     return;
   }
 
-  String latitude1 = (parts[6]);  // Chuyển thành số thực
+  String latitude1 = (parts[6]);  
   String longitude1 = (parts[5]); 
-  float latitude = atof(parts[6]);  // Chuyển thành số thực
+  float latitude = atof(parts[6]);  
   float longitude = atof(parts[5]); 
 
   Serial.println("------Thông tin địa chỉ IP------");
@@ -44,19 +51,23 @@ void TachChuoi(String data) {
   Serial.print(latitude);
   Serial.print("°, ");
   Serial.print(longitude);
-  Serial.println("°");
+  Serial.println("'");
 
-  // 🔥 Xuất link Google Maps
+  String googleMapsLink = "https://www.google.com/maps/place/" + latitude1 + "," + longitude1;
   Serial.print("Xem trên Google Maps: ");
-  Serial.println("https://www.google.com/maps/place/" + String(latitude1) + "," + String(longitude1));
+  Serial.println(googleMapsLink);
 
   Serial.println("--------------------------------");
+
+  //  Gửi dữ liệu lên Blynk
+  Blynk.virtualWrite(V1, String(parts[0]));  // Gửi IP lên Blynk V1
+  Blynk.virtualWrite(V2, googleMapsLink);    // Gửi Link Google Maps lên Blynk V2
 }
 
 void getGeoInfo() {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    String url = "http://ip4.iothings.vn?geo=1";
+    String url = "http://ip4.iothings.vn/?geo=1";
     Serial.print("Gửi yêu cầu HTTP đến: ");
     Serial.println(url);
 
@@ -79,6 +90,11 @@ void getGeoInfo() {
   }
 }
 
+void sendUptime() {
+  uptime++;
+  Blynk.virtualWrite(V0, uptime);  // Gửi thời gian hoạt động lên Blynk
+}
+
 void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, pass);
@@ -90,8 +106,14 @@ void setup() {
   }
   Serial.println("Đã kết nối WiFi");
 
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass); // Kết nối Blynk
+
   getGeoInfo();
+
+  timer.setInterval(1000L, sendUptime);  // Cập nhật uptime mỗi giây
 }
 
 void loop() {
+  Blynk.run();
+  timer.run();
 }
