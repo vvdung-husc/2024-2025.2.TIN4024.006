@@ -57,7 +57,7 @@ void upTime(){
         previousMillis = currentMillis;
 
         float uptimeSeconds = millis() / 1000.0;  // Uptime tính bằng giây
-        Blynk.virtualWrite(V0, uptimeSeconds);   // Hiển thị trên Blynk (có thể đổi V4)
+        Blynk.virtualWrite(V0, uptimeSeconds);   // Hiển thị trên Blynk (có thể đổi V0)
         
         Serial.print("Uptime: ");
         Serial.println(uptimeSeconds);
