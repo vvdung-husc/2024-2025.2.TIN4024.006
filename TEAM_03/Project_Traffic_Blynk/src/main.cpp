@@ -3,9 +3,9 @@
 #include <DHT.h>
 
 // Trần Tiến Lợi
-#define BLYNK_TEMPLATE_ID "TMPL63UdyxQPo"
-#define BLYNK_TEMPLATE_NAME "TrafficBlynk"
-#define BLYNK_AUTH_TOKEN "QJeHnTbQcSkdcOcbEnXoniJxXSHvmHOn"
+// #define BLYNK_TEMPLATE_ID "TMPL63UdyxQPo"
+// #define BLYNK_TEMPLATE_NAME "TrafficBlynk"
+// #define BLYNK_AUTH_TOKEN "QJeHnTbQcSkdcOcbEnXoniJxXSHvmHOn"
 //
 
 #include <WiFi.h>
