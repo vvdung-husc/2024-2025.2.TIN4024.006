@@ -2,9 +2,10 @@
 #include <TM1637Display.h>
 
 /* Fill in information from Blynk Device Info here */
-#define BLYNK_TEMPLATE_ID "TMPL6mdw-frwC"
-#define BLYNK_TEMPLATE_NAME "ESMART"
-#define BLYNK_AUTH_TOKEN "eWZEyfujz8ldHIoOEz945XhheVPqCPGS"
+#define BLYNK_TEMPLATE_ID "TMPL6ZJ29O7kP"
+#define BLYNK_TEMPLATE_NAME "ESMART3"
+#define BLYNK_AUTH_TOKEN "b6CL9SqPsJrmcrjSfVsuBa4bSxIKTFLt"
+
 // Phải để trước khai báo sử dụng thư viện Blynk
 
 #include <WiFi.h>
@@ -119,3 +120,4 @@ BLYNK_WRITE(V1) { //virtual_pin định nghĩa trong ứng dụng Blynk
     display.clear(); 
   }
 }
+

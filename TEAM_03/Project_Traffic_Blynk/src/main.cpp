@@ -7,6 +7,10 @@
 // #define BLYNK_TEMPLATE_NAME "TrafficBlynk"
 // #define BLYNK_AUTH_TOKEN "QJeHnTbQcSkdcOcbEnXoniJxXSHvmHOn"
 //
+//Lê Thị Huỳnh Trang
+// #define BLYNK_TEMPLATE_ID "TMPL65_ZTXoCJ"
+// #define BLYNK_TEMPLATE_NAME "TrafficBlynk"
+// #define BLYNK_AUTH_TOKEN "CFpOEmk0cpYCLL-c4v9ez9ZMl-Do68bT"
 
 #include <WiFi.h>
 #include <WiFiClient.h>
