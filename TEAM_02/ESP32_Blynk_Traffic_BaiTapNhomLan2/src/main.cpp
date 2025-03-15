@@ -18,10 +18,17 @@
 // #define BLYNK_TEMPLATE_NAME "BAITAPNHOM"
 // #define BLYNK_AUTH_TOKEN "qbKOyl_8WYeS6SZ0T1sn2zUKx1Z66KSx"
 
+<<<<<<< HEAD
 //Hoàng Hữu Hội
 // #define BLYNK_TEMPLATE_ID "TMPL6Pqb5LTxn"
 // #define BLYNK_TEMPLATE_NAME "BaiTapNhom"
 // #define BLYNK_AUTH_TOKEN "Zw0n552_0-26dD-BEiCzzJpQIS4y6DfS"
+=======
+//Lê Đình Trung
+// #define BLYNK_TEMPLATE_ID "TMPL6g_ylSMD2"
+// #define BLYNK_TEMPLATE_NAME "ESP32T2"
+// #define BLYNK_AUTH_TOKEN "w_TGq_MGsbS0PuAFALp4UsTRipPdF-ee"
+>>>>>>> fee2d613776dee600c5f7e4b940a1eb11a8b02a6
 
 //Lê Đức Duy Anh
 #define BLYNK_TEMPLATE_ID "TMPL6V7RZZSM7"
