@@ -19,18 +19,19 @@
 // #define BLYNK_AUTH_TOKEN "qbKOyl_8WYeS6SZ0T1sn2zUKx1Z66KSx"
 
 //Hoàng Hữu Hội
-// #define BLYNK_TEMPLATE_ID "TMPL6Pqb5LTxn"
-// #define BLYNK_TEMPLATE_NAME "BaiTapNhom"
-// #define BLYNK_AUTH_TOKEN "Zw0n552_0-26dD-BEiCzzJpQIS4y6DfS"
+#define BLYNK_TEMPLATE_ID "TMPL6Pqb5LTxn"
+#define BLYNK_TEMPLATE_NAME "BaiTapNhom"
+#define BLYNK_AUTH_TOKEN "Zw0n552_0-26dD-BEiCzzJpQIS4y6DfS"
+
 //Lê Đình Trung
 // #define BLYNK_TEMPLATE_ID "TMPL6g_ylSMD2"
 // #define BLYNK_TEMPLATE_NAME "ESP32T2"
 // #define BLYNK_AUTH_TOKEN "w_TGq_MGsbS0PuAFALp4UsTRipPdF-ee"
 
 //Lê Đức Duy Anh
-#define BLYNK_TEMPLATE_ID "TMPL6V7RZZSM7"
-#define BLYNK_TEMPLATE_NAME "ESP32 BAITAPNHOM"
-#define BLYNK_AUTH_TOKEN "9hmYK4FgSUgn_ApmyYaZ_nwjZXrvm2Oc"
+// #define BLYNK_TEMPLATE_ID "TMPL6V7RZZSM7"
+// #define BLYNK_TEMPLATE_NAME "ESP32 BAITAPNHOM"
+// #define BLYNK_AUTH_TOKEN "9hmYK4FgSUgn_ApmyYaZ_nwjZXrvm2Oc"
 
 #include <WiFi.h>
 #include <WiFiClient.h>
