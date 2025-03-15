@@ -1,282 +1,194 @@
-// Cấu hình Blynk
 #define BLYNK_TEMPLATE_ID "TMPL6Pqb5LTxn"
 #define BLYNK_TEMPLATE_NAME "ThoiTiet"
 #define BLYNK_AUTH_TOKEN "EJ09Np-So_h3eu_2VdX1qKgbt_vxJOia"
+#define BLYNK_PRINT Serial
 
-#include <Arduino.h>
 #include <WiFi.h>
 #include <BlynkSimpleEsp32.h>
 #include <DHT.h>
+#include <TM1637Display.h>
 
-// Cấu hình WiFi
-const char *ssid = "Wokwi-GUEST";
-const char *password = "";
+// 🔗 Thông tin WiFi
+const char ssid[] = "Wokwi-GUEST";
+const char pass[] = "";
 
-// Cấu hình DHT22
-#define DHTPIN 16     // Chân kết nối DHT22
-#define DHTTYPE DHT22 // Loại cảm biến DHT22
-DHT dht(DHTPIN, DHTTYPE);
+// 🛠 Chân kết nối phần cứng
+#define DHT_PIN 16
+#define BUTTON_PIN 23
+#define BLUE_LED_PIN 21
+#define CLK_PIN 18
+#define DIO_PIN 19
 
-// Chân kết nối cho LED 7 đoạn thứ nhất (A,B,C,D,E,F,G)
-const uint8_t SEG1_PINS[] = {13, 12, 14, 27, 26, 25, 33};
+// ⏳ Thời gian lấy mẫu
+#define SENSOR_INTERVAL 2000  // 2 giây cập nhật dữ liệu cảm biến
 
-// Chân kết nối cho LED 7 đoạn thứ hai (A,B,C,D,E,F,G)
-const uint8_t SEG2_PINS[] = {4, 0, 2, 15, 32, 18, 19};
+// 🔌 Khởi tạo đối tượng phần cứng
+DHT dht(DHT_PIN, DHT22);
+TM1637Display display(CLK_PIN, DIO_PIN);
+BlynkTimer timer;
 
-// Chân kết nối cho nút nhấn và LED xanh dương
-const uint8_t BUTTON_PIN = 21;
-const uint8_t BLUE_LED_PIN = 22;
+// 🌍 Địa chỉ máy chủ Blynk (IP của blynk.cloud, có thể cần cập nhật nếu thay đổi)
+IPAddress blynkServerIP(128, 199, 144, 129);
+uint16_t blynkPort = 8080; // Dùng cổng 8080 thay vì 80
 
-// Định nghĩa thời gian cho các chu kỳ
-const uint32_t SENSOR_READ_INTERVAL = 2000;    // Chu kỳ đọc cảm biến: 2 giây
-const uint32_t RUNTIME_UPDATE_INTERVAL = 1000; // Chu kỳ cập nhật thời gian chạy: 1 giây
+// ⏱ Biến toàn cục
+uint32_t startTime;
+bool displayOn = true;
+bool lastButtonState = HIGH;
+bool lastLedState = LOW;
+uint32_t lastDisplayUpdate = 0;
 
-// Các biến trạng thái
-uint32_t sensorReadPreviousMillis = 0; // Thời điểm đọc cảm biến gần nhất
-uint32_t runtimePreviousMillis = 0;    // Thời điểm cập nhật thời gian chạy gần nhất
-float temperature = 0.0;               // Nhiệt độ hiện tại
-float humidity = 0.0;                  // Độ ẩm hiện tại
-bool screenEnabled = true;             // Trạng thái màn hình
-bool lastButtonState = HIGH;           // Trạng thái nút nhấn cuối cùng
-bool buttonState;                      // Trạng thái nút nhấn hiện tại
-uint32_t lastDebounceTime = 0;         // Thời gian debounce
-uint32_t debounceDelay = 50;           // Độ trễ debounce
-uint32_t runtimeSeconds = 0;           // Thời gian chạy (giây)
-uint32_t runtimeMinutes = 0;           // Thời gian chạy (phút)
+// 🌡️ Biến cảm biến
+float humidity = 0;
+float temperature = 0;
 
-// Mảng các bit cho LED 7 đoạn (0 để sáng, 1 để tắt)
-const uint8_t PROGMEM digits[10][7] = {
-    {0, 0, 0, 0, 0, 0, 1}, // Số 0
-    {1, 0, 0, 1, 1, 1, 1}, // Số 1
-    {0, 0, 1, 0, 0, 1, 0}, // Số 2
-    {0, 0, 0, 0, 1, 1, 0}, // Số 3
-    {1, 0, 0, 1, 1, 0, 0}, // Số 4
-    {0, 1, 0, 0, 1, 0, 0}, // Số 5
-    {0, 1, 0, 0, 0, 0, 0}, // Số 6
-    {0, 0, 0, 1, 1, 1, 1}, // Số 7
-    {0, 0, 0, 0, 0, 0, 0}, // Số 8
-    {0, 0, 0, 0, 1, 0, 0}  // Số 9
-};
+// 🔄 Trạng thái kết nối
+bool blynkConnected = false;
 
-// Hiển thị số trên LED 7 đoạn
-void displayNumber(uint8_t number)
-{
-  if (!screenEnabled)
-    return;
+// 🕒 Biến để thử kết nối lại khi mất WiFi/Blynk
+unsigned long lastReconnectAttempt = 0;
+const unsigned long reconnectInterval = 5000; // 5 giây thử lại
 
-  uint8_t digit1 = min(number / 10, 9);
-  uint8_t digit2 = number % 10;
-
-  uint8_t pattern[7];
-
-  memcpy_P(pattern, digits[digit1], 7);
-  for (uint8_t i = 0; i < 7; i++)
-  {
-    digitalWrite(SEG1_PINS[i], pattern[i]);
-  }
-
-  memcpy_P(pattern, digits[digit2], 7);
-  for (uint8_t i = 0; i < 7; i++)
-  {
-    digitalWrite(SEG2_PINS[i], pattern[i]);
-  }
-}
-
-// Tắt LED 7 đoạn
-void turnOffDisplay()
-{
-  for (uint8_t i = 0; i < 7; i++)
-  {
-    digitalWrite(SEG1_PINS[i], HIGH);
-    digitalWrite(SEG2_PINS[i], HIGH);
-  }
-}
-
-// Cập nhật thời gian chạy
-void updateRuntime()
-{
-  runtimeSeconds++;
-  if (runtimeSeconds >= 60)
-  {
-    runtimeSeconds = 0;
-    runtimeMinutes++;
-    if (runtimeMinutes > 99)
-    {
-      runtimeMinutes = 0; // Reset khi đạt 100 phút
+// 🚀 Hàm gửi dữ liệu cảm biến lên Blynk
+void sendSensorData() {
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("⚠️ Mất kết nối WiFi, không thể gửi dữ liệu!");
+        return;
     }
-  }
 
-  // Hiển thị số giây trên LED 7 đoạn thay vì số phút
-  displayNumber(runtimeSeconds);
+    humidity = dht.readHumidity();
+    temperature = dht.readTemperature();
 
-  // Gửi thời gian chạy lên Blynk
-  char timeString[10];
-  sprintf(timeString, "%02d:%02d", runtimeMinutes, runtimeSeconds);
-  Blynk.virtualWrite(V1, timeString);
-}
+    if (!isnan(humidity) && !isnan(temperature)) {
+        Serial.printf("🌡️ Nhiệt độ: %.1f °C, 💧 Độ ẩm: %.1f%%", temperature, humidity);
 
-// Đọc giá trị từ cảm biến DHT22
-void readSensorData()
-{
-  // Đọc độ ẩm
-  humidity = dht.readHumidity();
-  // Đọc nhiệt độ theo Celsius
-  temperature = dht.readTemperature();
-
-  // Kiểm tra nếu đọc bị lỗi
-  if (isnan(humidity) || isnan(temperature))
-  {
-    Serial.println("Lỗi đọc từ cảm biến DHT!");
-    return;
-  }
-
-  // Gửi dữ liệu lên Blynk
-  Blynk.virtualWrite(V3, temperature);
-  Blynk.virtualWrite(V4, humidity);
-
-  Serial.print("Nhiệt độ: ");
-  Serial.print(temperature);
-  Serial.print(" °C, Độ ẩm: ");
-  Serial.print(humidity);
-  Serial.println(" %");
-}
-
-// Xử lý nút nhấn
-void handleButton()
-{
-  // Đọc trạng thái nút nhấn
-  int reading = digitalRead(BUTTON_PIN);
-
-  // Kiểm tra nút có thay đổi không
-  if (reading != lastButtonState)
-  {
-    lastDebounceTime = millis();
-  }
-
-  // Nếu trạng thái nút ổn định
-  if ((millis() - lastDebounceTime) > debounceDelay)
-  {
-    // Nếu trạng thái nút thay đổi
-    if (reading != buttonState)
-    {
-      buttonState = reading;
-
-      // Nếu nút được nhấn
-      if (buttonState == LOW)
-      {
-        screenEnabled = !screenEnabled;
-        digitalWrite(BLUE_LED_PIN, !screenEnabled);
-
-        // Cập nhật hiển thị
-        if (screenEnabled)
-        {
-          displayNumber(runtimeSeconds);
+        if (Blynk.connected()) {
+            Blynk.virtualWrite(V5, temperature);  // Gửi nhiệt độ lên Blynk
+            Blynk.virtualWrite(V6, humidity);    // Gửi độ ẩm lên Blynk
+            Blynk.virtualWrite(V0, (millis() - startTime) / 1000); // Gửi thời gian hoạt động
+        } else {
+            Serial.println("⚠️ Blynk chưa kết nối, không thể gửi dữ liệu!");
         }
-        else
-        {
-          turnOffDisplay();
-        }
-
-        // Gửi trạng thái lên Blynk
-        Blynk.virtualWrite(V2, !screenEnabled);
-      }
+    } else {
+        Serial.println("⚠️ Lỗi đọc dữ liệu từ DHT22!");
     }
-  }
-
-  // Lưu trạng thái nút
-  lastButtonState = reading;
 }
 
-// Hàm xử lý khi nhận lệnh từ Blynk
-BLYNK_WRITE(V2)
-{
-  // Nhận giá trị từ widget V2 (nút nhấn)
-  int value = param.asInt();
-
-  // Cập nhật trạng thái màn hình
-  screenEnabled = !value;
-  digitalWrite(BLUE_LED_PIN, value);
-
-  // Cập nhật hiển thị
-  if (screenEnabled)
-  {
-    displayNumber(runtimeSeconds);
-  }
-  else
-  {
-    turnOffDisplay();
-  }
+// 🔘 Xử lý nút nhấn từ Blynk
+BLYNK_WRITE(V1) {
+    lastLedState = param.asInt();
+    digitalWrite(BLUE_LED_PIN, lastLedState);
+    displayOn = !lastLedState;
+    if (!displayOn) {
+        display.clear();
+    }
 }
 
-void setup()
-{
-  // Cài đặt chế độ OUTPUT cho tất cả các chân LED 7 đoạn
-  for (uint8_t i = 0; i < 7; i++)
-  {
-    pinMode(SEG1_PINS[i], OUTPUT);
-    pinMode(SEG2_PINS[i], OUTPUT);
-  }
-
-  // Cài đặt chế độ OUTPUT cho LED xanh dương
-  pinMode(BLUE_LED_PIN, OUTPUT);
-  digitalWrite(BLUE_LED_PIN, LOW);
-
-  // Cài đặt chế độ INPUT_PULLUP cho nút nhấn
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  buttonState = digitalRead(BUTTON_PIN);
-  lastButtonState = buttonState;
-
-  // Khởi tạo giao tiếp Serial
-  Serial.begin(115200);
-  Serial.println("Khởi động hệ thống...");
-
-  // Khởi tạo cảm biến DHT
-  dht.begin();
-
-  // Kết nối WiFi
-  Serial.print("Kết nối WiFi");
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println();
-  Serial.println("WiFi đã kết nối");
-  Serial.print("Địa chỉ IP: ");
-  Serial.println(WiFi.localIP());
-
-  // Kết nối đến Blynk
-  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, password);
-
-  // Đọc giá trị ban đầu từ cảm biến
-  readSensorData();
-
-  // Hiển thị số giây ban đầu (0) thay vì số phút
-  displayNumber(0);
+// ✅ Khi Blynk kết nối lại
+BLYNK_CONNECTED() {
+    blynkConnected = true;
+    Blynk.virtualWrite(V1, lastLedState);
+    Serial.println("✅ Đã kết nối Blynk thành công!");
 }
 
-void loop()
-{
-  // Xử lý Blynk
-  Blynk.run();
+// 📡 Kết nối WiFi không làm treo chương trình
+void connectWiFi() {
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("🔄 Đang kết nối lại WiFi...");
+        WiFi.disconnect();
+        WiFi.begin(ssid, pass);
+    }
+}
 
-  // Xử lý nút nhấn
-  handleButton();
+// 🔗 Kết nối lại Blynk (dùng IP trực tiếp để nhanh hơn)
+void connectBlynk() {
+    unsigned long currentMillis = millis();
+    
+    if (!Blynk.connected() && (currentMillis - lastReconnectAttempt > reconnectInterval)) {
+        lastReconnectAttempt = currentMillis;
+        
+        Serial.println("🔄 Đang kết nối lại Blynk...");
+        
+        if (Blynk.connect(1000)) {
+            Serial.println("✅ Đã kết nối lại Blynk thành công!");
+            blynkConnected = true;
+        } else {
+            Serial.println("❌ Kết nối Blynk thất bại, sẽ thử lại sau!");
+            blynkConnected = false;
+        }
+    }
+}
 
-  uint32_t currentMillis = millis();
+// 🎯 Hiển thị thời gian hoạt động lên màn hình LED 7 đoạn
+void updateDisplay() {
+    if (displayOn && millis() - lastDisplayUpdate > 1000) {
+        lastDisplayUpdate = millis();
+        uint32_t uptime = (millis() - startTime) / 1000; // Thời gian hoạt động tính bằng giây
+        display.showNumberDecEx(uptime, 0x80, true);
+    }
+}
 
-  // Đọc cảm biến định kỳ
-  if (currentMillis - sensorReadPreviousMillis >= SENSOR_READ_INTERVAL)
-  {
-    sensorReadPreviousMillis = currentMillis;
-    readSensorData();
-  }
+void loop() {
+    Blynk.run();   // Chạy Blynk
+    timer.run();   // Chạy timer
+    connectWiFi(); // Kiểm tra & kết nối lại WiFi nếu mất kết nối
+    connectBlynk(); // Kiểm tra & kết nối lại Blynk nếu mất kết nối
 
-  // Cập nhật thời gian chạy mỗi giây
-  if (currentMillis - runtimePreviousMillis >= RUNTIME_UPDATE_INTERVAL)
-  {
-    runtimePreviousMillis = currentMillis;
-    updateRuntime();
-  }
+    // 🎛 Xử lý nút nhấn vật lý
+    bool currentButtonState = digitalRead(BUTTON_PIN);
+    if (currentButtonState == LOW && lastButtonState == HIGH) {
+        lastLedState = !lastLedState;
+        digitalWrite(BLUE_LED_PIN, lastLedState);
+        Blynk.virtualWrite(V1, lastLedState);
+    }
+    lastButtonState = currentButtonState;
+
+    // 🖥 Hiển thị thời gian hoạt động lên màn hình LED 7 đoạn
+    updateDisplay();
+}
+
+void setup() {
+    Serial.begin(115200);
+    
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    pinMode(BLUE_LED_PIN, OUTPUT);
+    digitalWrite(BLUE_LED_PIN, LOW);
+
+    dht.begin();
+    display.setBrightness(5);
+    display.clear();
+
+    startTime = millis();
+
+    Serial.println("🔗 Đang kết nối WiFi...");
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, pass);
+
+    uint32_t startAttemptTime = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 10000) {
+        delay(500);
+        Serial.print(".");
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("\n✅ Đã kết nối WiFi!");
+        Serial.print("🌍 IP: ");
+        Serial.println(WiFi.localIP());
+
+        // ⚡ Kết nối nhanh với Blynk qua IP
+        Blynk.config(BLYNK_AUTH_TOKEN, blynkServerIP, blynkPort);
+
+        if (Blynk.connect()) {
+            Serial.println("✅ Đã kết nối Blynk thành công!");
+        } else {
+            Serial.println("❌ Lỗi kết nối Blynk!");
+        }
+    } else {
+        Serial.println("\n❌ Không thể kết nối WiFi!");
+    }
+
+    // 🕒 Thiết lập timer gửi dữ liệu cảm biến
+    timer.setInterval(SENSOR_INTERVAL, sendSensorData);
+    
+    Serial.println("🚀 Hệ thống đã sẵn sàng!");
 }
