@@ -3,15 +3,15 @@
 
 /* Fill in information from Blynk Device Info here */
 //Huỳnh Quốc Anh
-// #define BLYNK_TEMPLATE_ID "TMPL6EpudKIqF"
-// #define BLYNK_TEMPLATE_NAME "ESP32 Traffic Blynk"
-// #define BLYNK_AUTH_TOKEN "5a7JuLnqJQZJzY2JIiR_p2zTbLKbaEqX"
+#define BLYNK_TEMPLATE_ID "TMPL6EpudKIqF"
+#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Blynk"
+#define BLYNK_AUTH_TOKEN "5a7JuLnqJQZJzY2JIiR_p2zTbLKbaEqX"
 // Phải để trước khai báo sử dụng thư viện Blynk
 
 //Lê Văn Phúc
-#define BLYNK_TEMPLATE_ID "TMPL6VIX_HCfP"
-#define BLYNK_TEMPLATE_NAME "ESP32  TRAFFIC Blynk"
-#define BLYNK_AUTH_TOKEN "IuEQvflXdqd7w0kD_l0SuVGFfBbPI-65"
+// #define BLYNK_TEMPLATE_ID "TMPL6VIX_HCfP"
+// #define BLYNK_TEMPLATE_NAME "ESP32  TRAFFIC Blynk"
+// #define BLYNK_AUTH_TOKEN "IuEQvflXdqd7w0kD_l0SuVGFfBbPI-65"
 
 
 
