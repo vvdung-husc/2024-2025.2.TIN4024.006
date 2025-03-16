@@ -11,10 +11,16 @@
 // #define BLYNK_TEMPLATE_ID "TMPL65_ZTXoCJ"
 // #define BLYNK_TEMPLATE_NAME "TrafficBlynk"
 // #define BLYNK_AUTH_TOKEN "CFpOEmk0cpYCLL-c4v9ez9ZMl-Do68bT"
+//
 // Đặng Thị Lài
-#define BLYNK_TEMPLATE_ID "TMPL6WPF0p5qA"
+//#define BLYNK_TEMPLATE_ID "TMPL6WPF0p5qA"
+//#define BLYNK_TEMPLATE_NAME "TrafficBlynk"
+//#define BLYNK_AUTH_TOKEN "WGkxYkxoKO9Q9drwNq4aIZJzf1JHVy6M"
+//
+// Nguyễn Công Phước Thịnh
+#define BLYNK_TEMPLATE_ID "TMPL6A5Ij8S53"
 #define BLYNK_TEMPLATE_NAME "TrafficBlynk"
-#define BLYNK_AUTH_TOKEN "WGkxYkxoKO9Q9drwNq4aIZJzf1JHVy6M"
+#define BLYNK_AUTH_TOKEN "QvTg9jqNTjeZXTIugbk4KCbCi_h9x2fE"
 
 #include <WiFi.h>
 #include <WiFiClient.h>
