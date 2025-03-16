@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+
 #define BLYNK_TEMPLATE_ID "TMPL6QDGUBQ8t"
 #define BLYNK_TEMPLATE_NAME "GetAPI"
 #define BLYNK_AUTH_TOKEN "2INQR3OvsOThEEu6ZwXbQ5Eo4r_1hdvp"
@@ -135,7 +136,7 @@ void setup() {
         delay(500);
         Serial.print(".");
     }
-    Serial.println("\n Kết nối WiFi thành công!");
+    Serial.print("\nKết nối WiFi thành công!");
 
     Blynk.begin(BLYNK_AUTH_TOKEN, ssid, password);  // Kết nối với Blynk
 
