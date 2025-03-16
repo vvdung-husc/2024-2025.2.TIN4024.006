@@ -1,12 +1,12 @@
 //Văn Huỳnh Tường An
-#define BLYNK_TEMPLATE_ID "TMPL6u5TZHKn4"
-#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
-#define BLYNK_AUTH_TOKEN "FiSni_kbQZxJp3DqT41r5IuQwCHCc1xJ"
+//#define BLYNK_TEMPLATE_ID "TMPL6u5TZHKn4"
+//#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
+//#define BLYNK_AUTH_TOKEN "FiSni_kbQZxJp3DqT41r5IuQwCHCc1xJ"
 
 //Huỳnh Văn Nhân
-// #define BLYNK_TEMPLATE_ID "TMPL6PqjG-L40"
-// #define BLYNK_TEMPLATE_NAME "Nhan"
-// #define BLYNK_AUTH_TOKEN "IOg3DFoDvjBPSbxdbu3OOYGlKXGeGv52"
+#define BLYNK_TEMPLATE_ID "TMPL6PqjG-L40"
+#define BLYNK_TEMPLATE_NAME "Nhan"
+#define BLYNK_AUTH_TOKEN "IOg3DFoDvjBPSbxdbu3OOYGlKXGeGv52"
 
 
 //Nguyễn Khánh Phượng
@@ -107,11 +107,25 @@ void sendSensorData() {
 
 // Nhận giá trị ngưỡng ánh sáng từ Blynk
 BLYNK_WRITE(V6) {
+    static int previousThreshold = -1;
+
     darkThreshold = param.asInt();
     useBlynkLightData = true;
-    Serial.print("Cập nhật ngưỡng ánh sáng từ Blynk: ");
-    Serial.println(darkThreshold);
+
+    if (darkThreshold != previousThreshold) {
+        Serial.print("Cập nhật ngưỡng ánh sáng từ Blynk: ");
+        Serial.println(darkThreshold);
+
+        if (darkThreshold >= 1000) {
+            Serial.println("Trời sáng ☀️");
+        } else {
+            Serial.println("Trời tối 🌙");
+        }
+
+        previousThreshold = darkThreshold;
+    }
 }
+
 
 // Nhận nhiệt độ từ Blynk
 BLYNK_WRITE(V4) {
@@ -175,6 +189,12 @@ void checkLightLevel() {
         Serial.print("Ánh sáng hiện tại: ");
         Serial.println(lightLevel);
         lastLightLevel = lightLevel;
+        if(lightLevel < 1000){
+            Serial.println("Trời tối 🌙");
+        }
+        else{
+            Serial.println("Trời sáng ☀️");
+        }
     }
 }
 
@@ -191,7 +211,7 @@ void updateTrafficLights() {
             digitalWrite(YELLOW_LED, LOW);
             delay(500);
         }
-
+        
         if (displayState) {
             display.showNumberDec(0000);
         }
