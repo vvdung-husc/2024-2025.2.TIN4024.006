@@ -18,7 +18,7 @@ const char* password = "";         // Mật khẩu Wi-Fi
 
 // Initialize Telegram BOT
 #define BOTtoken "7619429343:AAFP4EzOeqa04U6v9XRFeBQBylQ4DnY5Nec"  // Mã Token của Telegram Bot (lấy từ BotFather)
-#define GROUP_ID "7582904058" // ID của nhóm Telegram (thường là số âm)
+#define GROUP_ID "-4607106565" // ID của nhóm Telegram (thường là số âm)
 
 WiFiClientSecure client; //Tạo một kết nối HTTPS an toàn.
 UniversalTelegramBot bot(BOTtoken, client); // Đối tượng giúp giao tiếp với Telegram bot.
