@@ -14,8 +14,6 @@
 //#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
 //#define BLYNK_AUTH_TOKEN "LDnnRXGZFlpczlq4J5GHdgLHwA86hqK0"
 
-
-
 #define WIFI_SSID "Wokwi-GUEST"
 #define WIFI_PASS ""
 
@@ -88,7 +86,6 @@ void sendSensorData() {
         return;
     }
 
-    
     Blynk.virtualWrite(V0, temperature);
     Blynk.virtualWrite(V1, humidity);
     Blynk.virtualWrite(V3, counter);
@@ -159,17 +156,9 @@ BLYNK_WRITE(V2) {
 }
 
 // Quản lý ánh sáng thấp
-
 void checkLightLevel() {
     int lightLevel = analogRead(LDR_PIN);
-    if (useBlynkLightData) {
-        // Ưu tiên sử dụng ngưỡng từ Blynk để quyết định lowLightMode
-        lowLightMode = (darkThreshold < 1000);
-    } else {
-        // Nếu chưa có dữ liệu từ Blynk, tự động lấy từ cảm biến
-        darkThreshold = lightLevel;
-        lowLightMode = (darkThreshold < 1000);
-    }
+    lowLightMode = (lightLevel < darkThreshold);
 
     if (lightLevel != lastLightLevel) {
         Serial.print("Ánh sáng hiện tại: ");
