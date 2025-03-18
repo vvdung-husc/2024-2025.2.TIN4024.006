@@ -14,8 +14,8 @@
 // #define BLYNK_AUTH_TOKEN "oANYuPhR9L9Z8cL7H6LIHHJ-dr8bMzuN"
 
 // Văn Viết Hiếu
-#define BLYNK_TEMPLATE_ID "TMPL6XiRGNNM_" 
-#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Blynk" 
+#define BLYNK_TEMPLATE_ID "TMPL6XiRGNNM_"
+#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Blynk"
 #define BLYNK_AUTH_TOKEN "LxFKoKU0VuT5SONVNq0Da9oCeqJRcxLu"
 // Phải để trước khai báo sử dụng thư viện Blynk
 

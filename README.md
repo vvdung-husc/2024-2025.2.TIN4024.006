@@ -45,6 +45,33 @@
 #### [Lập trình ESP32 GPIO Digital Input và Digital Output](https://khuenguyencreator.com/lap-trinh-esp32-gpio-digital-input-va-digital-output/)
 
 ---
+### - Esp8266 Project
+#### [Download and Install VCP Drivers](https://www.silabs.com/documents/public/software/CP210x_Windows_Drivers.zip)
+#### Tạo dự án - ESP32_Project 
++ Điều khiển đèn nhấp nháy
++ Đo nhiệt độ
++ Hiển thị lên màn hình OLED (SSD1306)
+
+![](https://raw.githubusercontent.com/vvdung/storage/refs/heads/main/IOT/diagram_two.png)
+
+---
+### - [Esp32 |  TELEGRAM BOT (***mã nguồn minh họa***)](https://wokwi.com/projects/425361659331202049)
+
+#### Tham khảo
+
++ [ESP32 Telegram Bot](https://www.iotzone.vn/esp32/cach-dung-esp32-telegram-dieu-khien-den-led-voi-arduino-ide/)
+
+#### Ứng dụng Telegram
+
+>[Telegram Applications](https://telegram.org/apps)
+
+>[Telegram APIs](https://core.telegram.org/api)
+
+## => Yêu cầu thực hiện được đoạn mã nguồn minh họa để hiển thị trong ứng dụng Telegram
+
+![](https://raw.githubusercontent.com/vvdung/storage/refs/heads/main/IOT/ESP32_Telegram_02.png)
+
+---
 ### - [Esp32 | API HTTP GET (***mã nguồn minh họa***)](https://wokwi.com/projects/425209099504209921)
 
 #### Tham khảo
