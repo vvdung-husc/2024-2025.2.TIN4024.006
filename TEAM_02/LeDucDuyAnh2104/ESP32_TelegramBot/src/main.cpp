@@ -1,23 +1,21 @@
 #include <Arduino.h>
 
-/*
-  Rui Santos
-  Complete project details at https://RandomNerdTutorials.com/telegram-esp32-motion-detection-arduino/
-  
-  Project created using Brian Lough's Universal Telegram Bot Library: https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot
-*/
 
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 #include <ArduinoJson.h>
-// Thay đổi mạng WiFi của bạn
-char ssid[] = "Wokwi-GUEST";  //Tên mạng WiFi
-char pass[] = "";             //Mật khẩu mạng WiFi
 
-// Khai báo Bot Telegram
-#define BOTtoken "8066719718:AAE9Pi7EVp4hRwUz7bW7_tmsmuQTq84iD6M"  // Thay thế thành Bot token của bạn
-#define CHAT_ID "-4657079728"  //Thay thế thành ID người dùng của bạn
+// Replace with your network credentials
+const char* ssid = "Wokwi-GUEST";
+const char* password = "";
+
+// Initialize Telegram BOT
+#define BOTtoken "7953104144:AAES14DfJQDNXIIf3WOckh2b64tN41GMnFM"
+
+// Dùng ChatGPT để nhờ hướng dẫn tìm giá trị GROUP_ID này
+#define GROUP_ID "-1002672539893" //là một số âm
+
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 
@@ -60,7 +58,7 @@ void setup() {
   Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, pass);
+  WiFi.begin(ssid, password);
   client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
   
   while (WiFi.status() != WL_CONNECTED) {
@@ -71,7 +69,7 @@ void setup() {
   Serial.println("");
   Serial.println("WiFi connected");
   
-  bot.sendMessage(CHAT_ID, "IoT Developer started up");
+  bot.sendMessage(GROUP_ID, "IoT Developer started up");
 }
 
 
@@ -80,12 +78,10 @@ void loop() {
 
   if(motionDetected){
     ++count_;
-    Serial.print(count_);
-    Serial.println(". MOTION DETECTED => Waiting to send to Telegram");    
+    Serial.print(count_);Serial.println(". MOTION DETECTED => Waiting to send to Telegram");    
     String msg = StringFormat("%u => Motion detected!",count_);
-    bot.sendMessage(CHAT_ID, msg.c_str());
-    Serial.print(count_);
-    Serial.println(". Sent successfully to Telegram: Motion Detected");
+    bot.sendMessage(GROUP_ID, msg.c_str());
+    Serial.print(count_);Serial.println(". Sent successfully to Telegram: Motion Detected");
     motionDetected = false;
   }
 }

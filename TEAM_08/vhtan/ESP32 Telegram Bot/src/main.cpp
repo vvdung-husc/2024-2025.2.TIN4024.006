@@ -11,18 +11,20 @@
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 #include <ArduinoJson.h>
-// Thay đổi mạng WiFi của bạn
-char ssid[] = "Wokwi-GUEST";  //Tên mạng WiFi
-char pass[] = "";             //Mật khẩu mạng WiFi
 
-// Khai báo Bot Telegram
-#define BOTtoken "8066719718:AAE9Pi7EVp4hRwUz7bW7_tmsmuQTq84iD6M"  // Thay thế thành Bot token của bạn
-#define CHAT_ID "-4657079728"  //Thay thế thành ID người dùng của bạn
-WiFiClientSecure client;
-UniversalTelegramBot bot(BOTtoken, client);
+// Kết nối WIFI
+const char* ssid = "Wokwi-GUEST";  // Tên Wi-Fi (thường sẽ là Wokwi-GUEST nếu sử dụng bảng mạch ảo)
+const char* password = "";         // Mật khẩu Wi-Fi
 
-const int motionSensor = 27; // PIR Motion Sensor
-bool motionDetected = false;
+// Initialize Telegram BOT
+#define BOTtoken "7619429343:AAFP4EzOeqa04U6v9XRFeBQBylQ4DnY5Nec"  // Mã Token của Telegram Bot (lấy từ BotFather)
+#define GROUP_ID "-4607106565" // ID của nhóm Telegram (thường là số âm)
+
+WiFiClientSecure client; //Tạo một kết nối HTTPS an toàn.
+UniversalTelegramBot bot(BOTtoken, client); // Đối tượng giúp giao tiếp với Telegram bot.
+
+const int motionSensor = 27; // Chân GPIO của ESP32 để đọc dữ liệu từ cảm biến PIR (chân 27).
+bool motionDetected = false; //Biến để đánh dấu khi có chuyển động: Khi cảm biến phát hiện chuyển động, biến này sẽ đổi thành true.
 
 //Định dạng chuỗi %s,%d,...
 String StringFormat(const char* fmt, ...){
@@ -41,7 +43,7 @@ String StringFormat(const char* fmt, ...){
   return String(s);
 }
 
-// Indicates when motion is detected
+// Hàm xử lý khi phát hiện chuyển động
 void IRAM_ATTR detectsMovement() {
   //Serial.println("MOTION DETECTED!!!");
   motionDetected = true;
@@ -50,7 +52,7 @@ void IRAM_ATTR detectsMovement() {
 void setup() {
   Serial.begin(115200);
 
-  // PIR Motion Sensor mode INPUT_PULLUP
+  // Cảm biến PIR ở chế độ INPUT_PULLUP
   pinMode(motionSensor, INPUT_PULLUP);
   // Set motionSensor pin as interrupt, assign interrupt function and set RISING mode
   attachInterrupt(digitalPinToInterrupt(motionSensor), detectsMovement, RISING);
@@ -60,7 +62,7 @@ void setup() {
   Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, pass);
+  WiFi.begin(ssid, password);
   client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
   
   while (WiFi.status() != WL_CONNECTED) {
@@ -71,7 +73,7 @@ void setup() {
   Serial.println("");
   Serial.println("WiFi connected");
   
-  bot.sendMessage(CHAT_ID, "IoT Developer started up");
+  bot.sendMessage(GROUP_ID, "IoT Developer started up");
 }
 
 
@@ -80,12 +82,10 @@ void loop() {
 
   if(motionDetected){
     ++count_;
-    Serial.print(count_);
-    Serial.println(". MOTION DETECTED => Waiting to send to Telegram");    
+    Serial.print(count_);Serial.println(". MOTION DETECTED => Waiting to send to Telegram");    
     String msg = StringFormat("%u => Motion detected!",count_);
-    bot.sendMessage(CHAT_ID, msg.c_str());
-    Serial.print(count_);
-    Serial.println(". Sent successfully to Telegram: Motion Detected");
+    bot.sendMessage(GROUP_ID, msg.c_str());
+    Serial.print(count_);Serial.println(". Sent successfully to Telegram: Motion Detected");
     motionDetected = false;
   }
 }
