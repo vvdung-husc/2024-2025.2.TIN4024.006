@@ -80,10 +80,12 @@ void loop() {
 
   if(motionDetected){
     ++count_;
-    Serial.print(count_);Serial.println(". MOTION DETECTED => Waiting to send to Telegram");    
+    Serial.print(count_);
+    Serial.println(". MOTION DETECTED => Waiting to send to Telegram");    
     String msg = StringFormat("%u => Motion detected!",count_);
     bot.sendMessage(CHAT_ID, msg.c_str());
-    Serial.print(count_);Serial.println(". Sent successfully to Telegram: Motion Detected");
+    Serial.print(count_);
+    Serial.println(". Sent successfully to Telegram: Motion Detected");
     motionDetected = false;
   }
 }
