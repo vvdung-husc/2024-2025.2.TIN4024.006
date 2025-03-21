@@ -2,18 +2,27 @@
 #include <TM1637Display.h>
 #include <DHT.h>
 
-/* Fill in information from Blynk Device Info here */
-#define BLYNK_TEMPLATE_ID "TMPL63UdyxQPo"
-#define BLYNK_TEMPLATE_NAME "TrafficBlynk"
-#define BLYNK_AUTH_TOKEN "QJeHnTbQcSkdcOcbEnXoniJxXSHvmHOn"
-// Phải để trước khai báo sử dụng thư viện Blynk
+// Trần Tiến Lợi
+// #define BLYNK_TEMPLATE_ID "TMPL63UdyxQPo"
+// #define BLYNK_TEMPLATE_NAME "TrafficBlynk"
+// #define BLYNK_AUTH_TOKEN "QJeHnTbQcSkdcOcbEnXoniJxXSHvmHOn"
+//
+//Lê Thị Huỳnh Trang
+// #define BLYNK_TEMPLATE_ID "TMPL65_ZTXoCJ"
+// #define BLYNK_TEMPLATE_NAME "TrafficBlynk"
+// #define BLYNK_AUTH_TOKEN "CFpOEmk0cpYCLL-c4v9ez9ZMl-Do68bT"
+// 
+// Phạm Thành Thể
+#define BLYNK_TEMPLATE_ID "TMPL6mZm9wTqT"
+#define BLYNK_TEMPLATE_NAME "BTTEAM"
+#define BLYNK_AUTH_TOKEN "Ukzr1r219SBEEWGfXmmQOPW9riwnsAya"
 
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
-// Wokwi sử dụng mạng WiFi "Wokwi-GUEST" không cần mật khẩu cho việc chạy mô phỏng
-char ssid[] = "Wokwi-GUEST";  //Tên mạng WiFi
-char pass[] = "";             //Mật khẩu mạng WiFi
+
+char ssid[] = "Wokwi-GUEST";  
+char pass[] = "";             
 
 //Pin - Các đèn LEDLED
 #define rLED  27
