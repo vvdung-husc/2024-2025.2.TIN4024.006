@@ -105,7 +105,7 @@ void loop()
   oled.print(" ");
   oled.setTextSize(1);
   oled.cp437(true);
-  oled.write(167); //*C
+  oled.write(167); //*C 
   oled.setTextSize(2);
   oled.print("C");
 
