@@ -51,10 +51,11 @@ void setup() {
   oled.begin();
   oled.clearBuffer();
   
-  oled.setFont(u8g2_font_unifont_t_vietnamese1);
-  oled.drawUTF8(0, 14, "Trường ĐHKH");  
+  oled.setFont(u8g2_font_5x8_tf);
+  oled.drawUTF8(0, 14, "Van Huynh Tuong An");  
   oled.drawUTF8(0, 28, "Khoa CNTT");
-  oled.drawUTF8(0, 42, "Lập trình IoT");  
+  oled.drawUTF8(0, 42, "Truong DHKH Hue");  
+  oled.drawUTF8(0, 54, "Lap Trinh IOT" );
 
   oled.sendBuffer();
 }
