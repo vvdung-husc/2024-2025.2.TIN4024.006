@@ -1,7 +1,7 @@
 //Văn Huỳnh Tường An
-#define BLYNK_TEMPLATE_ID "TMPL6u5TZHKn4"
-#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
-#define BLYNK_AUTH_TOKEN "FiSni_kbQZxJp3DqT41r5IuQwCHCc1xJ"
+//#define BLYNK_TEMPLATE_ID "TMPL6u5TZHKn4"
+//#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
+//#define BLYNK_AUTH_TOKEN "FiSni_kbQZxJp3DqT41r5IuQwCHCc1xJ"
 
 //Huỳnh Văn Nhân
 // #define BLYNK_TEMPLATE_ID "TMPL6PqjG-L40"
@@ -10,9 +10,9 @@
 
 
 //Nguyễn Khánh Phượng
-//#define BLYNK_TEMPLATE_ID "TMPL6Ovhz1RbQ"
-//#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
-//#define BLYNK_AUTH_TOKEN "LDnnRXGZFlpczlq4J5GHdgLHwA86hqK0"
+#define BLYNK_TEMPLATE_ID "TMPL6Ovhz1RbQ"
+#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
+#define BLYNK_AUTH_TOKEN "LDnnRXGZFlpczlq4J5GHdgLHwA86hqK0"
 
 
 
