@@ -4,17 +4,15 @@
 //#define BLYNK_AUTH_TOKEN "FiSni_kbQZxJp3DqT41r5IuQwCHCc1xJ"
 
 //Huỳnh Văn Nhân
-// #define BLYNK_TEMPLATE_ID "TMPL6PqjG-L40"
-// #define BLYNK_TEMPLATE_NAME "Nhan"
-// #define BLYNK_AUTH_TOKEN "IOg3DFoDvjBPSbxdbu3OOYGlKXGeGv52"
+#define BLYNK_TEMPLATE_ID "TMPL6PqjG-L40"
+#define BLYNK_TEMPLATE_NAME "Nhan"
+#define BLYNK_AUTH_TOKEN "IOg3DFoDvjBPSbxdbu3OOYGlKXGeGv52"
 
 
 //Nguyễn Khánh Phượng
 #define BLYNK_TEMPLATE_ID "TMPL6Ovhz1RbQ"
 #define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
 #define BLYNK_AUTH_TOKEN "LDnnRXGZFlpczlq4J5GHdgLHwA86hqK0"
-
-
 
 #define WIFI_SSID "Wokwi-GUEST"
 #define WIFI_PASS ""
@@ -88,7 +86,6 @@ void sendSensorData() {
         return;
     }
 
-    
     Blynk.virtualWrite(V0, temperature);
     Blynk.virtualWrite(V1, humidity);
     Blynk.virtualWrite(V3, counter);
@@ -107,11 +104,25 @@ void sendSensorData() {
 
 // Nhận giá trị ngưỡng ánh sáng từ Blynk
 BLYNK_WRITE(V6) {
+    static int previousThreshold = -1;
+
     darkThreshold = param.asInt();
     useBlynkLightData = true;
-    Serial.print("Cập nhật ngưỡng ánh sáng từ Blynk: ");
-    Serial.println(darkThreshold);
+
+    if (darkThreshold != previousThreshold) {
+        Serial.print("Cập nhật ngưỡng ánh sáng từ Blynk: ");
+        Serial.println(darkThreshold);
+
+        if (darkThreshold >= 1000) {
+            Serial.println("Trời sáng ☀️");
+        } else {
+            Serial.println("Trời tối 🌙");
+        }
+
+        previousThreshold = darkThreshold;
+    }
 }
+
 
 // Nhận nhiệt độ từ Blynk
 BLYNK_WRITE(V4) {
@@ -159,22 +170,20 @@ BLYNK_WRITE(V2) {
 }
 
 // Quản lý ánh sáng thấp
-
 void checkLightLevel() {
     int lightLevel = analogRead(LDR_PIN);
-    if (useBlynkLightData) {
-        // Ưu tiên sử dụng ngưỡng từ Blynk để quyết định lowLightMode
-        lowLightMode = (darkThreshold < 1000);
-    } else {
-        // Nếu chưa có dữ liệu từ Blynk, tự động lấy từ cảm biến
-        darkThreshold = lightLevel;
-        lowLightMode = (darkThreshold < 1000);
-    }
+    lowLightMode = (lightLevel < darkThreshold);
 
     if (lightLevel != lastLightLevel) {
         Serial.print("Ánh sáng hiện tại: ");
         Serial.println(lightLevel);
         lastLightLevel = lightLevel;
+        if(lightLevel < 1000){
+            Serial.println("Trời tối 🌙");
+        }
+        else{
+            Serial.println("Trời sáng ☀️");
+        }
     }
 }
 
@@ -191,7 +200,7 @@ void updateTrafficLights() {
             digitalWrite(YELLOW_LED, LOW);
             delay(500);
         }
-
+        
         if (displayState) {
             display.showNumberDec(0000);
         }
