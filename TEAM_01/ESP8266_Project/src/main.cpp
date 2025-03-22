@@ -1,73 +1,138 @@
 #include <Arduino.h>
-#include <TM1637Display.h>
+#include "utils.h"
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <Wire.h>
+#include <U8g2lib.h>
 
-// Định nghĩa các chân cho đèn LED
-const int RED_LED = 4;    // D2 trên NodeMCU
-const int YELLOW_LED = 2; // D4 trên NodeMCU
-const int GREEN_LED = 15; // D8 trên NodeMCU
+#define gPIN 15
+#define yPIN 2
+#define rPIN 5
 
-// Định nghĩa chân cho TM1637 (sửa theo sơ đồ)
-const int CLK = 16;  // D0 trên NodeMCU (theo sơ đồ)
-const int DIO = 0;   // D3 trên NodeMCU (theo sơ đồ)
+#define dhtPIN 16     // Digital pin connected to the DHT sensor
+#define dhtTYPE DHT11 // DHT 22 (AM2302)
 
-// Thời gian cho từng giai đoạn (đơn vị: mili giây)
-const int RED_TIME = 5000;    // 5 giây
-const int GREEN_TIME = 7000;  // 7 giây
-const int YELLOW_TIME = 2000; // 2 giây
+#define OLED_SDA 13
+#define OLED_SCL 12
 
-// Khởi tạo đối tượng TM1637
-TM1637Display display(CLK, DIO);
+// Khởi tạo OLED SH1106
+U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
-// Khai báo hàm countdown trước khi dùng
-void countdown(int seconds);
+DHT dht(D0, dhtTYPE);
+
+
+bool WelcomeDisplayTimeout(uint msSleep = 5000){
+  static ulong lastTimer = 0;
+  static bool bDone = false;
+  if (bDone) return true;
+  if (!IsReady(lastTimer, msSleep)) return false;
+  bDone = true;    
+  return bDone;
+}
+
 
 void setup() {
-  // Cấu hình các chân LED là OUTPUT
-  pinMode(RED_LED, OUTPUT);
-  pinMode(YELLOW_LED, OUTPUT);
-  pinMode(GREEN_LED, OUTPUT);
-  
-  // Tắt tất cả đèn khi khởi động
-  digitalWrite(RED_LED, LOW);
-  digitalWrite(YELLOW_LED, LOW);
-  digitalWrite(GREEN_LED, LOW);
-  
-  // Khởi tạo Serial để debug
   Serial.begin(115200);
-  Serial.println("Traffic Light with TM1637 Started");
+  pinMode(gPIN, OUTPUT);
+  pinMode(yPIN, OUTPUT);
+  pinMode(rPIN, OUTPUT);
   
-  // Khởi tạo TM1637
-  display.setBrightness(0x0f); // Độ sáng tối đa (0x00 - 0x0f)
-  display.clear();
+  digitalWrite(gPIN, LOW);
+  digitalWrite(yPIN, LOW);
+  digitalWrite(rPIN, LOW);
+
+  dht.begin();
+
+  Wire.begin(OLED_SDA, OLED_SCL);  // SDA, SCL
+
+  oled.begin();
+  oled.clearBuffer();
+  
+  oled.setFont(u8g2_font_unifont_t_vietnamese1);
+  oled.drawUTF8(0, 14, "Trường ĐHKH");  
+  oled.drawUTF8(0, 28, "Khoa CNTT");
+  oled.drawUTF8(0, 42, "Lập trình IoT");  
+
+  oled.sendBuffer();
+}
+
+void ThreeLedBlink(){
+  static ulong lastTimer = 0;
+  static int currentLed = 0;  
+  static const int ledPin[3] = {gPIN, yPIN, rPIN};
+
+  if (!IsReady(lastTimer, 1000)) return;
+  int prevLed = (currentLed + 2) % 3;
+  digitalWrite(ledPin[prevLed], LOW);  
+  digitalWrite(ledPin[currentLed], HIGH);  
+  currentLed = (currentLed + 1) % 3;
+}
+
+float fHumidity = 0.0;
+float fTemperature = 0.0;
+
+void updateDHT(){
+  static ulong lastTimer = 0;  
+  if (!IsReady(lastTimer, 2000)) return;
+
+  float h = dht.readHumidity();
+  float t = dht.readTemperature(); // or dht.readTemperature(true) for Fahrenheit
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+
+  bool bDraw = false;
+
+  if (fTemperature != t){
+    bDraw = true;
+    fTemperature = t;
+    Serial.print("Temperature: ");
+    Serial.print(t);
+    Serial.println(" *C");                    
+  }
+
+  if (fHumidity != h){
+    bDraw = true;
+    fHumidity = h;
+    Serial.print("Humidity: ");
+    Serial.print(h);
+    Serial.print(" %\t");  
+    
+  }
+  if (bDraw){
+    oled.clearBuffer();
+    oled.setFont(u8g2_font_unifont_t_vietnamese2);
+
+    String s = StringFormat("Nhiet do: %.2f °C", t);
+    oled.drawUTF8(0, 14, s.c_str());  
+    
+    s = StringFormat("Do am: %.2f %%", h);
+    oled.drawUTF8(0, 42, s.c_str());      
+
+    oled.sendBuffer();
+  } 
+  
+}
+
+void DrawCounter(){  
+  static uint counter = 0; // Biến đếm
+  static ulong lastTimer = 0;  
+  if (!IsReady(lastTimer, 2000)) return;
+
+  // Bắt đầu vẽ màn hình
+  oled.clearBuffer();  
+  oled.setFont(u8g2_font_logisoso32_tf); // Chọn font lớn để hiển thị số
+  oled.setCursor(30, 40); // Đặt vị trí chữ
+  oled.print(counter); // Hiển thị số đếm
+  oled.sendBuffer(); // Gửi dữ liệu lên màn hình
+
+  counter++; // Tăng giá trị đếm
+
 }
 
 void loop() {
-  // Đèn đỏ sáng với đếm ngược
-  digitalWrite(RED_LED, HIGH);
-  digitalWrite(YELLOW_LED, LOW);
-  digitalWrite(GREEN_LED, LOW);
-  Serial.println("Red Light ON");
-  countdown(RED_TIME / 1000); // Chuyển sang giây
-  
-  // Đèn xanh sáng với đếm ngược
-  digitalWrite(RED_LED, LOW);
-  digitalWrite(YELLOW_LED, LOW);
-  digitalWrite(GREEN_LED, HIGH);
-  Serial.println("Green Light ON");
-  countdown(GREEN_TIME / 1000);
-  
-  // Đèn vàng sáng với đếm ngược
-  digitalWrite(RED_LED, LOW);
-  digitalWrite(YELLOW_LED, HIGH);
-  digitalWrite(GREEN_LED, LOW);
-  Serial.println("Yellow Light ON");
-  countdown(YELLOW_TIME / 1000);
-}
-
-// Định nghĩa hàm countdown
-void countdown(int seconds) {
-  for (int i = seconds; i >= 0; i--) {
-    display.showNumberDec(i, false); // Hiển thị số, không dẫn 0
-    delay(1000); // Đợi 1 giây
-  }
+  if (!WelcomeDisplayTimeout()) return;
+  ThreeLedBlink();
+  updateDHT();
 }
