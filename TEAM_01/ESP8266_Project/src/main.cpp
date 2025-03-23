@@ -5,6 +5,18 @@
 #include <Wire.h>
 #include <U8g2lib.h>
 
+#define BLYNK_TEMPLATE_ID "TMPL6c_gqr655"
+#define BLYNK_TEMPLATE_NAME "ESP8266 Project"
+#define BLYNK_AUTH_TOKEN "H2zzhUiXIihOz-6LOFb865Y15ZHGp3Cs"
+
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp8266.h>
+
+// Wokwi sử dụng mạng WiFi "Wokwi-GUEST" không cần mật khẩu cho việc chạy mô phỏng
+char ssid[] = "Wokwi-GUEST";  //Tên mạng WiFi
+char pass[] = "";             //Mật khẩu mạng WiFi
+
 #define gPIN 15
 #define yPIN 2
 #define rPIN 5
@@ -41,6 +53,13 @@ void setup() {
   digitalWrite(yPIN, LOW);
   digitalWrite(rPIN, LOW);
 
+  // Start the WiFi connection
+  Serial.print("Connecting to ");Serial.println(ssid);
+  Blynk.begin(BLYNK_AUTH_TOKEN,ssid, pass); //Kết nối đến mạng WiFi
+
+  Serial.println();
+  Serial.println("WiFi connected");
+
   dht.begin();
 
   Wire.begin(OLED_SDA, OLED_SCL);  // SDA, SCL
@@ -54,6 +73,8 @@ void setup() {
   oled.drawUTF8(0, 42, "Lập trình IoT");  
 
   oled.sendBuffer();
+  // Đồng bộ trạng thái ban đầu từ Blynk
+  Blynk.syncVirtual(V0);
 }
 
 void ThreeLedBlink(){
@@ -70,6 +91,27 @@ void ThreeLedBlink(){
 
 float fHumidity = 0.0;
 float fTemperature = 0.0;
+
+BLYNK_WRITE(V0) {  // Hàm xử lý nút bật/tắt đèn vàng
+  int value = param.asInt(); // Lấy giá trị từ Blynk (0 hoặc 1)
+  digitalWrite(yPIN, value); // Điều khiển đèn vàng
+}
+
+void updateTime() {
+  static ulong lastTimer = 0;
+  if (!IsReady(lastTimer, 1000)) return; // Cập nhật mỗi 1 giây
+  
+  unsigned long uptime = millis() / 1000; // Lấy thời gian chạy tính bằng giây
+  int hours = uptime / 3600;
+  int minutes = (uptime % 3600) / 60;
+  int seconds = uptime % 60;
+  
+  String currentTime = String(hours) + ":" + 
+                      (minutes < 10 ? "0" : "") + String(minutes) + ":" + 
+                      (seconds < 10 ? "0" : "") + String(seconds);
+  
+  Blynk.virtualWrite(V1, currentTime);
+}
 
 void updateDHT(){
   static ulong lastTimer = 0;  
@@ -89,7 +131,8 @@ void updateDHT(){
     fTemperature = t;
     Serial.print("Temperature: ");
     Serial.print(t);
-    Serial.println(" *C");                    
+    Serial.println(" *C"); 
+    Blynk.virtualWrite(V2, t);                   
   }
 
   if (fHumidity != h){
@@ -98,7 +141,7 @@ void updateDHT(){
     Serial.print("Humidity: ");
     Serial.print(h);
     Serial.print(" %\t");  
-    
+    Blynk.virtualWrite(V3, t); 
   }
   if (bDraw){
     oled.clearBuffer();
@@ -132,7 +175,9 @@ void DrawCounter(){
 }
 
 void loop() {
+  Blynk.run();
   if (!WelcomeDisplayTimeout()) return;
   ThreeLedBlink();
   updateDHT();
+  updateTime(); // Thêm hàm cập nhật thời gian
 }
