@@ -1,10 +1,17 @@
 // Tuấn Long
-#define BLYNK_TEMPLATE_ID "TMPL6wY9aQJcC"
-#define BLYNK_TEMPLATE_NAME "Esp8266ProjectBlynk"
-#define BLYNK_AUTH_TOKEN "P72qCSf588f8rZIFc4JUEXOogQeyJjRM"
+// #define BLYNK_TEMPLATE_ID "TMPL6wY9aQJcC"
+// #define BLYNK_TEMPLATE_NAME "Esp8266ProjectBlynk"
+// #define BLYNK_AUTH_TOKEN "P72qCSf588f8rZIFc4JUEXOogQeyJjRM"
 //Tuấn Long
-#define BOTtoken "7553799111:AAFToVxt7rb578q0gg8-lgHnyiFQDTN9dEs"  
-#define GROUP_ID "-4778310042"
+// #define BOTtoken "7553799111:AAFToVxt7rb578q0gg8-lgHnyiFQDTN9dEs"  
+// #define GROUP_ID "-4778310042"
+//Văn Viết Hiếu
+#define BLYNK_TEMPLATE_ID "TMPL6iYq2l4R6"
+#define BLYNK_TEMPLATE_NAME "ESP8266 Blynk"
+#define BLYNK_AUTH_TOKEN "a6gRHYLTTv0K9Pw4Au6XkJitROUVAzUg"
+// Văn Viết Hiếu
+#define BOTtoken "7857117705:AAHJt2Cff1Hv0KGXvni1DSf4gIo4uN-AosE" 
+#define GROUP_ID "-4652014658" //là một số âm
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
