@@ -1,8 +1,11 @@
 // Tuấn Long
-#define BLYNK_TEMPLATE_ID "TMPL6wY9aQJcC"
-#define BLYNK_TEMPLATE_NAME "Esp8266ProjectBlynk"
-#define BLYNK_AUTH_TOKEN "P72qCSf588f8rZIFc4JUEXOogQeyJjRM"
-
+// #define BLYNK_TEMPLATE_ID "TMPL6wY9aQJcC"
+// #define BLYNK_TEMPLATE_NAME "Esp8266ProjectBlynk"
+// #define BLYNK_AUTH_TOKEN "P72qCSf588f8rZIFc4JUEXOogQeyJjRM"
+//Văn Viết Hiếu
+#define BLYNK_TEMPLATE_ID "TMPL6iYq2l4R6"
+#define BLYNK_TEMPLATE_NAME "ESP8266 Blynk"
+#define BLYNK_AUTH_TOKEN "a6gRHYLTTv0K9Pw4Au6XkJitROUVAzUg"
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
