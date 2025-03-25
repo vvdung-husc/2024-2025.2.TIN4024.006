@@ -1,10 +1,16 @@
 
 // TranTienLoi
-#define BLYNK_TEMPLATE_ID "TMPL6vXA5Snzn"
-#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegramBot"
-#define BLYNK_AUTH_TOKEN "qfHsznuSeuWwgo-5A1vjYFPn6i4G9TY5"
-#define BOTtoken "7050497129:AAH8bGHRryP8KwG-XOPQhjuT__mNPA4Qgfc"
-#define GROUP_ID "-4753410384"
+//#define BLYNK_TEMPLATE_ID "TMPL6vXA5Snzn"
+//#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegramBot"
+//#define BLYNK_AUTH_TOKEN "qfHsznuSeuWwgo-5A1vjYFPn6i4G9TY5"
+//#define BOTtoken "7050497129:AAH8bGHRryP8KwG-XOPQhjuT__mNPA4Qgfc"
+//#define GROUP_ID "-4753410384"
+//NguyenCongPhuocThinh
+#define BLYNK_TEMPLATE_ID "TMPL6mGLqQSog"
+#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTele"
+#define BLYNK_AUTH_TOKEN "iUO05-ezlVSuyMaYWgDEX2ZgQpAGOEwM"
+#define GROUP_ID "-4685427385"
+#define BOTtoken "7067444109:AAE-FOFegKVkl04H0Hz1fOF4cZVQ942iXkY"
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
