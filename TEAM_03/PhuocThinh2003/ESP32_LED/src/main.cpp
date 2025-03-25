@@ -1,5 +1,4 @@
 #include <Arduino.h>
-
 int ledPin = 5; // Chân GPIO 2 (thường nối sẵn LED trên board)
 
 bool isLED_ON = false;
@@ -49,12 +48,3 @@ void loop() {
   Serial.print("Timer :");
   Serial.println(t);
 }
-
-// void loop() {
-//   digitalWrite(ledPin, HIGH); // Bật LED
-//   Serial.println("LED -> ON");
-//   delay(1000);                // Đợi 1 giây
-//   digitalWrite(ledPin, LOW);  // Tắt LED
-//   Serial.println("LED -> OFF");
-//   delay(1000);                // Đợi 1 giây
-// }
