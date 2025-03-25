@@ -6,11 +6,17 @@
 //#define BOTtoken "7050497129:AAH8bGHRryP8KwG-XOPQhjuT__mNPA4Qgfc"
 //#define GROUP_ID "-4753410384"
 //NguyenCongPhuocThinh
-#define BLYNK_TEMPLATE_ID "TMPL6mGLqQSog"
-#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTele"
-#define BLYNK_AUTH_TOKEN "iUO05-ezlVSuyMaYWgDEX2ZgQpAGOEwM"
-#define GROUP_ID "-4685427385"
-#define BOTtoken "7067444109:AAE-FOFegKVkl04H0Hz1fOF4cZVQ942iXkY"
+// #define BLYNK_TEMPLATE_ID "TMPL6mGLqQSog"
+// #define BLYNK_TEMPLATE_NAME "ESP8266BlynkTele"
+// #define BLYNK_AUTH_TOKEN "iUO05-ezlVSuyMaYWgDEX2ZgQpAGOEwM"
+// #define GROUP_ID "-4685427385"
+// #define BOTtoken "7067444109:AAE-FOFegKVkl04H0Hz1fOF4cZVQ942iXkY"
+//DangThiLai
+#define BLYNK_TEMPLATE_ID "TMPL60KlMoShG"
+#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegram"
+#define BLYNK_AUTH_TOKEN "Ydw6h7TSq3Re-PLE2-joUww9WNISTO2q"
+#define GROUP_ID "-4770458147" //là một số âm
+#define BOTtoken "7899046540:AAF2zHGzZBf_NpbNIdP_gQwSkS9PL4rv2Uk" 
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
