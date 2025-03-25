@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <string>
 
 
 #define BLYNK_TEMPLATE_ID "TMPL6QDGUBQ8t"
@@ -8,7 +9,7 @@
 #include <HTTPClient.h>
 #include <BlynkSimpleEsp32.h>
 
-
+using namespace std;
 
 // Thông tin WiFi
 const char* ssid = "Wokwi-GUEST";
@@ -35,7 +36,7 @@ void fetchData() {
         
         if (httpResponseCode > 0) {
             String payload = http.getString();
-            Serial.println("Dữ liệu vị trí nhận được:");
+            Serial.print("Dữ liệu vị trí nhận được:");
             Serial.println(payload);
             String data[7];
             int index = 0, start = 0;
@@ -100,7 +101,7 @@ void fetchWeather() {
             if (tempPos != -1) {
                 int start = tempPos + 7; 
                 int end = payload.indexOf(",", start);
-                String temperature = payload.substring(start, end);
+                String temperature = String(payload.substring(start, end).toInt() - 273.15);
 
                 Serial.print("Nhiệt độ: ");
                 Serial.println(temperature + "°C");
@@ -136,7 +137,8 @@ void setup() {
         delay(500);
         Serial.print(".");
     }
-    Serial.print("\nKết nối WiFi thành công!");
+    Serial.println();
+    Serial.println("Kết nối WiFi thành công!");
 
     Blynk.begin(BLYNK_AUTH_TOKEN, ssid, password);  // Kết nối với Blynk
 
