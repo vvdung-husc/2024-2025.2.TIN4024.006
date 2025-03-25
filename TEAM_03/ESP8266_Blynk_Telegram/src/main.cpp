@@ -27,6 +27,11 @@
 #define BOTtoken "7899046540:AAF2zHGzZBf_NpbNIdP_gQwSkS9PL4rv2Uk" 
 
 //Lê Thị HUỳnh Trang
+#define BLYNK_TEMPLATE_ID "TMPL6AYM-_1_k"
+#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegram"
+#define BLYNK_AUTH_TOKEN "e2R0ZGVFTrBhDiGerFAdLheZHBq8XIxh"
+#define GROUP_ID "-4727500925" //là một số âm
+#define BOTtoken "7737666732:AAEWTA5lRq3XV0xSTft8N9ky3-EoDatJ6Q4" 
 
 
 #include <Arduino.h>
