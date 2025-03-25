@@ -1,18 +1,28 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+#define LED_XANH 15
+#define LED_VANG 2
+#define LED_DO 4
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+    pinMode(LED_XANH, OUTPUT);
+    pinMode(LED_VANG, OUTPUT);
+    pinMode(LED_DO, OUTPUT);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+    digitalWrite(LED_XANH, HIGH);
+    digitalWrite(LED_VANG, LOW);
+    digitalWrite(LED_DO, LOW);
+    delay(1000); // Giữ đèn xanh sáng 1 giây
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+    digitalWrite(LED_XANH, LOW);
+    digitalWrite(LED_VANG, HIGH);
+    digitalWrite(LED_DO, LOW);
+    delay(1000); // Giữ đèn vàng sáng 1 giây
+
+    digitalWrite(LED_XANH, LOW);
+    digitalWrite(LED_VANG, LOW);
+    digitalWrite(LED_DO, HIGH);
+    delay(1000); // Giữ đèn đỏ sáng 1 giây
 }
