@@ -13,6 +13,12 @@
 #define BOTtoken "7203343009:AAG6JTPn1tE0ut5cYd4IPtjZz2H_L5-Mnks"
 #define GROUP_ID "-4726185158"
 
+//NguyenCongPhuocThinh
+// #define BLYNK_TEMPLATE_ID "TMPL6mGLqQSog"
+// #define BLYNK_TEMPLATE_NAME "ESP8266BlynkTele"
+// #define BLYNK_AUTH_TOKEN "iUO05-ezlVSuyMaYWgDEX2ZgQpAGOEwM"
+// #define GROUP_ID "-4685427385"
+// #define BOTtoken "7067444109:AAE-FOFegKVkl04H0Hz1fOF4cZVQ942iXkY"
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
