@@ -25,7 +25,12 @@ char pass[] = "13572468";
 
 U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
-bool yellowBlinkMode = false; // Trạng thái chế độ đèn vàng nhấp nháy
+bool yellowBlinkMode = false;
+
+int currentLedIndex = 0;
+unsigned long lastLedSwitchTime = 0;
+const int ledPin[3] = {gPIN, yPIN, rPIN};
+const int durations[3] = {5000, 7000, 2000}; // Xanh 5s, Vàng 7s, Đỏ 2s
 
 bool WelcomeDisplayTimeout(uint msSleep = 5000){
   static unsigned long lastTimer = 0;
@@ -70,18 +75,16 @@ void setup() {
 
 void ThreeLedBlink(){
   static unsigned long lastTimer = 0;
-  static int currentLed = 0;  
-  static const int ledPin[3] = {gPIN, yPIN, rPIN};
-  static const int durations[3] = {7000, 2000, 5000};
 
   if (yellowBlinkMode) return;
 
-  if (!IsReady(lastTimer, durations[currentLed])) return;
+  if (!IsReady(lastTimer, durations[currentLedIndex])) return;
 
-  int prevLed = (currentLed + 2) % 3;
+  int prevLed = (currentLedIndex + 2) % 3;
   digitalWrite(ledPin[prevLed], LOW);  
-  digitalWrite(ledPin[currentLed], HIGH);  
-  currentLed = (currentLed + 1) % 3;
+  digitalWrite(ledPin[currentLedIndex], HIGH);  
+  lastLedSwitchTime = millis(); // Cập nhật thời điểm chuyển đèn
+  currentLedIndex = (currentLedIndex + 1) % 3;
 }
 
 void yellowBlink() {
@@ -99,16 +102,16 @@ void yellowBlink() {
 }
 
 float generateRandomTemperature() {
-  return random(-400, 801) / 10.0; // -40.0 đến 80.0
+  return random(-400, 801) / 10.0;
 }
 
 float generateRandomHumidity() {
-  return random(0, 1001) / 10.0; // 0.0 đến 100.0
+  return random(0, 1001) / 10.0;
 }
 
 void updateRandomDHT(){
   static unsigned long lastTimer = 0;  
-  if (!IsReady(lastTimer, 5000)) return;
+  if (!IsReady(lastTimer, 1000)) return; // Cập nhật nhiệt độ, độ ẩm mỗi 5 giây
 
   float t = generateRandomTemperature();
   float h = generateRandomHumidity();
@@ -123,28 +126,48 @@ void updateRandomDHT(){
   Blynk.virtualWrite(V1, t);
   Blynk.virtualWrite(V2, h);
 
+  // Hiển thị trên OLED
   oled.clearBuffer();
-  oled.setFont(u8g2_font_unifont_t_vietnamese1);
-  String tempStr = StringFormat("Nhiet do: %.1f C", t); // Sử dụng StringFormat
-  String humStr = StringFormat("Do am: %.1f %%", h);    // Sử dụng StringFormat
+  oled.setFont(u8g2_font_unifont_t_vietnamese1); // Dùng font nhỏ hơn để vừa 4 dòng
+  String tempStr = StringFormat("Nhiet: %.1f C", t);
+  String humStr = StringFormat("Do am: %.1f %%", h);
+
+  unsigned long uptime = millis() / 1000;
+  int hours = uptime / 3600;
+  int minutes = (uptime % 3600) / 60;
+  int seconds = uptime % 60;
+  String uptimeStr = StringFormat("Up: %dh %02dm %02ds", hours, minutes, seconds);
   
-  oled.drawUTF8(0, 16, tempStr.c_str());  
-  oled.drawUTF8(0, 32, humStr.c_str());  
+  oled.drawUTF8(0, 14, tempStr.c_str());  // Dòng 1
+  oled.drawUTF8(0, 28, humStr.c_str());   // Dòng 2
+  oled.drawUTF8(0, 42, uptimeStr.c_str()); // Dòng 3
+  
+  if (!yellowBlinkMode) {
+    unsigned long elapsed = millis() - lastLedSwitchTime;
+    int remainingTime = (durations[currentLedIndex] - elapsed) / 1000; // Giây còn lại
+    if (remainingTime < 0) remainingTime = 0; // Đảm bảo không âm
+    
+    String ledStr;
+    if (ledPin[currentLedIndex] == gPIN) ledStr = "Do";
+    else if (ledPin[currentLedIndex] == yPIN) ledStr = "Xanh";
+    else ledStr = "Vang";
+    
+    String countdownStr = StringFormat("%s: %ds", ledStr.c_str(), remainingTime);
+    oled.drawUTF8(0, 56, countdownStr.c_str()); // Dòng 4
+  }
+
   oled.sendBuffer();
 }
 
 void updateUptime() {
   static unsigned long lastTimer = 0;
-  if (!IsReady(lastTimer, 1000)) return;
+  if (!IsReady(lastTimer, 1000)) return; // Cập nhật mỗi 1 giây
   
-  unsigned long uptime = millis() / 1000;
-  int hours = uptime / 3600;
-  int minutes = (uptime % 3600) / 60;
-  int seconds = uptime % 60;
+  unsigned long uptime = millis() / 1000; // Thời gian chạy tính bằng giây
+  Blynk.virtualWrite(V0, uptime);
   
-  String timeStr = StringFormat("%dh %02dm %02ds", hours, minutes, seconds); // Sử dụng StringFormat
-  
-  Blynk.virtualWrite(V0, timeStr);
+  Serial.print("Uptime (seconds) sent to Blynk: ");
+  Serial.println(uptime);
 }
 
 BLYNK_WRITE(V3) {
