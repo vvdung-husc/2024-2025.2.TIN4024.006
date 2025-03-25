@@ -44,7 +44,7 @@ BLYNK_WRITE(V1) {
 
 // Telegram Bot Token và Group ID
 #define BOTtoken "7905069023:AAEL-dgmljUYwG3Hihu73O7bNPoUtfnMPC4"
-#define GROUP_ID "7196545948"
+#define GROUP_ID "-2594207741"
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
