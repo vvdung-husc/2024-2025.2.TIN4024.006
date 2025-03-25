@@ -1,8 +1,13 @@
+//Huỳnh Văn Nhân
 #define BLYNK_TEMPLATE_ID "TMPL6PqjG-L40"
 #define BLYNK_TEMPLATE_NAME "Nhan"
 #define BLYNK_AUTH_TOKEN "IOg3DFoDvjBPSbxdbu3OOYGlKXGeGv52"
 
 
+//Nguyễn Khánh Phượng
+//#define BLYNK_TEMPLATE_ID "TMPL6Ovhz1RbQ"
+//#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
+//#define BLYNK_AUTH_TOKEN "LDnnRXGZFlpczlq4J5GHdgLHwA86hqK0"
 
 
 #define WIFI_SSID "Wokwi-GUEST"
