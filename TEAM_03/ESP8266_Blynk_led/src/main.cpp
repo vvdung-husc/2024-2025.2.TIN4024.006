@@ -3,9 +3,13 @@
 // #define BLYNK_TEMPLATE_NAME "ESP8266"
 // #define BLYNK_AUTH_TOKEN "-4XrB4USEieqfCGdIIkKgrZvfyDalGcq"
 // Phạm Thành Thể
-#define BLYNK_TEMPLATE_ID "TMPL6dptoRrh1"
+//#define BLYNK_TEMPLATE_ID "TMPL6dptoRrh1"
+//#define BLYNK_TEMPLATE_NAME "ESP8266Project"
+//#define BLYNK_AUTH_TOKEN "bojqfYbbfGyyDuFkqLx-IJhq9n4UOEMk"
+// Nguyễn Công Phước Thịnh
+#define BLYNK_TEMPLATE_ID "TMPL6u3oTo3nV"
 #define BLYNK_TEMPLATE_NAME "ESP8266Project"
-#define BLYNK_AUTH_TOKEN "bojqfYbbfGyyDuFkqLx-IJhq9n4UOEMk"
+#define BLYNK_AUTH_TOKEN "6VjcNeQg1dT6XkR273UyVoDSSHPYmwuE"
 
 #include <Arduino.h>
 #include <Wire.h>
