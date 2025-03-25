@@ -1,142 +1,178 @@
+#define BLYNK_TEMPLATE_ID "TMPL6RQGDLOQe" 
+#define BLYNK_TEMPLATE_NAME "ESP8266" 
+#define BLYNK_AUTH_TOKEN "HkHpsRJ8SZ-wbZcBynAWmAqATjJOvHQV" 
+
 #include <Arduino.h>
 #include "utils.h"
 
-#include <Adafruit_Sensor.h>
-#include <DHT.h>
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
 
 #include <Wire.h>
 #include <U8g2lib.h>
 
-
+// Định nghĩa chân kết nối
 #define gPIN 15
 #define yPIN 2
 #define rPIN 5
 
-#define dhtPIN 16     // Digital pin connected to the DHT sensor
-#define dhtTYPE DHT11 // DHT 22 (AM2302)
-
 #define OLED_SDA 13
 #define OLED_SCL 12
 
-// Khởi tạo OLED SH1106
 U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
-DHT dht(D0, dhtTYPE);
+bool blinkMode = false;
 
+unsigned long upTime = 0;
+float fTemperature = 0.0;
+float fHumidity = 0.0;
 
-bool WelcomeDisplayTimeout(uint msSleep = 5000){
-  static ulong lastTimer = 0;
+BlynkTimer timer;
+
+BLYNK_WRITE(V3) {
+  blinkMode = param.asInt();
+}
+
+bool WelcomeDisplayTimeout(unsigned int msSleep = 3000) {
+  static unsigned long lastTimer = 0;
   static bool bDone = false;
   if (bDone) return true;
-  if (!IsReady(lastTimer, msSleep)) return false;
-  bDone = true;    
+  if (millis() - lastTimer < msSleep) return false;
+  bDone = true;
   return bDone;
 }
 
-
-void setup() {
-  Serial.begin(115200);
-  pinMode(gPIN, OUTPUT);
-  pinMode(yPIN, OUTPUT);
-  pinMode(rPIN, OUTPUT);
-  
-  digitalWrite(gPIN, LOW);
-  digitalWrite(yPIN, LOW);
-  digitalWrite(rPIN, LOW);
-
-  dht.begin();
-
-  Wire.begin(OLED_SDA, OLED_SCL);  // SDA, SCL
-
-  oled.begin();
+//Hiển thị trên OLED
+void updateOLED() {
   oled.clearBuffer();
-  
-  oled.setFont(u8g2_font_5x8_tf);
-  oled.drawUTF8(0, 14, "Van Huynh Tuong An");  
-  oled.drawUTF8(0, 28, "Khoa CNTT");
-  oled.drawUTF8(0, 42, "Truong DHKH Hue");  
-  oled.drawUTF8(0, 54, "Lap Trinh IOT" );
+  oled.setFont(u8g2_font_unifont_t_vietnamese2);
+
+  oled.drawUTF8(0, 14, ("Nhiet do: " + String(fTemperature, 1) + "°C").c_str());
+  oled.drawUTF8(0, 28, ("Do am: " + String(fHumidity, 1) + "%").c_str());
+  oled.drawUTF8(0, 42, ("Uptime: " + String(upTime) + "s").c_str());
 
   oled.sendBuffer();
 }
 
-void ThreeLedBlink(){
-  static ulong lastTimer = 0;
-  static int currentLed = 0;  
-  static const int ledPin[3] = {gPIN, yPIN, rPIN};
+//Điều khiển đèn giao thông
+void TrafficLightControl() {
+  static unsigned long lastTimer = 0;
+  static int state = 0;
+  static const unsigned long durations[] = {2000, 3000, 1000}; // Đỏ 10s, Xanh 8s, Vàng 3s
+  static const int ledPins[] = {rPIN, gPIN, yPIN};
 
-  if (!IsReady(lastTimer, 1000)) return;
-  int prevLed = (currentLed + 2) % 3;
-  digitalWrite(ledPin[prevLed], LOW);  
-  digitalWrite(ledPin[currentLed], HIGH);  
-  currentLed = (currentLed + 1) % 3;
-}
-
-float fHumidity = 0.0;
-float fTemperature = 0.0;
-
-void updateDHT(){
-  static ulong lastTimer = 0;  
-  if (!IsReady(lastTimer, 2000)) return;
-
-  float h = dht.readHumidity();
-  float t = dht.readTemperature(); // or dht.readTemperature(true) for Fahrenheit
-  if (isnan(h) || isnan(t)) {
-    Serial.println("Failed to read from DHT sensor!");
+  if (blinkMode) {
+    // Trạng thái bật/tắt nhấp nháy đèn vàng
+    if (millis() - lastTimer > 500) {
+      lastTimer = millis();
+      digitalWrite(yPIN, !digitalRead(yPIN));
+    }
+    digitalWrite(rPIN, LOW);
+    digitalWrite(gPIN, LOW);
     return;
   }
 
-  bool bDraw = false;
-
-  if (fTemperature != t){
-    bDraw = true;
-    fTemperature = t;
-    Serial.print("Temperature: ");
-    Serial.print(t);
-    Serial.println(" *C");                    
+  if (millis() - lastTimer > durations[state]) {
+    lastTimer = millis();
+    digitalWrite(ledPins[state], LOW);
+    state = (state + 1) % 3;
+    digitalWrite(ledPins[state], HIGH);
   }
-
-  if (fHumidity != h){
-    bDraw = true;
-    fHumidity = h;
-    Serial.print("Humidity: ");
-    Serial.print(h);
-    Serial.print(" %\t");  
-    
-  }
-  if (bDraw){
-    oled.clearBuffer();
-    oled.setFont(u8g2_font_unifont_t_vietnamese2);
-
-    String s = StringFormat("Nhiet do: %.2f °C", t);
-    oled.drawUTF8(0, 14, s.c_str());  
-    
-    s = StringFormat("Do am: %.2f %%", h);
-    oled.drawUTF8(0, 42, s.c_str());      
-
-    oled.sendBuffer();
-  } 
-  
 }
 
-void DrawCounter(){  
-  static uint counter = 0; // Biến đếm
-  static ulong lastTimer = 0;  
-  if (!IsReady(lastTimer, 2000)) return;
 
-  // Bắt đầu vẽ màn hình
-  oled.clearBuffer();  
-  oled.setFont(u8g2_font_logisoso32_tf); // Chọn font lớn để hiển thị số
-  oled.setCursor(30, 40); // Đặt vị trí chữ
-  oled.print(counter); // Hiển thị số đếm
-  oled.sendBuffer(); // Gửi dữ liệu lên màn hình
+// Gửi dữ liệu lên Blynk
+void sendToBlynk() {
+  Blynk.virtualWrite(V0, upTime);      // Thời gian chạy
+  Blynk.virtualWrite(V1, fTemperature); // Nhiệt độ
+  Blynk.virtualWrite(V2, fHumidity);    // Độ ẩm
+}
 
-  counter++; // Tăng giá trị đếm
+// Sinh dữ liệu nhiệt độ & độ ẩm ngẫu nhiên
+float randomTemperature() {
+  return random(-400, 800) / 10.0;
+}
 
+float randomHumidity() {
+  return random(0, 1000) / 10.0;
+}
+
+
+// Cập nhật nhiệt độ & độ ẩm
+void updateSensorData() {
+  static unsigned long lastTimer = 0;
+  if (millis() - lastTimer < 2000) return;
+  lastTimer = millis();
+
+  fTemperature = randomTemperature();
+  fHumidity = randomHumidity();
+
+  Serial.print("Nhiet do: ");
+  Serial.print(fTemperature);
+  Serial.println("°C");
+
+  Serial.print("Do am: ");
+  Serial.print(fHumidity);
+  Serial.println("%");
+}
+
+// Hiển thị thời gian chạy
+void updateupTime() {
+  static unsigned long lastTimer = 0;
+  if (millis() - lastTimer < 1000) return;
+  lastTimer = millis();
+
+  upTime++;
+}
+
+// SETUP
+void setup() {
+  Serial.begin(115200);
+
+  //Cấu hình LED
+  pinMode(gPIN, OUTPUT);
+  pinMode(yPIN, OUTPUT);
+  pinMode(rPIN, OUTPUT);
+  digitalWrite(gPIN, LOW);
+  digitalWrite(yPIN, LOW);
+  digitalWrite(rPIN, HIGH); // Bắt đầu với đèn đỏ
+
+  // Cấu hình OLED
+  Wire.begin(OLED_SDA, OLED_SCL);
+  oled.begin();
+  oled.clearBuffer();
+  oled.setFont(u8g2_font_unifont_t_vietnamese1);
+  oled.drawUTF8(0, 14, "Trường ĐHKH");
+  oled.drawUTF8(0, 28, "Khoa CNTT");
+  oled.drawUTF8(0, 42, "Lập trình IoT");
+  oled.sendBuffer();
+  oled.sendBuffer();
+
+  // Kết nối WiFi & Blynk
+  const char* ssid = "CNTT-MMT";       // Thay bằng SSID thực tế
+  const char* password = "13572468";   // Thay bằng mật khẩu thực tế
+
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi connected!");
+
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, password);
+
+  // Gửi dữ liệu lên Blynk mỗi 3 giây
+  timer.setInterval(3000L, sendToBlynk);
 }
 
 void loop() {
+  Blynk.run();
+  timer.run();
+
   if (!WelcomeDisplayTimeout()) return;
-  ThreeLedBlink();
-  updateDHT();
+
+  TrafficLightControl();
+  updateSensorData();
+  updateupTime();
+  updateOLED();
 }

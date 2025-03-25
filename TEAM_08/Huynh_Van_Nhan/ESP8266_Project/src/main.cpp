@@ -1,100 +1,178 @@
-// Blynk Template Information
 #define BLYNK_TEMPLATE_ID "TMPL6RQGDLOQe" 
 #define BLYNK_TEMPLATE_NAME "ESP8266" 
 #define BLYNK_AUTH_TOKEN "HkHpsRJ8SZ-wbZcBynAWmAqATjJOvHQV" 
 
-#define BLYNK_PRINT Serial 
-#include <ESP8266WiFi.h> 
-#include <BlynkSimpleEsp8266.h> 
-#include <Wire.h> 
-#include <Adafruit_GFX.h> 
-#include <Adafruit_SSD1306.h> 
+#include <Arduino.h>
+#include "utils.h"
 
-// Blynk Credentials
-char auth[] = "HkHpsRJ8SZ-wbZcBynAWmAqATjJOvHQV"; 
-char ssid[] = "Thanh Nhan"; 
-char pass[] = "66669999"; 
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
 
-// OLED setup
-#define SCREEN_WIDTH 128 // Chiều rộng màn hình OLED
-#define SCREEN_HEIGHT 64 // Chiều cao màn hình OLED
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+#include <Wire.h>
+#include <U8g2lib.h>
 
-// Virtual Pins (Chân ảo của Blynk)
-#define UPTIME_VPIN V0 // Gửi thời gian hoạt động lên Blynk
-#define TEMP_VPIN V1 // Gửi nhiệt độ lên Blynk
-#define HUMI_VPIN V2 // Gửi độ ẩm lên Blynk
-#define SWITCH_VPIN V3 // Nhận trạng thái nút bấm từ Blynk
+// Định nghĩa chân kết nối
+#define gPIN 15
+#define yPIN 2
+#define rPIN 5
 
-// LED Pins
-#define RED_LED D5 // LED đỏ
-#define YELLOW_LED D6 // LED vàng
-#define GREEN_LED D7 // LED xanh
+#define OLED_SDA 13
+#define OLED_SCL 12
 
-bool blinkMode = false; // Biến trạng thái cho chế độ nhấp nháy
+U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
-void setup() {
-    Serial.begin(115200); // Khởi động Serial
-    Blynk.begin(auth, ssid, pass); // Kết nối Blynk
-    pinMode(RED_LED, OUTPUT);
-    pinMode(YELLOW_LED, OUTPUT);
-    pinMode(GREEN_LED, OUTPUT);
-    
-    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Kiểm tra màn hình OLED
-        Serial.println(F("SSD1306 allocation failed"));
-        for (;;);
+bool blinkMode = false;
+
+unsigned long upTime = 0;
+float fTemperature = 0.0;
+float fHumidity = 0.0;
+
+BlynkTimer timer;
+
+BLYNK_WRITE(V3) {
+  blinkMode = param.asInt();
+}
+
+bool WelcomeDisplayTimeout(unsigned int msSleep = 3000) {
+  static unsigned long lastTimer = 0;
+  static bool bDone = false;
+  if (bDone) return true;
+  if (millis() - lastTimer < msSleep) return false;
+  bDone = true;
+  return bDone;
+}
+
+//Hiển thị trên OLED
+void updateOLED() {
+  oled.clearBuffer();
+  oled.setFont(u8g2_font_unifont_t_vietnamese2);
+
+  oled.drawUTF8(0, 14, ("Nhiet do: " + String(fTemperature, 1) + "°C").c_str());
+  oled.drawUTF8(0, 28, ("Do am: " + String(fHumidity, 1) + "%").c_str());
+  oled.drawUTF8(0, 42, ("Uptime: " + String(upTime) + "s").c_str());
+
+  oled.sendBuffer();
+}
+
+//Điều khiển đèn giao thông
+void TrafficLightControl() {
+  static unsigned long lastTimer = 0;
+  static int state = 0;
+  static const unsigned long durations[] = {2000, 3000, 1000}; // Đỏ 10s, Xanh 8s, Vàng 3s
+  static const int ledPins[] = {rPIN, gPIN, yPIN};
+
+  if (blinkMode) {
+    // Trạng thái bật/tắt nhấp nháy đèn vàng
+    if (millis() - lastTimer > 500) {
+      lastTimer = millis();
+      digitalWrite(yPIN, !digitalRead(yPIN));
     }
-    display.clearDisplay(); // Xóa màn hình OLED
+    digitalWrite(rPIN, LOW);
+    digitalWrite(gPIN, LOW);
+    return;
+  }
+
+  if (millis() - lastTimer > durations[state]) {
+    lastTimer = millis();
+    digitalWrite(ledPins[state], LOW);
+    state = (state + 1) % 3;
+    digitalWrite(ledPins[state], HIGH);
+  }
+}
+
+
+// Gửi dữ liệu lên Blynk
+void sendToBlynk() {
+  Blynk.virtualWrite(V0, upTime);      // Thời gian chạy
+  Blynk.virtualWrite(V1, fTemperature); // Nhiệt độ
+  Blynk.virtualWrite(V2, fHumidity);    // Độ ẩm
+}
+
+// Sinh dữ liệu nhiệt độ & độ ẩm ngẫu nhiên
+float randomTemperature() {
+  return random(-400, 800) / 10.0;
+}
+
+float randomHumidity() {
+  return random(0, 1000) / 10.0;
+}
+
+
+// Cập nhật nhiệt độ & độ ẩm
+void updateSensorData() {
+  static unsigned long lastTimer = 0;
+  if (millis() - lastTimer < 2000) return;
+  lastTimer = millis();
+
+  fTemperature = randomTemperature();
+  fHumidity = randomHumidity();
+
+  Serial.print("Nhiet do: ");
+  Serial.print(fTemperature);
+  Serial.println("°C");
+
+  Serial.print("Do am: ");
+  Serial.print(fHumidity);
+  Serial.println("%");
+}
+
+// Hiển thị thời gian chạy
+void updateupTime() {
+  static unsigned long lastTimer = 0;
+  if (millis() - lastTimer < 1000) return;
+  lastTimer = millis();
+
+  upTime++;
+}
+
+// SETUP
+void setup() {
+  Serial.begin(115200);
+
+  //Cấu hình LED
+  pinMode(gPIN, OUTPUT);
+  pinMode(yPIN, OUTPUT);
+  pinMode(rPIN, OUTPUT);
+  digitalWrite(gPIN, LOW);
+  digitalWrite(yPIN, LOW);
+  digitalWrite(rPIN, HIGH); // Bắt đầu với đèn đỏ
+
+  // Cấu hình OLED
+  Wire.begin(OLED_SDA, OLED_SCL);
+  oled.begin();
+  oled.clearBuffer();
+  oled.setFont(u8g2_font_unifont_t_vietnamese1);
+  oled.drawUTF8(0, 14, "Trường ĐHKH");
+  oled.drawUTF8(0, 28, "Khoa CNTT");
+  oled.drawUTF8(0, 42, "Lập trình IoT");
+  oled.sendBuffer();
+  oled.sendBuffer();
+
+  // Kết nối WiFi & Blynk
+  const char* ssid = "CNTT-MMT";       // Thay bằng SSID thực tế
+  const char* password = "13572468";   // Thay bằng mật khẩu thực tế
+
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi connected!");
+
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, password);
+
+  // Gửi dữ liệu lên Blynk mỗi 3 giây
+  timer.setInterval(3000L, sendToBlynk);
 }
 
 void loop() {
-    Blynk.run(); // Chạy Blynk
-    float temperature = random(-400, 800) / 10.0; // Tạo giá trị nhiệt độ ngẫu nhiên (-40 đến 80 độ C)
-    float humidity = random(0, 1000) / 10.0; // Tạo giá trị độ ẩm ngẫu nhiên (0 - 100%)
-    long uptime = millis() / 1000; // Lấy thời gian hoạt động của thiết bị
-    
-    // Gửi dữ liệu lên Blynk
-    Blynk.virtualWrite(UPTIME_VPIN, uptime);
-    Blynk.virtualWrite(TEMP_VPIN, temperature);
-    Blynk.virtualWrite(HUMI_VPIN, humidity);
-    
-    // Hiển thị lên màn hình OLED
-    display.clearDisplay();
-    display.setTextSize(2);
-    display.setTextColor(SSD1306_WHITE);
-    display.setCursor(0, 10);
-    display.print("Temp: ");
-    display.print(temperature);
-    display.println(" C");
-    display.setCursor(0, 30);
-    display.print("Humi: ");
-    display.print(humidity);
-    display.println(" %");
-    display.display();
+  Blynk.run();
+  timer.run();
 
-    delay(1000);
-}
+  if (!WelcomeDisplayTimeout()) return;
 
-// Nhận dữ liệu từ Blynk để điều khiển chế độ nhấp nháy LED
-BLYNK_WRITE(SWITCH_VPIN) {
-    blinkMode = param.asInt(); // Đọc giá trị từ ứng dụng Blynk
-}
-
-// Hàm điều khiển hệ thống đèn giao thông
-void trafficLightControl() {
-    if (blinkMode) { // Nếu chế độ nhấp nháy được bật
-        digitalWrite(RED_LED, LOW);
-        digitalWrite(GREEN_LED, LOW);
-        digitalWrite(YELLOW_LED, millis() % 1000 < 500 ? HIGH : LOW); // Nhấp nháy đèn vàng
-    } else { // Nếu chế độ giao thông bình thường
-        digitalWrite(RED_LED, HIGH);
-        delay(3000);
-        digitalWrite(RED_LED, LOW);
-        digitalWrite(GREEN_LED, HIGH);
-        delay(5000);
-        digitalWrite(GREEN_LED, LOW);
-        digitalWrite(YELLOW_LED, HIGH);
-        delay(2000);
-        digitalWrite(YELLOW_LED, LOW);
-    }
+  TrafficLightControl();
+  updateSensorData();
+  updateupTime();
+  updateOLED();
 }
