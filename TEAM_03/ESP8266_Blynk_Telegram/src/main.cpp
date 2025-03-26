@@ -1,10 +1,38 @@
 
 // TranTienLoi
-#define BLYNK_TEMPLATE_ID "TMPL6vXA5Snzn"
-#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegramBot"
-#define BLYNK_AUTH_TOKEN "qfHsznuSeuWwgo-5A1vjYFPn6i4G9TY5"
-#define BOTtoken "7050497129:AAH8bGHRryP8KwG-XOPQhjuT__mNPA4Qgfc"
-#define GROUP_ID "-4753410384"
+// #define BLYNK_TEMPLATE_ID "TMPL6vXA5Snzn"
+// #define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegramBot"
+// #define BLYNK_AUTH_TOKEN "qfHsznuSeuWwgo-5A1vjYFPn6i4G9TY5"
+// #define BOTtoken "7050497129:AAH8bGHRryP8KwG-XOPQhjuT__mNPA4Qgfc"
+// #define GROUP_ID "-4753410384"
+
+// Phạm Thành Thể
+#define BLYNK_TEMPLATE_ID "TMPL6JkACj44f"
+#define BLYNK_TEMPLATE_NAME "ESP8266 BT03"
+#define BLYNK_AUTH_TOKEN "oqA40ltN1MW7S6DJXc1BFB9ravk7tO2E"
+#define BOTtoken "7203343009:AAG6JTPn1tE0ut5cYd4IPtjZz2H_L5-Mnks"
+#define GROUP_ID "-4726185158"
+
+//NguyenCongPhuocThinh
+#define BLYNK_TEMPLATE_ID "TMPL6mGLqQSog"
+#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTele"
+#define BLYNK_AUTH_TOKEN "iUO05-ezlVSuyMaYWgDEX2ZgQpAGOEwM"
+#define GROUP_ID "-4685427385"
+#define BOTtoken "7067444109:AAE-FOFegKVkl04H0Hz1fOF4cZVQ942iXkY"
+//DangThiLai
+#define BLYNK_TEMPLATE_ID "TMPL60KlMoShG"
+#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegram"
+#define BLYNK_AUTH_TOKEN "Ydw6h7TSq3Re-PLE2-joUww9WNISTO2q"
+#define GROUP_ID "-4770458147" //là một số âm
+#define BOTtoken "7899046540:AAF2zHGzZBf_NpbNIdP_gQwSkS9PL4rv2Uk" 
+
+//Lê Thị HUỳnh Trang
+#define BLYNK_TEMPLATE_ID "TMPL6AYM-_1_k"
+#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegram"
+#define BLYNK_AUTH_TOKEN "e2R0ZGVFTrBhDiGerFAdLheZHBq8XIxh"
+#define GROUP_ID "-4727500925" //là một số âm
+#define BOTtoken "7737666732:AAEWTA5lRq3XV0xSTft8N9ky3-EoDatJ6Q4" 
+
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
