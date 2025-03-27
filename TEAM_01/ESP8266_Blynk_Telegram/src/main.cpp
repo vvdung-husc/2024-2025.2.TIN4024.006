@@ -6,17 +6,20 @@
 #include <WiFiClientSecure.h>
 
 // Lê Hữu Nhật
-#define BLYNK_TEMPLATE_ID "TMPL6c_LsX9l3"
+#define BLYNK_TEMPLATE_ID "TMPL6c_gqr655"
 #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
-#define BLYNK_AUTH_TOKEN "vBJLhwxTiSgPItQ2raIlgudebqwHd2I2"
+#define BLYNK_AUTH_TOKEN "Ie8HwIvuIhSRfWozHPmllwsvDShXMix-"
+// #define BLYNK_TEMPLATE_ID "TMPL6c_LsX9l3"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
+// #define BLYNK_AUTH_TOKEN "vBJLhwxTiSgPItQ2raIlgudebqwHd2I2"
 
 
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
 // Thông tin WiFi
-char ssid[] = "CNTT-MMT";
-char pass[] = "13572468";
+char ssid[] = "DIA DU";
+char pass[] = "diadu@123";
 
 //Telegram Bot Lê Hữu Nhật
 #define BOT_TOKEN "8066719718:AAE9Pi7EVp4hRwUz7bW7_tmsmuQTq84iD6M"  // Thay bằng Bot Token từ BotFather
@@ -126,7 +129,7 @@ float generateRandomHumidity() {
 
 void updateRandomDHT() {
   static unsigned long lastTimer = 0;
-  if (!IsReady(lastTimer, 5000)) return; // 5 giây = 5,000 ms
+  if (!IsReady(lastTimer, 300000)) return; // 5 giây = 5,000 ms
 
   temperature = generateRandomTemperature();
   humidity = generateRandomHumidity();
@@ -144,25 +147,25 @@ void updateRandomDHT() {
 
 void checkHealthConditions() {
   static unsigned long lastAlertTime = 0;
-  if (!IsReady(lastAlertTime, 300000)) return; // 5 phút = 300,000 ms
+  if (!IsReady(lastAlertTime, 5000)) return; // 5 phút = 300,000 ms
 
   String NT = "";
   String DA = "";
   // Nhiệt độ
-  if (temperature < 10) NT = "Nhiệt độ < 10°C - Nguy cơ hạ thân nhiệt!";
-  else if (10 <= temperature <= 15) NT = "Cảm giác lạnh, tăng nguy cơ mắc bệnh đường hô hấp.";
-  else if (20 <= temperature <= 30) NT = " Nhiệt độ lý tưởng, ít ảnh hưởng đến sức khỏe.";
-  else if (30 < temperature <= 35) NT = "Cơ thể bắt đầu có dấu hiệu mất nước, mệt mỏi.";
-  else if (temperature > 35) NT = "Nguy cơ sốc nhiệt, chuột rút, say nắng.";
-  else if (temperature > 40) NT = "Cực kỳ nguy hiểm, có thể gây suy nội tạng, đột quỵ nhiệt.";
+  if (temperature < 10) NT = "- Nhiệt độ "+(String)temperature+"°C - Nguy cơ hạ thân nhiệt, tê cóng, giảm miễn dịch.";
+  else if (10 <= temperature && temperature <= 15) NT = "- Nhiệt độ "+(String)temperature+"°C - Cảm giác lạnh, tăng nguy cơ mắc bệnh đường hô hấp.";
+  else if (20 <= temperature && temperature <= 30) NT = "- Nhiệt độ "+(String)temperature+"°C - Nhiệt độ lý tưởng, ít ảnh hưởng đến sức khỏe.";
+  else if (30 < temperature && temperature <= 35) NT = "- Nhiệt độ "+(String)temperature+"°C - Cơ thể bắt đầu có dấu hiệu mất nước, mệt mỏi.";
+  else if (temperature > 35) NT = "- Nhiệt độ "+(String)temperature+"°C - Nguy cơ sốc nhiệt, chuột rút, say nắng.";
+  else if (temperature > 40) NT = "- Nhiệt độ "+(String)temperature+"°C - Cực kỳ nguy hiểm, có thể gây suy nội tạng, đột quỵ nhiệt.";
   // Độ ẩm
-  if (humidity < 30) DA = "Da khô, kích ứng mắt, tăng nguy cơ mắc bệnh về hô hấp (viêm họng, khô mũi).";
-  else if (40 <= humidity <= 60) DA = "Mức lý tưởng, ít ảnh hưởng đến sức khỏe.";
-  else if (humidity > 70) DA = "Tăng nguy cơ nấm mốc, vi khuẩn phát triển, gây bệnh về đường hô hấp.";
-  else if (humidity > 80) DA = "Cảm giác oi bức, khó thở, cơ thể khó thoát mồ hôi, tăng nguy cơ sốc nhiệt.";
+  if (humidity < 30) DA = "- Độ ẩm "+(String)humidity+"% - Da khô, kích ứng mắt, tăng nguy cơ mắc bệnh về hô hấp (viêm họng, khô mũi).";
+  else if (40 <= humidity && temperature <= 60) DA = "- Độ ẩm "+(String)humidity+"% - Mức lý tưởng, ít ảnh hưởng đến sức khỏe.";
+  else if (humidity > 70) DA = "- Độ ẩm "+(String)humidity+"% - Tăng nguy cơ nấm mốc, vi khuẩn phát triển, gây bệnh về đường hô hấp.";
+  else if (humidity > 80) DA = "- Độ ẩm "+(String)humidity+"% - Cảm giác oi bức, khó thở, cơ thể khó thoát mồ hôi, tăng nguy cơ sốc nhiệt.";
 
   if (NT != "" && DA != "") {
-    String canhBao = "Cảnh báo: " + NT + "\n" + DA;
+    String canhBao = "Cảnh báo:\n" + NT + "\n" + DA;
     bot.sendMessage(CHAT_ID, canhBao);
     Serial.println(canhBao); // hiển thị ra telegram
   }
