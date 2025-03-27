@@ -9,7 +9,10 @@
 #define BLYNK_TEMPLATE_ID "TMPL6c_LsX9l3"
 #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
 #define BLYNK_AUTH_TOKEN "vBJLhwxTiSgPItQ2raIlgudebqwHd2I2"
-
+// Ngô Nguyễn Đức Quý
+// #define BLYNK_TEMPLATE_ID "TMPL6mnBiUYvY"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 PROJECT"
+// #define BLYNK_AUTH_TOKEN "IxtbuqIjlNRk9XCPWHvG3-tFmFa38jKy"
 
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
@@ -18,16 +21,19 @@
 char ssid[] = "CNTT-MMT";
 char pass[] = "13572468";
 
-//Telegram Bot Lê Hữu Nhật
-#define BOT_TOKEN "8066719718:AAE9Pi7EVp4hRwUz7bW7_tmsmuQTq84iD6M"  // Thay bằng Bot Token từ BotFather
-#define CHAT_ID "-4657079728"                                      // Thay bằng Chat ID của bạn
+// Telegram Bot Lê Hữu Nhật
+#define BOT_TOKEN "8066719718:AAE9Pi7EVp4hRwUz7bW7_tmsmuQTq84iD6M" // Thay bằng Bot Token từ BotFather
+#define CHAT_ID "-4657079728"
+// Telegram Bot Ngô Nguyễn Đức Quý
+// #define BOTtoken "7226596485:AAF4YaLRF30HTPW58ZL9p3TCJipO8lIrptQ"
+// #define GROUP_ID "-4755643301"
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOT_TOKEN, client);
 
-#define gPIN 15  // Đèn xanh
-#define yPIN 2   // Đèn vàng
-#define rPIN 5   // Đèn đỏ
+#define gPIN 15 // Đèn xanh
+#define yPIN 2  // Đèn vàng
+#define rPIN 5  // Đèn đỏ
 #define OLED_SDA 13
 #define OLED_SCL 12
 
@@ -45,16 +51,20 @@ const int durations[3] = {5000, 7000, 2000}; // Xanh 5s, Vàng 7s, Đỏ 2s
 float temperature = 0.0;
 float humidity = 0.0;
 
-bool WelcomeDisplayTimeout(uint msSleep = 5000) {
+bool WelcomeDisplayTimeout(uint msSleep = 5000)
+{
   static unsigned long lastTimer = 0;
   static bool bDone = false;
-  if (bDone) return true;
-  if (!IsReady(lastTimer, msSleep)) return false;
+  if (bDone)
+    return true;
+  if (!IsReady(lastTimer, msSleep))
+    return false;
   bDone = true;
   return bDone;
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   randomSeed(analogRead(0));
 
@@ -77,7 +87,8 @@ void setup() {
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, pass);
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -85,17 +96,23 @@ void setup() {
 
   client.setInsecure();
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
-  if (Blynk.connected()) {
+  if (Blynk.connected())
+  {
     Serial.println("Connected to Blynk!");
-  } else {
+  }
+  else
+  {
     Serial.println("Failed to connect to Blynk!");
   }
 }
 
-void ThreeLedBlink() {
+void ThreeLedBlink()
+{
   static unsigned long lastTimer = 0;
-  if (yellowBlinkMode || !trafficOn) return;
-  if (!IsReady(lastTimer, durations[currentLedIndex])) return;
+  if (yellowBlinkMode || !trafficOn)
+    return;
+  if (!IsReady(lastTimer, durations[currentLedIndex]))
+    return;
 
   int prevLed = (currentLedIndex + 2) % 3;
   digitalWrite(ledPin[prevLed], LOW);
@@ -104,11 +121,14 @@ void ThreeLedBlink() {
   currentLedIndex = (currentLedIndex + 1) % 3;
 }
 
-void yellowBlink() {
+void yellowBlink()
+{
   static unsigned long lastTimer = 0;
   static bool state = false;
-  if (!yellowBlinkMode) return;
-  if (!IsReady(lastTimer, 2000)) return;
+  if (!yellowBlinkMode)
+    return;
+  if (!IsReady(lastTimer, 2000))
+    return;
 
   state = !state;
   digitalWrite(gPIN, LOW);
@@ -116,17 +136,21 @@ void yellowBlink() {
   digitalWrite(yPIN, state);
 }
 
-float generateRandomTemperature() {
+float generateRandomTemperature()
+{
   return random(-400, 800) / 10.0;
 }
 
-float generateRandomHumidity() {
+float generateRandomHumidity()
+{
   return random(0, 1000) / 10.0;
 }
 
-void updateRandomDHT() {
+void updateRandomDHT()
+{
   static unsigned long lastTimer = 0;
-  if (!IsReady(lastTimer, 300000)) return; // 5 giây = 5,000 ms
+  if (!IsReady(lastTimer, 300000))
+    return; // 5 giây = 5,000 ms
 
   temperature = generateRandomTemperature();
   humidity = generateRandomHumidity();
@@ -142,51 +166,73 @@ void updateRandomDHT() {
   Blynk.virtualWrite(V2, humidity);
 }
 
-void checkHealthConditions() {
+void checkHealthConditions()
+{
   static unsigned long lastAlertTime = 0;
-  if (!IsReady(lastAlertTime, 5000)) return; // 5 phút = 300,000 ms
+  if (!IsReady(lastAlertTime, 5000))
+    return; // 5 phút = 300,000 ms
 
   String NT = "";
   String DA = "";
   // Nhiệt độ
-  if (temperature < 10) NT = "- Nhiệt độ "+(String)temperature+"°C - Nguy cơ hạ thân nhiệt, tê cóng, giảm miễn dịch.";
-  else if (10 <= temperature && temperature <= 15) NT = "- Nhiệt độ "+(String)temperature+"°C - Cảm giác lạnh, tăng nguy cơ mắc bệnh đường hô hấp.";
-  else if (20 <= temperature && temperature <= 30) NT = "- Nhiệt độ "+(String)temperature+"°C - Nhiệt độ lý tưởng, ít ảnh hưởng đến sức khỏe.";
-  else if (30 < temperature && temperature <= 35) NT = "- Nhiệt độ "+(String)temperature+"°C - Cơ thể bắt đầu có dấu hiệu mất nước, mệt mỏi.";
-  else if (temperature > 35) NT = "- Nhiệt độ "+(String)temperature+"°C - Nguy cơ sốc nhiệt, chuột rút, say nắng.";
-  else if (temperature > 40) NT = "- Nhiệt độ "+(String)temperature+"°C - Cực kỳ nguy hiểm, có thể gây suy nội tạng, đột quỵ nhiệt.";
+  if (temperature < 10)
+    NT = "- Nhiệt độ " + (String)temperature + "°C - Nguy cơ hạ thân nhiệt, tê cóng, giảm miễn dịch.";
+  else if (10 <= temperature && temperature <= 15)
+    NT = "- Nhiệt độ " + (String)temperature + "°C - Cảm giác lạnh, tăng nguy cơ mắc bệnh đường hô hấp.";
+  else if (20 <= temperature && temperature <= 30)
+    NT = "- Nhiệt độ " + (String)temperature + "°C - Nhiệt độ lý tưởng, ít ảnh hưởng đến sức khỏe.";
+  else if (30 < temperature && temperature <= 35)
+    NT = "- Nhiệt độ " + (String)temperature + "°C - Cơ thể bắt đầu có dấu hiệu mất nước, mệt mỏi.";
+  else if (temperature > 35)
+    NT = "- Nhiệt độ " + (String)temperature + "°C - Nguy cơ sốc nhiệt, chuột rút, say nắng.";
+  else if (temperature > 40)
+    NT = "- Nhiệt độ " + (String)temperature + "°C - Cực kỳ nguy hiểm, có thể gây suy nội tạng, đột quỵ nhiệt.";
   // Độ ẩm
-  if (humidity < 30) DA = "- Độ ẩm "+(String)humidity+"% - Da khô, kích ứng mắt, tăng nguy cơ mắc bệnh về hô hấp (viêm họng, khô mũi).";
-  else if (40 <= humidity && temperature <= 60) DA = "- Độ ẩm "+(String)humidity+"% - Mức lý tưởng, ít ảnh hưởng đến sức khỏe.";
-  else if (humidity > 70) DA = "- Độ ẩm "+(String)humidity+"% - Tăng nguy cơ nấm mốc, vi khuẩn phát triển, gây bệnh về đường hô hấp.";
-  else if (humidity > 80) DA = "- Độ ẩm "+(String)humidity+"% - Cảm giác oi bức, khó thở, cơ thể khó thoát mồ hôi, tăng nguy cơ sốc nhiệt.";
+  if (humidity < 30)
+    DA = "- Độ ẩm " + (String)humidity + "% - Da khô, kích ứng mắt, tăng nguy cơ mắc bệnh về hô hấp (viêm họng, khô mũi).";
+  else if (40 <= humidity && temperature <= 60)
+    DA = "- Độ ẩm " + (String)humidity + "% - Mức lý tưởng, ít ảnh hưởng đến sức khỏe.";
+  else if (humidity > 70)
+    DA = "- Độ ẩm " + (String)humidity + "% - Tăng nguy cơ nấm mốc, vi khuẩn phát triển, gây bệnh về đường hô hấp.";
+  else if (humidity > 80)
+    DA = "- Độ ẩm " + (String)humidity + "% - Cảm giác oi bức, khó thở, cơ thể khó thoát mồ hôi, tăng nguy cơ sốc nhiệt.";
 
-  if (NT != "" && DA != "") {
+  if (NT != "" && DA != "")
+  {
     String canhBao = "Cảnh báo:\n" + NT + "\n" + DA;
     bot.sendMessage(CHAT_ID, canhBao);
     Serial.println(canhBao); // hiển thị ra telegram
   }
 }
 
-void handleTelegramMessages() {
+void handleTelegramMessages()
+{
   int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
-  while (numNewMessages) {
-    for (int i = 0; i < numNewMessages; i++) {
+  while (numNewMessages)
+  {
+    for (int i = 0; i < numNewMessages; i++)
+    {
       String chat_id = bot.messages[i].chat_id;
       String text = bot.messages[i].text;
 
-      if (chat_id != CHAT_ID) continue;
+      if (chat_id != CHAT_ID)
+        continue;
 
-      if (text == "/traffic_off") {
+      if (text == "/traffic_off")
+      {
         trafficOn = false;
         digitalWrite(gPIN, LOW);
         digitalWrite(yPIN, LOW);
         digitalWrite(rPIN, LOW);
         bot.sendMessage(CHAT_ID, "Đèn giao thông đã tắt!");
-      } else if (text == "/traffic_on") {
+      }
+      else if (text == "/traffic_on")
+      {
         trafficOn = true;
         bot.sendMessage(CHAT_ID, "Đèn giao thông hoạt động trở lại!");
-      } else {
+      }
+      else
+      {
         bot.sendMessage(CHAT_ID, "Lệnh không hợp lệ! Dùng: /traffic_on hoặc /traffic_off");
       }
     }
@@ -194,9 +240,11 @@ void handleTelegramMessages() {
   }
 }
 
-void updateOLED() {
+void updateOLED()
+{
   static unsigned long lastTimer = 0;
-  if (!IsReady(lastTimer, 1000)) return; // Cập nhật OLED mỗi giây
+  if (!IsReady(lastTimer, 1000))
+    return; // Cập nhật OLED mỗi giây
 
   oled.clearBuffer();
   oled.setFont(u8g2_font_unifont_t_vietnamese1);
@@ -213,15 +261,20 @@ void updateOLED() {
   oled.drawUTF8(0, 28, humStr.c_str());
   oled.drawUTF8(0, 42, uptimeStr.c_str());
 
-  if (!yellowBlinkMode && trafficOn) {
+  if (!yellowBlinkMode && trafficOn)
+  {
     unsigned long elapsed = millis() - lastLedSwitchTime;
     int remainingTime = (durations[currentLedIndex] - elapsed) / 1000;
-    if (remainingTime < 0) remainingTime = 0;
+    if (remainingTime < 0)
+      remainingTime = 0;
 
     String ledStr;
-    if (ledPin[currentLedIndex] == gPIN) ledStr = "Xanh";
-    else if (ledPin[currentLedIndex] == yPIN) ledStr = "Vang";
-    else ledStr = "Do";
+    if (ledPin[currentLedIndex] == gPIN)
+      ledStr = "Xanh";
+    else if (ledPin[currentLedIndex] == yPIN)
+      ledStr = "Vang";
+    else
+      ledStr = "Do";
 
     String countdownStr = StringFormat("%s: %ds", ledStr.c_str(), remainingTime);
     oled.drawUTF8(0, 56, countdownStr.c_str());
@@ -229,9 +282,11 @@ void updateOLED() {
   oled.sendBuffer();
 }
 
-void updateUptime() {
+void updateUptime()
+{
   static unsigned long lastTimer = 0;
-  if (!IsReady(lastTimer, 1000)) return;
+  if (!IsReady(lastTimer, 1000))
+    return;
 
   unsigned long uptime = millis() / 1000;
   Blynk.virtualWrite(V0, uptime);
@@ -239,14 +294,18 @@ void updateUptime() {
   Serial.println(uptime);
 }
 
-BLYNK_WRITE(V3) {
+BLYNK_WRITE(V3)
+{
   yellowBlinkMode = param.asInt();
-  if (!yellowBlinkMode) digitalWrite(yPIN, LOW);
+  if (!yellowBlinkMode)
+    digitalWrite(yPIN, LOW);
 }
 
-void loop() {
+void loop()
+{
   Blynk.run();
-  if (!WelcomeDisplayTimeout()) return;
+  if (!WelcomeDisplayTimeout())
+    return;
   ThreeLedBlink();
   yellowBlink();
   updateRandomDHT();
