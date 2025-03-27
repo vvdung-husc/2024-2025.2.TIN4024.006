@@ -6,20 +6,17 @@
 #include <WiFiClientSecure.h>
 
 // Lê Hữu Nhật
-#define BLYNK_TEMPLATE_ID "TMPL6c_gqr655"
+#define BLYNK_TEMPLATE_ID "TMPL6c_LsX9l3"
 #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
-#define BLYNK_AUTH_TOKEN "Ie8HwIvuIhSRfWozHPmllwsvDShXMix-"
-// #define BLYNK_TEMPLATE_ID "TMPL6c_LsX9l3"
-// #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
-// #define BLYNK_AUTH_TOKEN "vBJLhwxTiSgPItQ2raIlgudebqwHd2I2"
+#define BLYNK_AUTH_TOKEN "vBJLhwxTiSgPItQ2raIlgudebqwHd2I2"
 
 
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
 // Thông tin WiFi
-char ssid[] = "DIA DU";
-char pass[] = "diadu@123";
+char ssid[] = "CNTT-MMT";
+char pass[] = "13572468";
 
 //Telegram Bot Lê Hữu Nhật
 #define BOT_TOKEN "8066719718:AAE9Pi7EVp4hRwUz7bW7_tmsmuQTq84iD6M"  // Thay bằng Bot Token từ BotFather
