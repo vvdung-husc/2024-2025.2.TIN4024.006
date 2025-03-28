@@ -4,7 +4,12 @@
 #define BLYNK_TEMPLATE_NAME "esp8266 blynk telegram"
 #define BLYNK_AUTH_TOKEN "Ex622jIU2X7ixiJfYpOtA6tvmYhYijv4"
 
-#include <Arduino.h>
+// //Nguyễn Văn Tuấn Hải
+// #define BLYNK_TEMPLATE_ID "TMPL66BocAkvr"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Blynk Tele"
+// #define BLYNK_AUTH_TOKEN "KWjPv-LRxnvl-hvgFp3iyF4y3cp--eC-"
+    
+#include <Arduino.h>   
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 #include <Wire.h>
@@ -42,8 +47,15 @@ BLYNK_WRITE(V1) {
   yellowBlinkMode = param.asInt(); // 1 = bật, 0 = tắt
 }
 
-// Telegram Bot Token và Group ID
+//Trần Hải Đông
 #define BOTtoken "7905069023:AAEL-dgmljUYwG3Hihu73O7bNPoUtfnMPC4"
+#define USER_ID "7196545948" 
+
+//Nguyễn Văn Tuấn Hải
+// #define BOTtoken "7845979937:AAFVcEGgh9baF0sUOusSQXxO-21x6F-OfCE"
+// #define USER_ID "7413444616"
+
+// Group ID
 #define GROUP_ID "-1002594207741"
 
 WiFiClientSecure client;
