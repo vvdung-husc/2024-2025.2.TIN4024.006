@@ -1,5 +1,11 @@
 #include <Arduino.h>
 
+/*
+  Rui Santos
+  Complete project details at https://RandomNerdTutorials.com/telegram-esp32-motion-detection-arduino/
+  
+  Project created using Brian Lough's Universal Telegram Bot Library: https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot
+*/
 
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -11,8 +17,10 @@ const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
 // Initialize Telegram BOT
-#define BOTtoken "7953104144:AAES14DfJQDNXIIf3WOckh2b64tN41GMnFM"
-#define GROUP_ID "-1002672539893" //là một số âm
+#define BOTtoken "7718248016:AAE-Nwueo9jFfkVVCn31ipqCh7XkVPGNj24"  // your Bot Token (Get from Botfather)
+
+// Dùng ChatGPT để nhờ hướng dẫn tìm giá trị GROUP_ID này
+#define GROUP_ID "-4733032207" //là một số âm
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
