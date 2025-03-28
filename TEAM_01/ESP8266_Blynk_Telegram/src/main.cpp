@@ -126,7 +126,7 @@ float generateRandomHumidity() {
 
 void updateRandomDHT() {
   static unsigned long lastTimer = 0;
-  if (!IsReady(lastTimer, 300000)) return; // 5 giây = 5,000 ms
+  if (!IsReady(lastTimer, 5000)) return; // 5 giây = 5,000 ms
 
   temperature = generateRandomTemperature();
   humidity = generateRandomHumidity();
@@ -144,7 +144,7 @@ void updateRandomDHT() {
 
 void checkHealthConditions() {
   static unsigned long lastAlertTime = 0;
-  if (!IsReady(lastAlertTime, 5000)) return; // 5 phút = 300,000 ms
+  if (!IsReady(lastAlertTime, 300000)) return; // 5 phút = 300,000 ms
 
   String NT = "";
   String DA = "";
@@ -200,14 +200,14 @@ void updateOLED() {
 
   oled.clearBuffer();
   oled.setFont(u8g2_font_unifont_t_vietnamese1);
-  String tempStr = StringFormat("Nhiet: %.1f C", temperature);
-  String humStr = StringFormat("Do am: %.1f %%", humidity);
+  String tempStr = StringFormat("Nhiệt: %.1f C", temperature);
+  String humStr = StringFormat("Độ ẩm: %.1f %%", humidity);
 
   unsigned long uptime = millis() / 1000;
   int hours = uptime / 3600;
   int minutes = (uptime % 3600) / 60;
   int seconds = uptime % 60;
-  String uptimeStr = StringFormat("Up: %dh %02dm %02ds", hours, minutes, seconds);
+  String uptimeStr = StringFormat("Thời gian: %dh %02dm %02ds", hours, minutes, seconds);
 
   oled.drawUTF8(0, 14, tempStr.c_str());
   oled.drawUTF8(0, 28, humStr.c_str());
@@ -220,8 +220,8 @@ void updateOLED() {
 
     String ledStr;
     if (ledPin[currentLedIndex] == gPIN) ledStr = "Xanh";
-    else if (ledPin[currentLedIndex] == yPIN) ledStr = "Vang";
-    else ledStr = "Do";
+    else if (ledPin[currentLedIndex] == yPIN) ledStr = "Vàng";
+    else ledStr = "Đỏ";
 
     String countdownStr = StringFormat("%s: %ds", ledStr.c_str(), remainingTime);
     oled.drawUTF8(0, 56, countdownStr.c_str());
