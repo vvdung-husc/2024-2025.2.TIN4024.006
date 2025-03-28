@@ -10,9 +10,9 @@
 
 
 //Nguyễn Khánh Phượng
-//#define BLYNK_TEMPLATE_ID "TMPL6Ovhz1RbQ"
-//#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
-//#define BLYNK_AUTH_TOKEN "LDnnRXGZFlpczlq4J5GHdgLHwA86hqK0"
+#define BLYNK_TEMPLATE_ID "TMPL6Ovhz1RbQ"
+#define BLYNK_TEMPLATE_NAME "ESP32 Traffic Light Blynk"
+#define BLYNK_AUTH_TOKEN "LDnnRXGZFlpczlq4J5GHdgLHwA86hqK0"
 
 #define WIFI_SSID "Wokwi-GUEST"
 #define WIFI_PASS ""
