@@ -1,9 +1,17 @@
+#define BLYNK_TEMPLATE_ID "TMPL6ZLCad5kE"
+#define BLYNK_TEMPLATE_NAME "ESP8266"
+#define BLYNK_AUTH_TOKEN "XVy7pNOV6Mh-Qv1Pz9y9FxqR2Tt1-phq"
+
 #include <Arduino.h>
 #include "utils.h"
-
 #include <Adafruit_Sensor.h>
-#include <DHT.h>
 
+#include <ESP8266WiFi.h>
+char ssid[] = "CNTT-MMT";    
+char pass[] = "13572468"; 
+#include <BlynkSimpleEsp8266.h>
+
+#include <DHT.h>
 #include <Wire.h>
 #include <U8g2lib.h>
 
@@ -25,6 +33,13 @@ DHT dht(dhtPIN, dhtTYPE);
 float fHumidity = 0.0;
 float fTemperature = 0.0;
 ulong startTime = 0; // Lưu thời gian ESP32 bắt đầu chạy
+bool yellowBlinkMode = false; // Chế độ đèn vàng nhấp nháy
+BlynkTimer timer;
+
+
+BLYNK_WRITE(V3) {
+  yellowBlinkMode = param.asInt();  
+}
 
 void GenerateRandomTempHumidity() {
   fTemperature = -40.0 + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (80.0 + 40.0)));
@@ -42,11 +57,24 @@ String GetUptime() {
   return String(buffer);
 }
 
+void SendDataToBlynk() {
+  Blynk.virtualWrite(V0, GetUptime());  
+  Blynk.virtualWrite(V1, fTemperature);
+  Blynk.virtualWrite(V2, fHumidity);
+}
+
 void TrafficLightControl() {
   static ulong lastTimer = 0;
   static int state = 0;  
   static const int ledPin[3] = {gPIN, yPIN, rPIN};
   static const int durations[3] = {5000, 2000, 3000}; 
+
+  if (yellowBlinkMode) {
+    digitalWrite(gPIN, LOW);
+    digitalWrite(rPIN, LOW);
+    digitalWrite(yPIN, millis() % 1000 < 500 ? HIGH : LOW);
+    return;
+  }
 
   if (!IsReady(lastTimer, durations[state])) return;
 
@@ -86,6 +114,7 @@ void TrafficLightControl() {
   state = (state + 1) % 3;
 }
 
+
 void setup() {
   Serial.begin(115200);
   pinMode(gPIN, OUTPUT);
@@ -108,8 +137,12 @@ void setup() {
   oled.sendBuffer();
 
   startTime = millis(); // Bắt đầu tính thời gian hoạt động
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+  timer.setInterval(2000L, SendDataToBlynk);
 }
 
 void loop() {
+  Blynk.run();
+  timer.run();
   TrafficLightControl();
 }
