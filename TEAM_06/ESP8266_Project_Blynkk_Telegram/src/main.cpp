@@ -4,6 +4,11 @@
 #define BLYNK_TEMPLATE_NAME "esp8266 blynk telegram"
 #define BLYNK_AUTH_TOKEN "Ex622jIU2X7ixiJfYpOtA6tvmYhYijv4"
 
+// //Nguyễn Văn Tuấn Hải
+// #define BLYNK_TEMPLATE_ID "TMPL66BocAkvr"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Blynk Tele"
+// #define BLYNK_AUTH_TOKEN "KWjPv-LRxnvl-hvgFp3iyF4y3cp--eC-"
+
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
