@@ -6,6 +6,10 @@
 // #define BLYNK_TEMPLATE_ID "TMPL6wt_mGzLq"
 // #define BLYNK_TEMPLATE_NAME "BaiTapNhom3"
 // #define BLYNK_AUTH_TOKEN "xNgTnMqAzz4-VYipg4ZZ3eB-PHcvnmEg"
+// Lê Đức Duy Anh
+// #define BLYNK_TEMPLATE_ID "TMPL6T44Uqo5P"
+// #define BLYNK_TEMPLATE_NAME "BaiTapNhom3"
+// #define BLYNK_AUTH_TOKEN "-E1eTMRpGxeqTDp4jy4wkALmI7hagTMF"
 
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
@@ -22,9 +26,11 @@
 #define BOT_TOKEN "7882389525:AAHSlKS59-U7bb2y0Ea4FWQlwW2tqtvuhOw"
 #define CHAT_ID "-4728373238"
 // Đặng Trọng Trí Tuệ
-#define BOTtoken "7860410039:AAEfVfs5V3GmFYfbNFeUkQF7H4EuMCxKM6g"
-#define GROUP_ID "-4753535169" // là một số âm
-
+// #define BOTtoken "7860410039:AAEfVfs5V3GmFYfbNFeUkQF7H4EuMCxKM6g"
+// #define GROUP_ID "-4753535169" // là một số âm
+// Lê Đức Duy Anh
+// #define BOTtoken "7953104144:AAES14DfJQDNXIIf3WOckh2b64tN41GMnFM"
+// #define GROUP_ID "-1002672539893"
 // Định nghĩa chân kết nối
 #define gPIN 15 // Đèn LED Xanh
 #define yPIN 2  // Đèn LED Vàng
