@@ -58,8 +58,7 @@ String GetUptime() {
 }
 
 void SendDataToBlynk() {
-  ulong elapsed = millis() / 1000; // Lấy số giây hoạt động
-  Blynk.virtualWrite(V0, elapsed); // Chỉ gửi giá trị số giây
+  Blynk.virtualWrite(V0, GetUptime());  
   Blynk.virtualWrite(V1, fTemperature);
   Blynk.virtualWrite(V2, fHumidity);
 }
@@ -144,9 +143,6 @@ void setup() {
 
 void loop() {
   Blynk.run();
-  timer.run(); // Chạy cập nhật dữ liệu trước khi kiểm tra chế độ nhấp nháy
-
-  if (!yellowBlinkMode) { // Chỉ chạy điều khiển đèn nếu không ở chế độ nhấp nháy
-    TrafficLightControl();
-  }
+  timer.run();
+  TrafficLightControl();
 }
