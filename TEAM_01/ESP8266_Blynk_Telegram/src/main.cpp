@@ -23,7 +23,7 @@ char pass[] = "13572468";
 
 // Telegram Bot Lê Hữu Nhật
 #define BOT_TOKEN "8066719718:AAE9Pi7EVp4hRwUz7bW7_tmsmuQTq84iD6M" // Thay bằng Bot Token từ BotFather
-#define CHAT_ID "-4657079728"
+#define CHAT_ID "-4657079728"                                      // Thay bằng Chat ID của bạn
 // Telegram Bot Ngô Nguyễn Đức Quý
 // #define BOTtoken "7226596485:AAF4YaLRF30HTPW58ZL9p3TCJipO8lIrptQ"
 // #define GROUP_ID "-4755643301"
@@ -149,7 +149,7 @@ float generateRandomHumidity()
 void updateRandomDHT()
 {
   static unsigned long lastTimer = 0;
-  if (!IsReady(lastTimer, 300000))
+  if (!IsReady(lastTimer, 5000))
     return; // 5 giây = 5,000 ms
 
   temperature = generateRandomTemperature();
@@ -169,7 +169,7 @@ void updateRandomDHT()
 void checkHealthConditions()
 {
   static unsigned long lastAlertTime = 0;
-  if (!IsReady(lastAlertTime, 5000))
+  if (!IsReady(lastAlertTime, 300000))
     return; // 5 phút = 300,000 ms
 
   String NT = "";
@@ -214,103 +214,6 @@ void handleTelegramMessages()
     {
       String chat_id = bot.messages[i].chat_id;
       String text = bot.messages[i].text;
-
-      if (chat_id != CHAT_ID)
-        continue;
-
-      if (text == "/traffic_off")
-      {
-        trafficOn = false;
-        digitalWrite(gPIN, LOW);
-        digitalWrite(yPIN, LOW);
-        digitalWrite(rPIN, LOW);
-        bot.sendMessage(CHAT_ID, "Đèn giao thông đã tắt!");
-      }
-      else if (text == "/traffic_on")
-      {
-        trafficOn = true;
-        bot.sendMessage(CHAT_ID, "Đèn giao thông hoạt động trở lại!");
-      }
-      else
-      {
-        bot.sendMessage(CHAT_ID, "Lệnh không hợp lệ! Dùng: /traffic_on hoặc /traffic_off");
-      }
     }
-    numNewMessages = bot.getUpdates(bot.last_message_received + 1);
   }
-}
-
-void updateOLED()
-{
-  static unsigned long lastTimer = 0;
-  if (!IsReady(lastTimer, 1000))
-    return; // Cập nhật OLED mỗi giây
-
-  oled.clearBuffer();
-  oled.setFont(u8g2_font_unifont_t_vietnamese1);
-  String tempStr = StringFormat("Nhiet: %.1f C", temperature);
-  String humStr = StringFormat("Do am: %.1f %%", humidity);
-
-  unsigned long uptime = millis() / 1000;
-  int hours = uptime / 3600;
-  int minutes = (uptime % 3600) / 60;
-  int seconds = uptime % 60;
-  String uptimeStr = StringFormat("Up: %dh %02dm %02ds", hours, minutes, seconds);
-
-  oled.drawUTF8(0, 14, tempStr.c_str());
-  oled.drawUTF8(0, 28, humStr.c_str());
-  oled.drawUTF8(0, 42, uptimeStr.c_str());
-
-  if (!yellowBlinkMode && trafficOn)
-  {
-    unsigned long elapsed = millis() - lastLedSwitchTime;
-    int remainingTime = (durations[currentLedIndex] - elapsed) / 1000;
-    if (remainingTime < 0)
-      remainingTime = 0;
-
-    String ledStr;
-    if (ledPin[currentLedIndex] == gPIN)
-      ledStr = "Xanh";
-    else if (ledPin[currentLedIndex] == yPIN)
-      ledStr = "Vang";
-    else
-      ledStr = "Do";
-
-    String countdownStr = StringFormat("%s: %ds", ledStr.c_str(), remainingTime);
-    oled.drawUTF8(0, 56, countdownStr.c_str());
-  }
-  oled.sendBuffer();
-}
-
-void updateUptime()
-{
-  static unsigned long lastTimer = 0;
-  if (!IsReady(lastTimer, 1000))
-    return;
-
-  unsigned long uptime = millis() / 1000;
-  Blynk.virtualWrite(V0, uptime);
-  Serial.print("Uptime (seconds) sent to Blynk: ");
-  Serial.println(uptime);
-}
-
-BLYNK_WRITE(V3)
-{
-  yellowBlinkMode = param.asInt();
-  if (!yellowBlinkMode)
-    digitalWrite(yPIN, LOW);
-}
-
-void loop()
-{
-  Blynk.run();
-  if (!WelcomeDisplayTimeout())
-    return;
-  ThreeLedBlink();
-  yellowBlink();
-  updateRandomDHT();
-  updateOLED(); // Cập nhật OLED mỗi giây
-  updateUptime();
-  checkHealthConditions();
-  handleTelegramMessages();
 }
