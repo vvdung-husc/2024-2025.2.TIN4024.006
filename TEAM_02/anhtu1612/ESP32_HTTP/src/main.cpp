@@ -2,9 +2,9 @@
 #include <HTTPClient.h>
 #include <Arduino.h>
 
-#define BLYNK_TEMPLATE_ID "TMPL6sgfMUn-r"
-#define BLYNK_TEMPLATE_NAME "IOT"
-#define BLYNK_AUTH_TOKEN "CxU89qjWLucJlR2b99uw2k8Xv14yKWdV"
+#define BLYNK_TEMPLATE_ID "TMPL6rT1WI8qy"
+#define BLYNK_TEMPLATE_NAME "WEATHER"
+#define BLYNK_AUTH_TOKEN "PN8EJhDdV7lxx-DANu-WYHMYNx_M0FK4"
 
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
