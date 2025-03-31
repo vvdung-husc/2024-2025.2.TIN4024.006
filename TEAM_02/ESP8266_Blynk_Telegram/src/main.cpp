@@ -257,8 +257,6 @@ void setup()
 
   // Lưu thời gian bắt đầu
   startTime = millis();
-
-  bot.sendMessage(CHAT_ID, "Bot đã khởi động!", "");
 }
 
 void loop()
