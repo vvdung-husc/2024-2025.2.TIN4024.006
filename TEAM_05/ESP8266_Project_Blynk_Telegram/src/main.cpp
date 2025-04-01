@@ -136,13 +136,27 @@ void sendTelegramAlert()
 
     String message = "";
     if (temperature < 10)
-        message += "Nguy cơ hạ thân nhiệt!\n";
+        message += "Nguy cơ hạ thân nhiệt, tê cóng, giảm miễn dịch!\n";
+    else if (10 < temperature < 15)
+        message += "Cảm giác lạnh, tăng nguy cơ mắc bệnh đường hô hấp!\n";
+    else if (25 < temperature < 30)
+        message += "Nhiệt độ lý tưởng, ít ảnh hưởng đến sức khỏe!\n";
+    else if (30 < temperature < 35)
+        message += "Cơ thể bắt đầu có dấu hiệu mất nước, mệt mỏi!\n";
     else if (temperature > 35)
-        message += "Nguy cơ sốc nhiệt!\n";
+        message += "Nguy cơ sốc nhiệt, chuột rút, say nắng!\n";
+    else if (temperature > 40)
+        message += "Cực kỳ nguy hiểm, có thể gây suy nội tạng, đột quỵ nhiệt!\n";
+
+
     if (humidity < 30)
-        message += "Độ ẩm thấp, nguy cơ bệnh hô hấp!\n";
+        message += "Da khô, kích ứng mắt, tăng nguy cơ mắc bệnh về hô hấp (viêm họng, khô mũi)!\n";
+    else if (40 < humidity < 60)
+        message += "Mức lý tưởng, ít ảnh hưởng đến sức khỏe!\n";
     else if (humidity > 70)
-        message += "Độ ẩm cao, nguy cơ nấm mốc!\n";
+        message += "Tăng nguy cơ nấm mốc, vi khuẩn phát triển, gây bệnh về đường hô hấp!\n";
+    else if (humidity > 70)
+        message += "Cảm giác oi bức, khó thở, cơ thể khó thoát mồ hôi, tăng nguy cơ sốc nhiệt!\n";
 
     if (!message.isEmpty())
     {

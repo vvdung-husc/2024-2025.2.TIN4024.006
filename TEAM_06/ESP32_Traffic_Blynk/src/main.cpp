@@ -7,6 +7,7 @@
 //#define BLYNK_TEMPLATE_ID "TMPL6O0lyhqIF"
 //#define BLYNK_TEMPLATE_NAME "ESP32 LED TM1637" 
 //#define BLYNK_AUTH_TOKEN "l7wJ7KNMTtXJwGAX68QaqmcPJMWBO09C"
+
 //Trần Hải Đông
 // #define BLYNK_TEMPLATE_ID "TMPL6CrjN4tCi"
 // #define BLYNK_TEMPLATE_NAME "ESP32 Blynkk Trafic Project"
