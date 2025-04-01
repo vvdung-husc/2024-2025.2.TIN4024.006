@@ -8,6 +8,9 @@
 // #define BLYNK_AUTH_TOKEN "XVy7pNOV6Mh-Qv1Pz9y9FxqR2Tt1-phq"
 
 //NGUYỄN KHÁNH PHƯỢNG
+//#define BLYNK_TEMPLATE_ID "TMPL6g637i_uM"
+//#define BLYNK_TEMPLATE_NAME "ESP8266"
+//#define BLYNK_AUTH_TOKEN "J1Z79ngFV0fyjM1r8OLUE7QzQIULpJTx"
 
 #include <Arduino.h>
 #include "utils.h"
@@ -37,6 +40,8 @@ const String chatId = "-1002439452600";
 // const String chatId = "-1002574788554"
 
 //NGUYỄN KHÁNH PHƯỢNG
+// const char* botToken = "7770420858:AAHEY8OZxUDEhFBPrQOw4rgU9OoPZ3r8tvg"
+// const String chatId "-4709041095"
 
 // Chân LED điều khiển đèn giao thông
 #define gPIN 15
