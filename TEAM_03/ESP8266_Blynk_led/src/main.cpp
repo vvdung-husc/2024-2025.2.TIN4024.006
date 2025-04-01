@@ -1,10 +1,29 @@
+// Tran Tien Loi
 // #define BLYNK_TEMPLATE_ID "TMPL69tNWI5dt"
 // #define BLYNK_TEMPLATE_NAME "ESP8266"
 // #define BLYNK_AUTH_TOKEN "-4XrB4USEieqfCGdIIkKgrZvfyDalGcq"
 // Phạm Thành Thể
-#define BLYNK_TEMPLATE_ID "TMPL6dptoRrh1"
-#define BLYNK_TEMPLATE_NAME "ESP8266Project"
-#define BLYNK_AUTH_TOKEN "bojqfYbbfGyyDuFkqLx-IJhq9n4UOEMk"
+// #define BLYNK_TEMPLATE_ID "TMPL6dptoRrh1"
+// #define BLYNK_TEMPLATE_NAME "ESP8266Project"
+// #define BLYNK_AUTH_TOKEN "bojqfYbbfGyyDuFkqLx-IJhq9n4UOEMk"
+//Đặng Thị Lài
+// #define BLYNK_TEMPLATE_ID "TMPL6NX46k3SM"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
+// #define BLYNK_AUTH_TOKEN "WVDb2aF2-EA3iB2aQoWYOuYbopo9OvOe"
+//Nguyễn Công Phước Thịnh
+//#define BLYNK_TEMPLATE_ID "TMPL6u3oTo3nV"
+//#define BLYNK_TEMPLATE_NAME "ESP8266Project"
+//#define BLYNK_AUTH_TOKEN "6VjcNeQg1dT6XkR273UyVoDSSHPYmwuE"
+
+// Đinh Xuân Thái
+// #define BLYNK_TEMPLATE_ID "TMPL6bmCsYVj7"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
+// #define BLYNK_AUTH_TOKEN "9pLxfegbNTZnPuKML_HpJBZ5CBxHKQIU"
+
+//Lê Thị Huỳnh Trang
+#define BLYNK_TEMPLATE_ID "TMPL64DdLcWm7"
+#define BLYNK_TEMPLATE_NAME "BLynk"
+#define BLYNK_AUTH_TOKEN "•••• - m3Jw"
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -12,15 +31,15 @@
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
-#define gPIN 15  // Đèn xanh
-#define yPIN 2   // Đèn vàng
-#define rPIN 5   // Đèn đỏ
+#define gPIN 15 // Đèn xanh
+#define yPIN 2  // Đèn vàng
+#define rPIN 5  // Đèn đỏ
 
 #define OLED_SDA 13
 #define OLED_SCL 12
 
 // Khởi tạo màn hình OLED SH1106
-U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 
 // Kết nối WiFi
 char ssid[] = "CNTT-MMT";
@@ -30,15 +49,17 @@ BlynkTimer timer;
 
 // -------------------- Biến toàn cục --------------------
 bool yellowBlinkMode = false; // Chế độ đèn vàng nhấp nháy
-unsigned long startMillis; // Thời gian bắt đầu
+unsigned long startMillis;    // Thời gian bắt đầu
 
 float fHumidity = 0.0;
 float fTemperature = 0.0;
 
 // -------------------- Hàm kiểm tra thời gian --------------------
-bool IsReady(unsigned long &lastTimer, unsigned long interval) {
+bool IsReady(unsigned long &lastTimer, unsigned long interval)
+{
     unsigned long currentMillis = millis();
-    if (currentMillis - lastTimer >= interval) {
+    if (currentMillis - lastTimer >= interval)
+    {
         lastTimer = currentMillis;
         return true;
     }
@@ -46,12 +67,14 @@ bool IsReady(unsigned long &lastTimer, unsigned long interval) {
 }
 
 // -------------------- Hàm cập nhật dữ liệu --------------------
-void updateData() {
+void updateData()
+{
     static unsigned long lastTimer = 0;
-    if (!IsReady(lastTimer, 2000)) return;
+    if (!IsReady(lastTimer, 2000))
+        return;
 
-    fTemperature = random(-400, 801) / 10.0;  // Nhiệt độ từ -40.0°C đến 80.0°C
-    fHumidity = random(0, 1001) / 10.0;       // Độ ẩm từ 0.0% đến 100.0%
+    fTemperature = random(-400, 801) / 10.0; // Nhiệt độ từ -40.0°C đến 80.0°C
+    fHumidity = random(0, 1001) / 10.0;      // Độ ẩm từ 0.0% đến 100.0%
 
     Serial.print("Temperature: ");
     Serial.print(fTemperature);
@@ -80,20 +103,24 @@ void updateData() {
 }
 
 // -------------------- Điều khiển đèn LED --------------------
-void controlTrafficLights() {
+void controlTrafficLights()
+{
     static unsigned long lastTimer = 0;
     static int currentLed = 0;
     static const int ledPin[3] = {gPIN, yPIN, rPIN};
 
-    if (yellowBlinkMode) {
-        if (!IsReady(lastTimer, 500)) return;
+    if (yellowBlinkMode)
+    {
+        if (!IsReady(lastTimer, 500))
+            return;
         digitalWrite(gPIN, LOW);
         digitalWrite(rPIN, LOW);
-        digitalWrite(yPIN, !digitalRead(yPIN));  // Nhấp nháy đèn vàng
+        digitalWrite(yPIN, !digitalRead(yPIN)); // Nhấp nháy đèn vàng
         return;
     }
 
-    if (!IsReady(lastTimer, 1000)) return;
+    if (!IsReady(lastTimer, 1000))
+        return;
     int prevLed = (currentLed + 2) % 3;
     digitalWrite(ledPin[prevLed], LOW);
     digitalWrite(ledPin[currentLed], HIGH);
@@ -101,31 +128,37 @@ void controlTrafficLights() {
 }
 
 // -------------------- Hiển thị thời gian chạy lên Blynk --------------------
-void sendUptime() {
+void sendUptime()
+{
     unsigned long uptime = millis() / 1000;
     Blynk.virtualWrite(V0, uptime);
 }
 
 // -------------------- Nhận lệnh từ Blynk --------------------
-BLYNK_WRITE(V3) {
+BLYNK_WRITE(V3)
+{
     int value = param.asInt();
     yellowBlinkMode = (value == 1);
-    if (yellowBlinkMode) {
+    if (yellowBlinkMode)
+    {
         digitalWrite(gPIN, LOW);
         digitalWrite(rPIN, LOW);
         digitalWrite(yPIN, HIGH);
-    } else {
+    }
+    else
+    {
         digitalWrite(yPIN, LOW);
     }
 }
 
 // -------------------- Setup --------------------
-void setup() {
+void setup()
+{
     Serial.begin(115200);
     pinMode(gPIN, OUTPUT);
     pinMode(yPIN, OUTPUT);
     pinMode(rPIN, OUTPUT);
-    
+
     digitalWrite(gPIN, LOW);
     digitalWrite(yPIN, LOW);
     digitalWrite(rPIN, LOW);
@@ -133,7 +166,7 @@ void setup() {
     Wire.begin(OLED_SDA, OLED_SCL);
     oled.begin();
     oled.clearBuffer();
-    
+
     oled.setFont(u8g2_font_unifont_t_vietnamese1);
     oled.drawUTF8(0, 14, "Team03");
     oled.sendBuffer();
@@ -149,7 +182,8 @@ void setup() {
     startMillis = millis();
 }
 
-void loop() {
+void loop()
+{
     Blynk.run();
     timer.run();
     controlTrafficLights();

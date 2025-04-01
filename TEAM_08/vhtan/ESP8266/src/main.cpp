@@ -1,36 +1,117 @@
+#define BLYNK_TEMPLATE_ID "TMPL6ZLCad5kE"
+#define BLYNK_TEMPLATE_NAME "ESP8266"
+#define BLYNK_AUTH_TOKEN "XVy7pNOV6Mh-Qv1Pz9y9FxqR2Tt1-phq"
+
 #include <Arduino.h>
 #include "utils.h"
-
 #include <Adafruit_Sensor.h>
-#include <DHT.h>
 
+#include <ESP8266WiFi.h>
+char ssid[] = "CNTT-MMT";    
+char pass[] = "13572468"; 
+#include <BlynkSimpleEsp8266.h>
+
+#include <DHT.h>
 #include <Wire.h>
 #include <U8g2lib.h>
-
 
 #define gPIN 15
 #define yPIN 2
 #define rPIN 5
 
-#define dhtPIN 16     // Digital pin connected to the DHT sensor
-#define dhtTYPE DHT11 // DHT 22 (AM2302)
+#define dhtPIN 16     
+#define dhtTYPE DHT11 
 
 #define OLED_SDA 13
 #define OLED_SCL 12
 
-// Khởi tạo OLED SH1106
+#include <cstdlib> // Thêm thư viện tạo số ngẫu nhiên
+
 U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+DHT dht(dhtPIN, dhtTYPE);
 
-DHT dht(D0, dhtTYPE);
+float fHumidity = 0.0;
+float fTemperature = 0.0;
+ulong startTime = 0; // Lưu thời gian ESP32 bắt đầu chạy
+bool yellowBlinkMode = false; // Chế độ đèn vàng nhấp nháy
+BlynkTimer timer;
 
 
-bool WelcomeDisplayTimeout(uint msSleep = 5000){
+BLYNK_WRITE(V3) {
+  yellowBlinkMode = param.asInt();  
+}
+
+void GenerateRandomTempHumidity() {
+  fTemperature = -40.0 + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (80.0 + 40.0)));
+  fHumidity = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 100.0));
+}
+
+String GetUptime() {
+  ulong elapsed = millis() / 1000; // Chuyển từ ms → giây
+  int hours = elapsed / 3600;
+  int minutes = (elapsed % 3600) / 60;
+  int seconds = elapsed % 60;
+  
+  char buffer[20];
+  sprintf(buffer, "Uptime: %02d:%02d:%02d", hours, minutes, seconds);
+  return String(buffer);
+}
+
+void SendDataToBlynk() {
+  Blynk.virtualWrite(V0, GetUptime());  
+  Blynk.virtualWrite(V1, fTemperature);
+  Blynk.virtualWrite(V2, fHumidity);
+}
+
+void TrafficLightControl() {
   static ulong lastTimer = 0;
-  static bool bDone = false;
-  if (bDone) return true;
-  if (!IsReady(lastTimer, msSleep)) return false;
-  bDone = true;    
-  return bDone;
+  static int state = 0;  
+  static const int ledPin[3] = {gPIN, yPIN, rPIN};
+  static const int durations[3] = {5000, 2000, 3000}; 
+
+  if (yellowBlinkMode) {
+    digitalWrite(gPIN, LOW);
+    digitalWrite(rPIN, LOW);
+    digitalWrite(yPIN, millis() % 1000 < 500 ? HIGH : LOW);
+    return;
+  }
+
+  if (!IsReady(lastTimer, durations[state])) return;
+
+  digitalWrite(gPIN, LOW);
+  digitalWrite(yPIN, LOW);
+  digitalWrite(rPIN, LOW);
+  digitalWrite(ledPin[state], HIGH); 
+
+  GenerateRandomTempHumidity();
+
+  String status;
+  int countdown = 0;
+  if (state == 0) { status = "Den xanh: "; countdown = 5; }
+  else if (state == 1) { status = "Den vang: "; countdown = 2; }
+  else { status = "Den do: "; countdown = 3; }
+
+  for (int i = countdown; i >= 1; i--) {
+    oled.clearBuffer();
+    oled.setFont(u8g2_font_6x10_tf);
+
+    String tempStr = StringFormat("Nhiet do: %.2f C", fTemperature);
+    oled.drawUTF8(0, 14, tempStr.c_str());
+
+    String humidStr = StringFormat("Do am: %.2f %%", fHumidity);
+    oled.drawUTF8(0, 28, humidStr.c_str());
+
+    String trafficStr = status + String(i) + "s";
+    oled.drawUTF8(0, 42, trafficStr.c_str());
+
+    String uptimeStr = GetUptime();
+    oled.drawUTF8(0, 56, uptimeStr.c_str());
+
+    oled.sendBuffer();
+    delay(1000);
+  }
+
+  state = (state + 1) % 3;
 }
 
 
@@ -39,104 +120,29 @@ void setup() {
   pinMode(gPIN, OUTPUT);
   pinMode(yPIN, OUTPUT);
   pinMode(rPIN, OUTPUT);
-  
+
   digitalWrite(gPIN, LOW);
   digitalWrite(yPIN, LOW);
   digitalWrite(rPIN, LOW);
 
   dht.begin();
-
-  Wire.begin(OLED_SDA, OLED_SCL);  // SDA, SCL
+  Wire.begin(OLED_SDA, OLED_SCL);
 
   oled.begin();
   oled.clearBuffer();
-  
-  oled.setFont(u8g2_font_5x8_tf);
+  oled.setFont(u8g2_font_6x10_tf);
   oled.drawUTF8(0, 14, "Van Huynh Tuong An");  
-  oled.drawUTF8(0, 28, "Khoa CNTT");
-  oled.drawUTF8(0, 42, "Truong DHKH Hue");  
-  oled.drawUTF8(0, 54, "Lap Trinh IOT" );
-
+  oled.drawUTF8(0, 28, "Huynh Van Nhan");
+  oled.drawUTF8(0, 42, "Nguyen Khanh Phuong");  
   oled.sendBuffer();
-}
 
-void ThreeLedBlink(){
-  static ulong lastTimer = 0;
-  static int currentLed = 0;  
-  static const int ledPin[3] = {gPIN, yPIN, rPIN};
-
-  if (!IsReady(lastTimer, 1000)) return;
-  int prevLed = (currentLed + 2) % 3;
-  digitalWrite(ledPin[prevLed], LOW);  
-  digitalWrite(ledPin[currentLed], HIGH);  
-  currentLed = (currentLed + 1) % 3;
-}
-
-float fHumidity = 0.0;
-float fTemperature = 0.0;
-
-void updateDHT(){
-  static ulong lastTimer = 0;  
-  if (!IsReady(lastTimer, 2000)) return;
-
-  float h = dht.readHumidity();
-  float t = dht.readTemperature(); // or dht.readTemperature(true) for Fahrenheit
-  if (isnan(h) || isnan(t)) {
-    Serial.println("Failed to read from DHT sensor!");
-    return;
-  }
-
-  bool bDraw = false;
-
-  if (fTemperature != t){
-    bDraw = true;
-    fTemperature = t;
-    Serial.print("Temperature: ");
-    Serial.print(t);
-    Serial.println(" *C");                    
-  }
-
-  if (fHumidity != h){
-    bDraw = true;
-    fHumidity = h;
-    Serial.print("Humidity: ");
-    Serial.print(h);
-    Serial.print(" %\t");  
-    
-  }
-  if (bDraw){
-    oled.clearBuffer();
-    oled.setFont(u8g2_font_unifont_t_vietnamese2);
-
-    String s = StringFormat("Nhiet do: %.2f °C", t);
-    oled.drawUTF8(0, 14, s.c_str());  
-    
-    s = StringFormat("Do am: %.2f %%", h);
-    oled.drawUTF8(0, 42, s.c_str());      
-
-    oled.sendBuffer();
-  } 
-  
-}
-
-void DrawCounter(){  
-  static uint counter = 0; // Biến đếm
-  static ulong lastTimer = 0;  
-  if (!IsReady(lastTimer, 2000)) return;
-
-  // Bắt đầu vẽ màn hình
-  oled.clearBuffer();  
-  oled.setFont(u8g2_font_logisoso32_tf); // Chọn font lớn để hiển thị số
-  oled.setCursor(30, 40); // Đặt vị trí chữ
-  oled.print(counter); // Hiển thị số đếm
-  oled.sendBuffer(); // Gửi dữ liệu lên màn hình
-
-  counter++; // Tăng giá trị đếm
-
+  startTime = millis(); // Bắt đầu tính thời gian hoạt động
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+  timer.setInterval(2000L, SendDataToBlynk);
 }
 
 void loop() {
-  if (!WelcomeDisplayTimeout()) return;
-  ThreeLedBlink();
-  updateDHT();
+  Blynk.run();
+  timer.run();
+  TrafficLightControl();
 }

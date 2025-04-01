@@ -7,13 +7,11 @@
 #include <Wire.h>
 #include <U8g2lib.h>
 
+#include <stdlib.h>
 
 #define gPIN 15
 #define yPIN 2
 #define rPIN 5
-
-#define dhtPIN 16     // Digital pin connected to the DHT sensor
-#define dhtTYPE DHT11 // DHT 22 (AM2302)
 
 #define OLED_SDA 13
 #define OLED_SCL 12
@@ -21,19 +19,8 @@
 // Khởi tạo OLED SH1106
 U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
-DHT dht(D0, dhtTYPE);
-
-
-bool WelcomeDisplayTimeout(uint msSleep = 5000){
-  static ulong lastTimer = 0;
-  static bool bDone = false;
-  if (bDone) return true;
-  if (!IsReady(lastTimer, msSleep)) return false;
-  bDone = true;    
-  return bDone;
-}
-
-
+bool welcomeDisplayed = false; // Biến kiểm tra đã hiển thị thông điệp chào mừng
+void DisplayMessage();
 void setup() {
   Serial.begin(115200);
   pinMode(gPIN, OUTPUT);
@@ -44,22 +31,20 @@ void setup() {
   digitalWrite(yPIN, LOW);
   digitalWrite(rPIN, LOW);
 
-  dht.begin();
-
   Wire.begin(OLED_SDA, OLED_SCL);  // SDA, SCL
 
   oled.begin();
-  oled.clearBuffer();
-  
-  oled.setFont(u8g2_font_unifont_t_vietnamese1);
-  oled.drawUTF8(0, 14, "Trường ĐHKH");  
-  oled.drawUTF8(0, 28, "Khoa CNTT");
-  oled.drawUTF8(0, 42, "Lập trình IoT");  
 
+  // Hiển thị thông điệp chào mừng 2 giây đầu
+  DisplayMessage();
+  delay(2000);
+  oled.clearBuffer();
   oled.sendBuffer();
+
+  welcomeDisplayed = true; // Đánh dấu là đã hiển thị xong thông điệp chào mừng
 }
 
-void ThreeLedBlink(){
+void ThreeLedBlink() {
   static ulong lastTimer = 0;
   static int currentLed = 0;  
   static const int ledPin[3] = {gPIN, yPIN, rPIN};
@@ -71,71 +56,41 @@ void ThreeLedBlink(){
   currentLed = (currentLed + 1) % 3;
 }
 
-float fHumidity = 0.0;
-float fTemperature = 0.0;
-
-void updateDHT(){
-  static ulong lastTimer = 0;  
-  if (!IsReady(lastTimer, 2000)) return;
-
-  float h = dht.readHumidity();
-  float t = dht.readTemperature(); // or dht.readTemperature(true) for Fahrenheit
-  if (isnan(h) || isnan(t)) {
-    Serial.println("Failed to read from DHT sensor!");
-    return;
-  }
-
-  bool bDraw = false;
-
-  if (fTemperature != t){
-    bDraw = true;
-    fTemperature = t;
-    Serial.print("Temperature: ");
-    Serial.print(t);
-    Serial.println(" *C");                    
-  }
-
-  if (fHumidity != h){
-    bDraw = true;
-    fHumidity = h;
-    Serial.print("Humidity: ");
-    Serial.print(h);
-    Serial.print(" %\t");  
-    
-  }
-  if (bDraw){
-    oled.clearBuffer();
-    oled.setFont(u8g2_font_unifont_t_vietnamese2);
-
-    String s = StringFormat("Nhiet do: %.2f °C", t);
-    oled.drawUTF8(0, 14, s.c_str());  
-    
-    s = StringFormat("Do am: %.2f %%", h);
-    oled.drawUTF8(0, 42, s.c_str());      
-
-    oled.sendBuffer();
-  } 
-  
+void DisplayMessage() {
+  oled.clearBuffer();
+  oled.setFont(u8g2_font_unifont_t_vietnamese1);
+  oled.drawUTF8(0, 14, "Từn En");  
+  oled.drawUTF8(0, 28, "khoa CNTT");
+  oled.drawUTF8(0, 42, "chơi Elsu");
+  oled.drawUTF8(0, 54, "bị lỏ");
+  oled.sendBuffer();
 }
 
-void DrawCounter(){  
-  static uint counter = 0; // Biến đếm
-  static ulong lastTimer = 0;  
-  if (!IsReady(lastTimer, 2000)) return;
-
-  // Bắt đầu vẽ màn hình
-  oled.clearBuffer();  
-  oled.setFont(u8g2_font_logisoso32_tf); // Chọn font lớn để hiển thị số
-  oled.setCursor(30, 40); // Đặt vị trí chữ
-  oled.print(counter); // Hiển thị số đếm
-  oled.sendBuffer(); // Gửi dữ liệu lên màn hình
-
-  counter++; // Tăng giá trị đếm
-
+void DisplayTemperatureHumidity() {
+  float t = random(200, 350) / 10.0; // Nhiệt độ ngẫu nhiên từ 20.0 đến 35.0
+  float h = random(400, 800) / 10.0; // Độ ẩm ngẫu nhiên từ 40.0 đến 80.0
+  ulong runtime = millis() / 1000; // Thời gian chạy tính bằng giây
+  
+  oled.clearBuffer();
+  oled.setFont(u8g2_font_6x10_tf);
+  
+  String s = StringFormat("Temperature: %.1f °C", t);
+  oled.drawUTF8(0, 14, s.c_str());  
+  
+  s = StringFormat("Humidity: %.1f %%", h);
+  oled.drawUTF8(0, 28, s.c_str());  
+  
+  s = StringFormat("Runtime: %lu s", runtime);
+  oled.drawUTF8(0, 42, s.c_str());      
+  
+  oled.sendBuffer();
 }
 
 void loop() {
-  if (!WelcomeDisplayTimeout()) return;
   ThreeLedBlink();
-  updateDHT();
+  
+  static ulong lastTimer = 0;
+  if (!IsReady(lastTimer, 1000)) return;
+  
+  DisplayTemperatureHumidity(); // Luôn hiển thị nhiệt độ & độ ẩm sau 2s đầu tiên
 }
