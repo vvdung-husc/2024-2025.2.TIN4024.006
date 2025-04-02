@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "blynk-library": "^1.2.0",
+    "ArduinoJson": "^6.21.3"
+  }
+} 
