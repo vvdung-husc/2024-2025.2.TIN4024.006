@@ -33,6 +33,13 @@
 // #define GROUP_ID "-4727500925" //là một số âm
 // #define BOTtoken "7737666732:AAEWTA5lRq3XV0xSTft8N9ky3-EoDatJ6Q4"
 
+// Đinh Xuân Thái
+#define BLYNK_TEMPLATE_ID "TMPL6hRWEoN0Z"
+#define BLYNK_TEMPLATE_NAME "ESP8266 Bot Telegram Weather Forecast"
+#define BLYNK_AUTH_TOKEN "HVY_wqFL-QHzeNKuwAfMrc78ZPQsHx_h"
+#define BOTtoken "7718248016:AAE-Nwueo9jFfkVVCn31ipqCh7XkVPGNj24"  // your Bot Token (Get from Botfather)
+#define GROUP_ID "-4733032207" //là một số âm
+
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>

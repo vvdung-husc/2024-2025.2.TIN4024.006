@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "author": "Văn Huỳnh Tường An",
+  "editor": "wokwi",
+  "parts": [ { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": -4.76, "attrs": {} } ],
+  "connections": [ [ "esp:TX", "$serialMonitor:RX", "", [] ], [ "esp:RX", "$serialMonitor:TX", "", [] ] ],
+  "dependencies": {}
+}
