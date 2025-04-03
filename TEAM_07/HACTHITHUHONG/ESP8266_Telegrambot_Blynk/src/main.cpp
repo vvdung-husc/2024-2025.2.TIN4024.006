@@ -29,6 +29,9 @@ char pass[] = "farming";
 const char* botToken ="7923044965:AAFozEkzt0C57xx38dBg5xk8mHtkQ7lR0x8";
 const char* chatID = "7850672731";
 
+// Dùng ChatGPT để nhờ hướng dẫn tìm giá trị GROUP_ID này
+#define GROUP_ID "-4720454162" //thường là một số âm
+
 WiFiClientSecure client;
 UniversalTelegramBot bot(botToken, client);
 
