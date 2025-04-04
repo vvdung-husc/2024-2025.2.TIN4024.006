@@ -13,6 +13,10 @@
 // #define BLYNK_TEMPLATE_NAME "ESP32 Blynkk Trafic Project"
 // #define BLYNK_AUTH_TOKEN "ebn0HBX3ebcrl2pp93LxiUyGev2x0q8g"
 
+//Dương Duy Quốc
+// #define BLYNK_TEMPLATE_ID "TMPL6CAb1i-FP"
+// #define BLYNK_TEMPLATE_NAME "Quoc"
+// #define BLYNK_AUTH_TOKEN "zAqkB_WAIkQhDwwl322ZBsh04YgWlXv"
 
 #include <Arduino.h>
 #include <TM1637Display.h>

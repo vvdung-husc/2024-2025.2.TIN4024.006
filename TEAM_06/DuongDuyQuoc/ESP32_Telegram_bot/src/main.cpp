@@ -17,8 +17,8 @@ const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
 
-#define BOTtoken "7776687012:AAHR-qESXTCQ8ALHUQX8kjHgcZqgyZtFWcU" 
-#define GROUP_ID "7196545948" 
+#define BOTtoken "8108680571:AAFHtHHaKovNDdEDxjO15XM-FkC8oLX9kQ0" 
+#define GROUP_ID "-4601094652" 
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);

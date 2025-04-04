@@ -1,5 +1,5 @@
-#define BLYNK_TEMPLATE_ID "TMPL6A2eXM-RM"
-#define BLYNK_TEMPLATE_NAME "ESP8266 Project Blynkk"
+#define BLYNK_TEMPLATE_ID "TMPL6CAb1i-FP"
+#define BLYNK_TEMPLATE_NAME "Quoc"
 #define BLYNK_AUTH_TOKEN "eBrb1KkrGT4HjuMxx0HqPBZrdfqyBpb1"
 
 #include <Arduino.h>
