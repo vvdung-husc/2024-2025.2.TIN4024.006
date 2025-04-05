@@ -25,7 +25,10 @@
 // #define BLYNK_TEMPLATE_NAME "Quoc"
 // #define BLYNK_AUTH_TOKEN "zAqkB_WAIkQhDwwl322ZBsh04YgWlXv"
 
-
+//Nguyễn Đức Huy
+// #define BLYNK_TEMPLATE_ID "TMPL6r3KCHcQS"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 TELEGRAM"
+// #define BLYNK_AUTH_TOKEN "h1H-2UILxsZ7oHUbu2fW2I47T-x_aHtv"
 
 #include <Arduino.h>   
 #include <ESP8266WiFi.h>
