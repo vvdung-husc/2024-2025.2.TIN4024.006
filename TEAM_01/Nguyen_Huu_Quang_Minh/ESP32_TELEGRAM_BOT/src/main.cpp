@@ -16,7 +16,7 @@ char ssid[] = "Wokwi-GUEST";  //Tên mạng WiFi
 char pass[] = "";             //Mật khẩu mạng WiFi
 
 // Khai báo Bot Telegram
-#define BOTtoken "8066719718:AAE9Pi7EVp4hRwUz7bW7_tmsmuQTq84iD6M"  // Thay thế thành Bot token của bạn
+#define BOTtoken "7607079001:AAG23OpAZ7kzGwiCaCMio1P_IB04LJ62eR8"  // Thay thế thành Bot token của bạn
 #define CHAT_ID "-4657079728"  //Thay thế thành ID người dùng của bạn
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);

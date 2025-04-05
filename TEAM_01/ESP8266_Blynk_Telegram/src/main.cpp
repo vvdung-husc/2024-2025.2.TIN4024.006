@@ -14,6 +14,16 @@
 // #define BLYNK_TEMPLATE_NAME "ESP8266 PROJECT"
 // #define BLYNK_AUTH_TOKEN "IxtbuqIjlNRk9XCPWHvG3-tFmFa38jKy"
 
+// Nguyễn Hữu Quang Minh
+// #define BLYNK_TEMPLATE_ID "TMPL6wIZoVPPK"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
+// #define BLYNK_AUTH_TOKEN "QckUyxNa3JJG-2WG3GpJrj68VJ1ThbQX"
+
+// Đỗ Thị Thu Hiền
+// #define BLYNK_TEMPLATE_ID "TMPL6Xgn0_aXT"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
+// #define BLYNK_AUTH_TOKEN "jO4zwZxp_jDuIgKz9ZJmskhEhGjR07AC"
+
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
@@ -26,6 +36,14 @@ char pass[] = "13572468";
 #define CHAT_ID "-4657079728"                                      // Thay bằng Chat ID của bạn
 // Telegram Bot Ngô Nguyễn Đức Quý
 // #define BOTtoken "7226596485:AAF4YaLRF30HTPW58ZL9p3TCJipO8lIrptQ"
+// #define GROUP_ID "-4755643301"
+
+// Telegram Bot Nguyễn Hữu Quang Minh
+// #define BOTtoken "7607079001:AAG23OpAZ7kzGwiCaCMio1P_IB04LJ62eR8"
+// #define GROUP_ID "-4755643301"
+
+// Telegram Bot Đỗ Thị Thu Hiền
+// #define BOTtoken "7838793193:AAESBDO75Zpui_cdJcdWUk5jDLfn_Q1kkFw"
 // #define GROUP_ID "-4755643301"
 
 WiFiClientSecure client;
