@@ -23,6 +23,10 @@
 // #define BLYNK_TEMPLATE_NAME "Quoc"
 // #define BLYNK_AUTH_TOKEN "zAqkB_WAIkQhDwwl322ZBsh04YgWlXv"
 
+//Nguyễn Đức Huy
+// #define BLYNK_TEMPLATE_ID "TMPL6fIB6n4b0"
+// #define BLYNK_TEMPLATE_NAME "ESP32 LED TM1637"
+// #define BLYNK_AUTH_TOKEN "F9oNxXoCagAzq5PwUXu4eRoKpaqo-Jd_"
 #include <Arduino.h>
 #include <TM1637Display.h>
 #include <DHT.h>
