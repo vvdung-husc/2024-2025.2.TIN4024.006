@@ -4,6 +4,12 @@
 #define BLYNK_TEMPLATE_NAME "esp8266 blynk telegram"
 #define BLYNK_AUTH_TOKEN "Ex622jIU2X7ixiJfYpOtA6tvmYhYijv4"
 
+//Nguyễn Ngọc Tiến Đạt
+// #define BLYNK_TEMPLATE_ID "TMPL6IUsklK2w"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Project Blynk Telegram"
+// #define BLYNK_AUTH_TOKEN "2PxzaHtrIk7sCPT8FV4fanSC8CofObeR"
+
+
 // //Nguyễn Văn Tuấn Hải
 // #define BLYNK_TEMPLATE_ID "TMPL66BocAkvr"
 // #define BLYNK_TEMPLATE_NAME "ESP8266 Blynk Tele"
@@ -18,6 +24,8 @@
 // #define BLYNK_TEMPLATE_ID "TMPL6CAb1i-FP"
 // #define BLYNK_TEMPLATE_NAME "Quoc"
 // #define BLYNK_AUTH_TOKEN "zAqkB_WAIkQhDwwl322ZBsh04YgWlXv"
+
+
 
 #include <Arduino.h>   
 #include <ESP8266WiFi.h>
@@ -60,6 +68,10 @@ BLYNK_WRITE(V1) {
 //Trần Hải Đông
 #define BOTtoken "7905069023:AAEL-dgmljUYwG3Hihu73O7bNPoUtfnMPC4"
 #define USER_ID "7196545948" 
+
+//Nguyễn Ngọc Tiến Đạt
+// #define BOTtoken "7996806265:AAHeTN2z6k0muLRw4X99sSDFv579rlnBcoU"
+// #define GROUP_ID "-4604565399"
 
 //Nguyễn Văn Tuấn Hải
 // #define BOTtoken "7845979937:AAFVcEGgh9baF0sUOusSQXxO-21x6F-OfCE"

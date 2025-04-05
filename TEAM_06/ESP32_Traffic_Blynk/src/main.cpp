@@ -3,6 +3,11 @@
 #define BLYNK_TEMPLATE_NAME "Esp32 Traffic Blynk"
 #define BLYNK_AUTH_TOKEN "BNZyTNA92WBaNZyI9n1QyMGJcRb1ePa9"
 
+//Nguyễn Ngọc Tiến Đạt 
+// #define BLYNK_TEMPLATE_ID "TMPL6XNQjnMi7"
+// #define BLYNK_TEMPLATE_NAME "ESP32 Traffic Blynk"
+// #define BLYNK_AUTH_TOKEN "fGAPwkB0Z0aDFQAtwxpD4NceGa8jek0F"
+
 // Huỳnh Ngọc Vĩnh Khang
 //#define BLYNK_TEMPLATE_ID "TMPL6O0lyhqIF"
 //#define BLYNK_TEMPLATE_NAME "ESP32 LED TM1637" 
