@@ -77,7 +77,7 @@ void loop() {
         Blynk.virtualWrite(V5, 1);
         Blynk.virtualWrite(V4, 0);
         Blynk.virtualWrite(V3, 0);
-        Blynk.virtualWrite(V2, "NGUY HIỂM");
+        Blynk.virtualWrite(V2, "!!! NGUY HIỂM !!!] Có nguy cơ cháy nổ hoặc ảnh hưởng đến sức khỏe!");
     } else if (gasValue > 200) {
         Serial.println("[CẢNH BÁO NHẸ] Cần thông gió hoặc kiểm tra rò rỉ khí gas.");
         digitalWrite(GREEN_LED_PIN, LOW);
@@ -87,7 +87,7 @@ void loop() {
         Blynk.virtualWrite(V5, 0);
         Blynk.virtualWrite(V4, 1);
         Blynk.virtualWrite(V3, 0);
-        Blynk.virtualWrite(V2, "CẢNH BÁO NHẸ");
+        Blynk.virtualWrite(V2, "[CẢNH BÁO NHẸ] Cần thông gió hoặc kiểm tra rò rỉ khí gas.");
     } else {
         Serial.println("[AN TOÀN] Mức khí gas bình thường.");
         digitalWrite(GREEN_LED_PIN, HIGH);
@@ -97,7 +97,7 @@ void loop() {
         Blynk.virtualWrite(V5, 0);
         Blynk.virtualWrite(V4, 0);
         Blynk.virtualWrite(V3, 1);
-        Blynk.virtualWrite(V2, "AN TOÀN");
+        Blynk.virtualWrite(V2, "[AN TOÀN] Mức khí gas bình thường.");
     }
     
     delay(1000);
