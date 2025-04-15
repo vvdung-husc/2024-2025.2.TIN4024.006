@@ -1,24 +1,44 @@
 
 // TranTienLoi
-// #define BLYNK_TEMPLATE_ID "TMPL6vXA5Snzn"
-// #define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegramBot"
-// #define BLYNK_AUTH_TOKEN "qfHsznuSeuWwgo-5A1vjYFPn6i4G9TY5"
-// #define BOTtoken "7050497129:AAH8bGHRryP8KwG-XOPQhjuT__mNPA4Qgfc"
-// #define GROUP_ID "-4753410384"
+#define BLYNK_TEMPLATE_ID "TMPL6vXA5Snzn"
+#define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegramBot"
+#define BLYNK_AUTH_TOKEN "qfHsznuSeuWwgo-5A1vjYFPn6i4G9TY5"
+#define BOTtoken "7050497129:AAH8bGHRryP8KwG-XOPQhjuT__mNPA4Qgfc"
+#define GROUP_ID "-4753410384"
 
 // Phạm Thành Thể
-#define BLYNK_TEMPLATE_ID "TMPL6JkACj44f"
-#define BLYNK_TEMPLATE_NAME "ESP8266 BT03"
-#define BLYNK_AUTH_TOKEN "oqA40ltN1MW7S6DJXc1BFB9ravk7tO2E"
-#define BOTtoken "7203343009:AAG6JTPn1tE0ut5cYd4IPtjZz2H_L5-Mnks"
-#define GROUP_ID "-4726185158"
+// #define BLYNK_TEMPLATE_ID "TMPL6JkACj44f"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 BT03"
+// #define BLYNK_AUTH_TOKEN "oqA40ltN1MW7S6DJXc1BFB9ravk7tO2E"
+// #define BOTtoken "7203343009:AAG6JTPn1tE0ut5cYd4IPtjZz2H_L5-Mnks"
+// #define GROUP_ID "-4726185158"
 
-//NguyenCongPhuocThinh
+// NguyenCongPhuocThinh
 // #define BLYNK_TEMPLATE_ID "TMPL6mGLqQSog"
 // #define BLYNK_TEMPLATE_NAME "ESP8266BlynkTele"
 // #define BLYNK_AUTH_TOKEN "iUO05-ezlVSuyMaYWgDEX2ZgQpAGOEwM"
 // #define GROUP_ID "-4685427385"
 // #define BOTtoken "7067444109:AAE-FOFegKVkl04H0Hz1fOF4cZVQ942iXkY"
+// DangThiLai
+// #define BLYNK_TEMPLATE_ID "TMPL60KlMoShG"
+// #define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegram"
+// #define BLYNK_AUTH_TOKEN "Ydw6h7TSq3Re-PLE2-joUww9WNISTO2q"
+// #define GROUP_ID "-4770458147" //là một số âm
+// #define BOTtoken "7899046540:AAF2zHGzZBf_NpbNIdP_gQwSkS9PL4rv2Uk"
+
+// Lê Thị HUỳnh Trang
+// #define BLYNK_TEMPLATE_ID "TMPL6AYM-_1_k"
+// #define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegram"
+// #define BLYNK_AUTH_TOKEN "e2R0ZGVFTrBhDiGerFAdLheZHBq8XIxh"
+// #define GROUP_ID "-4727500925" //là một số âm
+// #define BOTtoken "7737666732:AAEWTA5lRq3XV0xSTft8N9ky3-EoDatJ6Q4"
+
+// Đinh Xuân Thái
+#define BLYNK_TEMPLATE_ID "TMPL6hRWEoN0Z"
+#define BLYNK_TEMPLATE_NAME "ESP8266 Bot Telegram Weather Forecast"
+#define BLYNK_AUTH_TOKEN "HVY_wqFL-QHzeNKuwAfMrc78ZPQsHx_h"
+#define BOTtoken "7718248016:AAE-Nwueo9jFfkVVCn31ipqCh7XkVPGNj24"  // your Bot Token (Get from Botfather)
+#define GROUP_ID "-4733032207" //là một số âm
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
@@ -72,7 +92,7 @@ void TrafficLightControl()
 {
   static unsigned long lastTimer = 0;
   static int state = 0;
-  static const unsigned long durations[] = {2000, 3000, 1000};
+  static const unsigned long durations[] = {5000, 5000, 3000};
   static const int ledPins[] = {LED_RED, LED_GREEN, LED_YELLOW};
 
   if (!trafficEnabled)
@@ -85,16 +105,27 @@ void TrafficLightControl()
 
   if (yellowBlinkMode)
   {
-    if (millis() - lastTimer > 500)
+    static unsigned long yellowStartTime = 0;
+    static bool isYellowOn = false;
+
+    if (!isYellowOn) // Nếu đèn chưa sáng, bật lên và lưu thời gian
     {
-      lastTimer = millis();
-      digitalWrite(LED_YELLOW, !digitalRead(LED_YELLOW));
+      digitalWrite(LED_YELLOW, HIGH);
+      yellowStartTime = millis();
+      isYellowOn = true;
     }
+
+    // Nếu đã sáng đủ 1 giây thì tắt
+    if (isYellowOn && millis() - yellowStartTime >= 1000)
+    {
+      digitalWrite(LED_YELLOW, LOW);
+      isYellowOn = false; // Reset lại trạng thái
+    }
+
     digitalWrite(LED_RED, LOW);
     digitalWrite(LED_GREEN, LOW);
     return;
   }
-
   if (millis() - lastTimer > durations[state])
   {
     lastTimer = millis();
@@ -128,7 +159,7 @@ void sendBlynkData()
 void sendTelegramAlert()
 {
   static unsigned long lastTimer = 0;
-  if (millis() - lastTimer < 60000)
+  if (millis() - lastTimer < 300000)
     return;
   lastTimer = millis();
 
@@ -215,5 +246,5 @@ void loop()
   handleTelegramCommands();
   runTime++;
   updateOLED();
-  delay(1000);
+  // delay(1000);
 }

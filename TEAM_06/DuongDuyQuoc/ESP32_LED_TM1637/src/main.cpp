@@ -4,8 +4,8 @@
 #include <DHT.h>  // Thêm thư viện DHT
 
 // Blynk Auth Token, WiFi credentials
-#define BLYNK_TEMPLATE_ID "TMPL6fIB6n4b0"
-#define BLYNK_TEMPLATE_NAME "ESP32 LED TM1637"
+#define BLYNK_TEMPLATE_ID "TMPL6CAb1i-FP"
+#define BLYNK_TEMPLATE_NAME "Quoc"
 #define BLYNK_AUTH_TOKEN "F9oNxXoCagAzq5PwUXu4eRoKpaqo-Jd_"
 // Phải để trước khai báo sử dụng thư viện Blynk
 

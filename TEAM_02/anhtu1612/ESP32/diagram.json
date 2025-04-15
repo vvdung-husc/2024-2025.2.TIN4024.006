@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "author": "Tú Nguyễn Hoàng Anh",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 110.44, "attrs": {} },
+    {
+      "type": "board-ssd1306",
+      "id": "oled1",
+      "top": -102.46,
+      "left": 105.83,
+      "attrs": { "i2cAddress": "0x3c" }
+    },
+    {
+      "type": "wokwi-pir-motion-sensor",
+      "id": "pir1",
+      "top": -101.6,
+      "left": -74.58,
+      "attrs": {}
+    },
+    { "type": "wokwi-pir-motion-sensor", "id": "pir2", "top": 138.4, "left": -74.58, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:GND.1", "pir2:GND", "black", [ "h-19.05", "v76.8" ] ],
+    [ "pir1:GND", "esp:GND.2", "black", [ "h114.94", "v38.4" ] ],
+    [ "pir1:VCC", "esp:3V3", "red", [ "v0" ] ],
+    [ "pir2:VCC", "esp:3V3", "red", [ "v19.2", "h144", "v-220.8" ] ],
+    [ "pir1:OUT", "esp:14", "green", [ "v28.8", "h124.66", "v115.2" ] ],
+    [ "pir2:OUT", "esp:27", "green", [ "v9.6", "h115.06", "v-115.2" ] ],
+    [ "oled1:VCC", "esp:3V3", "red", [ "v-9.6", "h-57.45", "v124.8", "h19.05" ] ],
+    [ "oled1:GND", "esp:GND.3", "black", [ "v-9.6", "h76.8", "v192" ] ],
+    [ "oled1:SCL", "esp:22", "green", [ "v-9.6", "h67.5", "v153.6" ] ],
+    [ "oled1:SDA", "esp:23", "green", [ "v-9.6", "h67.27", "v144" ] ]
+  ],
+  "dependencies": {}
+}
