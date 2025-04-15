@@ -2,8 +2,8 @@
 #include <TM1637Display.h>
 
 /* Fill in information from Blynk Device Info here */
-#define BLYNK_TEMPLATE_ID "TMPL6dLHltid6"
-#define BLYNK_TEMPLATE_NAME "ESP32 BLYNK LED"
+#define BLYNK_TEMPLATE_ID "TMPL6CAb1i-FP"
+#define BLYNK_TEMPLATE_NAME "Quoc"
 #define BLYNK_AUTH_TOKEN "Wqk5DtpCwavpJF87iBQi_ifMNyXIoXC7"
 // Phải để trước khai báo sử dụng thư viện Blynk
 
