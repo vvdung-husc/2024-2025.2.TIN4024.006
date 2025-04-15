@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "author": "Anh Lê Đức Duy",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-gas-sensor", "id": "gas1", "top": -45.3, "left": -185, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": 125.1, "left": 167.4, "attrs": {} },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": -36,
+      "left": 155.4,
+      "attrs": { "volume": "0.1" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": -39.6,
+      "left": 97.4,
+      "attrs": { "color": "red", "flip": "1" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "gas1:VCC", "esp:3V3", "red", [ "h19.2", "v27.9" ] ],
+    [ "gas1:GND", "esp:GND.1", "black", [ "h28.8", "v162.4" ] ],
+    [ "gas1:AOUT", "esp:34", "green", [ "h9.6", "v96" ] ],
+    [ "dht1:VCC", "esp:3V3", "red", [ "v19.2", "h-211.2", "v-67.2", "h19.2", "v-163.2" ] ],
+    [ "dht1:GND", "esp:GND.3", "black", [ "v28.8", "h-76.8", "v-182.4" ] ],
+    [ "dht1:SDA", "esp:21", "green", [ "v9.6", "h-38.3", "v-172.8" ] ],
+    [ "bz1:1", "esp:GND.2", "green", [ "h-38.4", "v-19.2" ] ],
+    [ "bz1:2", "esp:18", "green", [ "v0" ] ],
+    [ "led1:C", "esp:GND.2", "black", [ "v0" ] ],
+    [ "led1:A", "esp:22", "red", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}

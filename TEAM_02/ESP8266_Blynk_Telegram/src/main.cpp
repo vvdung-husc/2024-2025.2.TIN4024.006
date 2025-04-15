@@ -1,11 +1,23 @@
 // Hoàng Hữu Hội
-#define BLYNK_TEMPLATE_ID "TMPL6_v5ZkGLx"
-#define BLYNK_TEMPLATE_NAME "BaiTapNhom3"
-#define BLYNK_AUTH_TOKEN "aZaQRvmSEcYj7OQ_MLVMfpJw2CVrXFXD"
+// #define BLYNK_TEMPLATE_ID "TMPL6_v5ZkGLx"
+// #define BLYNK_TEMPLATE_NAME "BaiTapNhom3"
+// #define BLYNK_AUTH_TOKEN "aZaQRvmSEcYj7OQ_MLVMfpJw2CVrXFXD"
+//Lê Đình Trung
+// #define BLYNK_TEMPLATE_ID "TMPL6aAxLlxjB"
+// #define BLYNK_TEMPLATE_NAME "ESP8266BlynkTelegrambot"
+// #define BLYNK_AUTH_TOKEN "aCXRFPvWlwdESAlkBvOHBwJ7-x3LN1sT"
 // Đặng Trọng Trí Tuệ
 // #define BLYNK_TEMPLATE_ID "TMPL6wt_mGzLq"
 // #define BLYNK_TEMPLATE_NAME "BaiTapNhom3"
 // #define BLYNK_AUTH_TOKEN "xNgTnMqAzz4-VYipg4ZZ3eB-PHcvnmEg"
+// Lê Đức Duy Anh
+// #define BLYNK_TEMPLATE_ID "TMPL6T44Uqo5P"
+// #define BLYNK_TEMPLATE_NAME "BaiTapNhom3"
+// #define BLYNK_AUTH_TOKEN "-E1eTMRpGxeqTDp4jy4wkALmI7hagTMF"
+// Nguyễn Hoàng Anh Tú
+#define BLYNK_TEMPLATE_ID "TMPL66Vvyofjj"
+#define BLYNK_TEMPLATE_NAME "BaiTapNhom3"
+#define BLYNK_AUTH_TOKEN "nTKk5RlwVtfhP55pu19jLGSC-y-bi0Rg"
 
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
@@ -18,13 +30,21 @@
 #define WIFI_SSID "CNTT-MMT"
 #define WIFI_PASS "13572468"
 
-// Cấu hình Telegram Bot
-#define BOT_TOKEN "7882389525:AAHSlKS59-U7bb2y0Ea4FWQlwW2tqtvuhOw"
-#define CHAT_ID "-4728373238"
-// Đặng Trọng Trí Tuệ
-#define BOTtoken "7860410039:AAEfVfs5V3GmFYfbNFeUkQF7H4EuMCxKM6g"
-#define GROUP_ID "-4753535169" // là một số âm
 
+// Cấu hình Telegram Bot
+// #define BOTtoken "7882389525:AAHSlKS59-U7bb2y0Ea4FWQlwW2tqtvuhOw"
+#define CHAT_ID "-4728373238"
+//Lê Đình Trung
+// #define BOTtoken "7757452277:AAEg_Zevqwn-fzKRqxpESJwAYmXkJUuU8UQ"
+// #define CHAT_ID "-4673960554"
+// Đặng Trọng Trí Tuệ
+// #define BOTtoken "7860410039:AAEfVfs5V3GmFYfbNFeUkQF7H4EuMCxKM6g"
+// #define GROUP_ID "-4753535169"
+// Lê Đức Duy Anh
+// #define BOTtoken "7953104144:AAES14DfJQDNXIIf3WOckh2b64tN41GMnFM"
+// #define GROUP_ID "-1002672539893"
+// Nguyễn Hoàng Anh Tú
+#define BOTtoken "7746876071:AAFRmWn2MtZmcUZmYe5ZxodREJmBkkLqBys"
 // Định nghĩa chân kết nối
 #define gPIN 15 // Đèn LED Xanh
 #define yPIN 2  // Đèn LED Vàng
@@ -44,7 +64,7 @@ String checkHumidityThreshold(float humidity);
 U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, /* clock=*/12, /* data=*/13, /* reset=*/U8X8_PIN_NONE);
 
 WiFiClientSecure secured_client;
-UniversalTelegramBot bot(BOT_TOKEN, secured_client);
+UniversalTelegramBot bot(BOTtoken, secured_client);
 
 // Biến điều khiển
 bool trafficLightEnabled = true;

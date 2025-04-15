@@ -8,11 +8,21 @@
 // Lê Hữu Nhật
 #define BLYNK_TEMPLATE_ID "TMPL6c_LsX9l3"
 #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
-#define BLYNK_AUTH_TOKEN "vBJLhwxTiSgPItQ2raIlgudebqwHd2I2"
+#define BLYNK_AUTH_TOKEN "eKkBH4HHG764y6xkI2FQPjVB7qbryD8e"
 // Ngô Nguyễn Đức Quý
 // #define BLYNK_TEMPLATE_ID "TMPL6mnBiUYvY"
 // #define BLYNK_TEMPLATE_NAME "ESP8266 PROJECT"
 // #define BLYNK_AUTH_TOKEN "IxtbuqIjlNRk9XCPWHvG3-tFmFa38jKy"
+
+// Nguyễn Hữu Quang Minh
+// #define BLYNK_TEMPLATE_ID "TMPL6wIZoVPPK"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
+// #define BLYNK_AUTH_TOKEN "QckUyxNa3JJG-2WG3GpJrj68VJ1ThbQX"
+
+// Đỗ Thị Thu Hiền
+// #define BLYNK_TEMPLATE_ID "TMPL6Xgn0_aXT"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
+// #define BLYNK_AUTH_TOKEN "jO4zwZxp_jDuIgKz9ZJmskhEhGjR07AC"
 
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
@@ -28,12 +38,21 @@ char pass[] = "13572468";
 // #define BOTtoken "7226596485:AAF4YaLRF30HTPW58ZL9p3TCJipO8lIrptQ"
 // #define GROUP_ID "-4755643301"
 
+// Telegram Bot Nguyễn Hữu Quang Minh
+// #define BOTtoken "7607079001:AAG23OpAZ7kzGwiCaCMio1P_IB04LJ62eR8"
+// #define GROUP_ID "-4755643301"
+
+// Telegram Bot Đỗ Thị Thu Hiền
+// #define BOTtoken "7838793193:AAESBDO75Zpui_cdJcdWUk5jDLfn_Q1kkFw"
+// #define GROUP_ID "-4755643301"
+
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOT_TOKEN, client);
 
 #define gPIN 15 // Đèn xanh
 #define yPIN 2  // Đèn vàng
 #define rPIN 5  // Đèn đỏ
+
 #define OLED_SDA 13
 #define OLED_SCL 12
 
@@ -51,9 +70,10 @@ const int durations[3] = {5000, 7000, 2000}; // Xanh 5s, Vàng 7s, Đỏ 2s
 float temperature = 0.0;
 float humidity = 0.0;
 
+
 bool WelcomeDisplayTimeout(uint msSleep = 5000)
 {
-  static unsigned long lastTimer = 0;
+  static ulong lastTimer = 0;
   static bool bDone = false;
   if (bDone)
     return true;
@@ -71,6 +91,7 @@ void setup()
   pinMode(gPIN, OUTPUT);
   pinMode(yPIN, OUTPUT);
   pinMode(rPIN, OUTPUT);
+  
   digitalWrite(gPIN, LOW);
   digitalWrite(yPIN, LOW);
   digitalWrite(rPIN, LOW);
@@ -78,6 +99,7 @@ void setup()
   Wire.begin(OLED_SDA, OLED_SCL);
   oled.begin();
   oled.clearBuffer();
+
   oled.setFont(u8g2_font_unifont_t_vietnamese1);
   oled.drawUTF8(0, 14, "Trường ĐHKH");
   oled.drawUTF8(0, 28, "Khoa CNTT");
@@ -87,12 +109,7 @@ void setup()
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, pass);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\nWiFi connected");
+
 
   client.setInsecure();
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
@@ -125,6 +142,7 @@ void yellowBlink()
 {
   static unsigned long lastTimer = 0;
   static bool state = false;
+
   if (!yellowBlinkMode)
     return;
   if (!IsReady(lastTimer, 2000))
@@ -255,7 +273,7 @@ void updateOLED()
   int hours = uptime / 3600;
   int minutes = (uptime % 3600) / 60;
   int seconds = uptime % 60;
-  String uptimeStr = StringFormat("Thời gian: %dh %02dm %02ds", hours, minutes, seconds);
+  String uptimeStr = StringFormat("Time: %dh %02dm %02ds", hours, minutes, seconds);
 
   oled.drawUTF8(0, 14, tempStr.c_str());
   oled.drawUTF8(0, 28, humStr.c_str());
@@ -269,12 +287,12 @@ void updateOLED()
       remainingTime = 0;
 
     String ledStr;
-    if (ledPin[currentLedIndex] == gPIN)
-      ledStr = "Xanh";
-    else if (ledPin[currentLedIndex] == yPIN)
-      ledStr = "Vàng";
-    else
-      ledStr = "Đỏ";
+    if (ledPin[currentLedIndex] == gPIN)      // gPIN = 15
+      ledStr = "Đỏ";                        // Đèn đỏ
+    else if (ledPin[currentLedIndex] == yPIN) // yPIN = 2
+      ledStr = "Xanh";                        // Đèn Xanh
+    else if (ledPin[currentLedIndex] == rPIN) // rPIN = 5
+      ledStr = "Vàng";                        // Đèn Vàng
 
     String countdownStr = StringFormat("%s: %ds", ledStr.c_str(), remainingTime);
     oled.drawUTF8(0, 56, countdownStr.c_str());
@@ -304,13 +322,13 @@ BLYNK_WRITE(V3)
 void loop()
 {
   Blynk.run();
-  if (!WelcomeDisplayTimeout())
-    return;
-  ThreeLedBlink();
-  yellowBlink();
-  updateRandomDHT();
-  updateOLED(); // Cập nhật OLED mỗi giây
-  updateUptime();
-  checkHealthConditions();
-  handleTelegramMessages();
+  if (!WelcomeDisplayTimeout()) return;
+  
+    ThreeLedBlink();
+    yellowBlink();
+    updateRandomDHT();
+    updateOLED(); // Cập nhật OLED mỗi giây
+    updateUptime();
+    checkHealthConditions();
+    handleTelegramMessages();
 }
