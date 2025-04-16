@@ -14,6 +14,16 @@
 // #define BLYNK_TEMPLATE_NAME "ESP8266 PROJECT"
 // #define BLYNK_AUTH_TOKEN "IxtbuqIjlNRk9XCPWHvG3-tFmFa38jKy"
 
+// Nguyễn Hữu Quang Minh
+// #define BLYNK_TEMPLATE_ID "TMPL6wIZoVPPK"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
+// #define BLYNK_AUTH_TOKEN "QckUyxNa3JJG-2WG3GpJrj68VJ1ThbQX"
+
+// Đỗ Thị Thu Hiền
+// #define BLYNK_TEMPLATE_ID "TMPL6Xgn0_aXT"
+// #define BLYNK_TEMPLATE_NAME "ESP8266 Project"
+// #define BLYNK_AUTH_TOKEN "jO4zwZxp_jDuIgKz9ZJmskhEhGjR07AC"
+
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
@@ -26,6 +36,14 @@ char pass[] = "13572468";
 #define CHAT_ID "-4657079728"                                      // Thay bằng Chat ID của bạn
 // Telegram Bot Ngô Nguyễn Đức Quý
 // #define BOTtoken "7226596485:AAF4YaLRF30HTPW58ZL9p3TCJipO8lIrptQ"
+// #define GROUP_ID "-4755643301"
+
+// Telegram Bot Nguyễn Hữu Quang Minh
+// #define BOTtoken "7607079001:AAG23OpAZ7kzGwiCaCMio1P_IB04LJ62eR8"
+// #define GROUP_ID "-4755643301"
+
+// Telegram Bot Đỗ Thị Thu Hiền
+// #define BOTtoken "7838793193:AAESBDO75Zpui_cdJcdWUk5jDLfn_Q1kkFw"
 // #define GROUP_ID "-4755643301"
 
 WiFiClientSecure client;
@@ -55,11 +73,11 @@ float humidity = 0.0;
 
 bool WelcomeDisplayTimeout(uint msSleep = 5000)
 {
-  static unsigned long lastTimer1 = 0;
+  static ulong lastTimer = 0;
   static bool bDone = false;
   if (bDone)
     return true;
-  if (!IsReady(lastTimer1, msSleep))
+  if (!IsReady(lastTimer, msSleep))
     return false;
   bDone = true;
   return bDone;
@@ -107,10 +125,10 @@ void setup()
 
 void ThreeLedBlink()
 {
-  static unsigned long lastTimer2 = 0;
+  static unsigned long lastTimer = 0;
   if (yellowBlinkMode || !trafficOn)
     return;
-  if (!IsReady(lastTimer2, durations[currentLedIndex]))
+  if (!IsReady(lastTimer, durations[currentLedIndex]))
     return;
 
   int prevLed = (currentLedIndex + 2) % 3;
@@ -122,12 +140,12 @@ void ThreeLedBlink()
 
 void yellowBlink()
 {
-  static unsigned long lastTimer3 = 0;
+  static unsigned long lastTimer = 0;
   static bool state = false;
 
   if (!yellowBlinkMode)
     return;
-  if (!IsReady(lastTimer3, 2000))
+  if (!IsReady(lastTimer, 2000))
     return;
 
   state = !state;
@@ -148,8 +166,8 @@ float generateRandomHumidity()
 
 void updateRandomDHT()
 {
-  static unsigned long lastTimer4 = 0;
-  if (!IsReady(lastTimer4, 5000))
+  static unsigned long lastTimer = 0;
+  if (!IsReady(lastTimer, 5000))
     return; // 5 giây = 5,000 ms
 
   temperature = generateRandomTemperature();
@@ -242,8 +260,8 @@ void handleTelegramMessages()
 
 void updateOLED()
 {
-  static unsigned long lastTimer5 = 0;
-  if (!IsReady(lastTimer5, 1000))
+  static unsigned long lastTimer = 0;
+  if (!IsReady(lastTimer, 1000))
     return; // Cập nhật OLED mỗi giây
 
   oled.clearBuffer();
@@ -284,8 +302,8 @@ void updateOLED()
 
 void updateUptime()
 {
-  static unsigned long lastTimer6 = 0;
-  if (!IsReady(lastTimer6, 1000))
+  static unsigned long lastTimer = 0;
+  if (!IsReady(lastTimer, 1000))
     return;
 
   unsigned long uptime = millis() / 1000;
