@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "author": "HAC THI THU HONG",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 4.7, "left": 4.6, "attrs": {} },
+    { "type": "board-ssd1306", "id": "oled1", "top": 29.54, "left": 147.83, "attrs": { "i2cAddress": "0x3c" } },
+    { "type": "wokwi-pushbutton", "id": "btn1", "top": 150.2, "left": 211.2, "attrs": { "color": "green", "bounce": "1" } },
+    { "type": "wokwi-pushbutton", "id": "btn2", "top": 204.72, "left": 212.29, "attrs": { "color": "green", "bounce": "1" } },
+    { "type": "wokwi-led", "id": "led1", "top": 6, "left": -44.2, "attrs": { "color": "red" } }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "oled1:GND", "esp:GND.1", "black", [ "v-33", "h-68.5", "v146" ] ],
+    [ "oled1:VCC", "esp:3V3", "red", [ "v-27", "h-71.95", "v148.67" ] ],
+    [ "oled1:SCL", "esp:D22", "green", [ "v-20.98", "h-71.21", "v27.31" ] ],
+    [ "oled1:SDA", "esp:D21", "green", [ "v-15.12", "h-75.84", "v42.02" ] ],
+    [ "btn1:1.l", "esp:GND.1", "black", [ "v0" ] ],
+    [ "btn1:2.l", "esp:D14", "green", [ "v0" ] ],
+    [ "btn2:1.l", "esp:GND.1", "black", [ "v0" ] ],
+    [ "btn2:2.l", "esp:D27", "green", [ "v0" ] ],
+    [ "led1:A", "esp:D15", "green", [ "v0" ] ],
+    [ "led1:C", "esp:GND.1", "black", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
